@@ -1,5 +1,10 @@
 {
   "name": "google-cloud-c",
   "version-string": "0.0.1",
-  "dependencies": []
+  "dependencies": [
+    "c89stringutils",
+    "cauthflow",
+    "parson",
+    "libcurl-simple-https"
+  ]
 }

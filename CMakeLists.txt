@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.3)
-project(google-cloud-c VERSION 0.0.1 LANGUAGES C)
+project(google_cloud_c VERSION 0.0.1 LANGUAGES C)
 
 set(CMAKE_C_STANDARD 90)
-cmake_policy(SET CMP0063 NEW)
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
@@ -21,7 +20,7 @@ set(msvc "$<COMPILE_LANG_AND_ID:C,CXX,MSVC>")
 target_compile_options(
         "${PROJECT_NAME}_compiler_flags"
         INTERFACE
-        "$<${gcc_like}:$<BUILD_INTERFACE:-Wall;-Wextra;-Wshadow;-Wformat=2;-Wunused;-pedantic>>"
+        "$<${gcc_like}:$<BUILD_INTERFACE:-Wall;-Wextra;-Wshadow;-Wformat=2;-Wunused;-Wno-declaration-after-statement;-Wno-c99-extensions;-Wno-overlength-strings;-pedantic>>"
         "$<${msvc}:$<BUILD_INTERFACE:-W3;-WX;-Zi;-permissive->>"
 )
 if (CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
@@ -35,11 +34,8 @@ configure_file(
         "${PROJECT_NAME}Config.h"
 )
 
+add_subdirectory("common")
 add_subdirectory("${PROJECT_NAME}")
-option(BUILD_CLI "Build curl_simple_https CLI" ON)
-if (BUILD_CLI)
-    add_subdirectory("${PROJECT_NAME}/google-cloud-c")
-endif (BUILD_CLI)
 
 include(GNUInstallDirs)
 

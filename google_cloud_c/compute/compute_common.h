@@ -1,8 +1,8 @@
 #ifndef PP_COMPUTE_COMMON_H
 #define PP_COMPUTE_COMMON_H
 
-#include <stdbool.h>
-#include "../gcloud_export.h"
+#include <acquire_stdbool.h>
+#include <google_cloud_c_export.h>
 
 struct GoogleCloudOperation {
     const char *id,
@@ -25,9 +25,9 @@ struct OptionalGoogleCloudOperation {
     struct GoogleCloudOperation googleCloudOperation;
 };
 
-extern GCLOUD_EXPORT const struct GoogleCloudOperation EMPTY_GOOGLE_CLOUD_OPERATION;
+extern GOOGLE_CLOUD_C_EXPORT const struct GoogleCloudOperation EMPTY_GOOGLE_CLOUD_OPERATION;
 
-extern GCLOUD_EXPORT struct OptionalGoogleCloudOperation google_cloud_operation_from_json(const JSON_Object *);
+extern GOOGLE_CLOUD_C_EXPORT struct OptionalGoogleCloudOperation google_cloud_operation_from_json(const JSON_Object *);
 
 /*
 #include <string>

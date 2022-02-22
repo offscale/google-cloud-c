@@ -5,8 +5,8 @@
 #include "../compute.h"
 #include "firewall.h"
 #include "network.h"
-#include "../gcloud_export.h"
-#include <stdbool.h>
+#include <google_cloud_c_export.h>
+#include <acquire_stdbool.h>
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
 #include <synchapi.h>
@@ -97,7 +97,7 @@ struct Instance {
     const char *fingerprint, *lastStartTimestamp, *kind;
 };
 
-extern GCLOUD_EXPORT const struct Instance EMPTY_INSTANCE;
+extern GOOGLE_CLOUD_C_EXPORT const struct Instance EMPTY_INSTANCE;
 
 struct OptionalInstance {
     bool set;
@@ -109,7 +109,7 @@ struct Instances {
     size_t size;
 };
 
-extern GCLOUD_EXPORT const struct Instances EMPTY_INSTANCES;
+extern GOOGLE_CLOUD_C_EXPORT const struct Instances EMPTY_INSTANCES;
 
 /* =============
  * | INSTANCES |
@@ -119,23 +119,23 @@ struct InstanceContext {
     const char *firewall_name, *network_name, *zone;
 };
 
-extern GCLOUD_EXPORT struct InstanceContext INSTANCE_CONTEXT;
+extern GOOGLE_CLOUD_C_EXPORT struct InstanceContext INSTANCE_CONTEXT;
 
-extern GCLOUD_EXPORT struct Instances instances_list();
+extern GOOGLE_CLOUD_C_EXPORT struct Instances instances_list();
 
 // struct Instance instance_create_all(const struct InstanceIncomplete *);
 
 // struct Instance instance_create_all(const struct CInstance *);
 
-extern GCLOUD_EXPORT bool instance_exists(const char *instance_name);
+extern GOOGLE_CLOUD_C_EXPORT bool instance_exists(const char *instance_name);
 
-extern GCLOUD_EXPORT struct OptionalInstance instance_insert(const struct InstanceIncomplete *, const char *);
+extern GOOGLE_CLOUD_C_EXPORT struct OptionalInstance instance_insert(const struct InstanceIncomplete *, const char *);
 
-extern GCLOUD_EXPORT struct OptionalInstance instance_get(const char *instance_name);
+extern GOOGLE_CLOUD_C_EXPORT struct OptionalInstance instance_get(const char *instance_name);
 
-extern GCLOUD_EXPORT struct OptionalInstance instance_from_json(const JSON_Object *);
+extern GOOGLE_CLOUD_C_EXPORT struct OptionalInstance instance_from_json(const JSON_Object *);
 
-extern GCLOUD_EXPORT struct OptionalInstance instance_incomplete_create_all(
+extern GOOGLE_CLOUD_C_EXPORT struct OptionalInstance instance_incomplete_create_all(
         const struct InstanceIncomplete *,
         const char *,
         const char *

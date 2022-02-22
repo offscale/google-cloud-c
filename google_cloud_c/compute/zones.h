@@ -1,11 +1,11 @@
 #ifndef PP_ZONES_H
 #define PP_ZONES_H
 
-#include <stdbool.h>
+#include <acquire_stdbool.h>
 #include <parson.h>
 
 #include "cloud_auth.h"
-#include "../gcloud_export.h"
+#include <google_cloud_c_export.h>
 
 struct Zone {
     const char *id;
@@ -30,6 +30,6 @@ struct Zones {
  * |   ZONES   |
  * ============= */
 
-extern GCLOUD_EXPORT struct Zones zone_list();
+extern GOOGLE_CLOUD_C_EXPORT struct Zones zone_list();
 
 #endif /* PP_ZONES_H */

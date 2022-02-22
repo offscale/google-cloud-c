@@ -2,13 +2,13 @@
 #define PP_COMPUTE_H
 
 #include <types_common.h>
-#include <stdbool.h>
+#include <acquire_stdbool.h>
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-#include "gcloud_export.h"
+#include <google_cloud_c_export.h>
 
 #include "compute/instance.h"
 
@@ -32,13 +32,13 @@ struct CInstance {
 };
 */
 
-extern GCLOUD_EXPORT struct StatusAndArrayCStrArray
+extern GOOGLE_CLOUD_C_EXPORT struct StatusAndArrayCStrArray
 compute(const struct configuration *, const char *, bool);
 
-extern GCLOUD_EXPORT struct StatusAndCstrAndCStr
+extern GOOGLE_CLOUD_C_EXPORT struct StatusAndCstrAndCStr
 create_fw_net_instance(const struct configuration *, const struct InstanceIncomplete *);
 
-extern GCLOUD_EXPORT struct StatusAndCstr
+extern GOOGLE_CLOUD_C_EXPORT struct StatusAndCstr
 get_instance_ip(const struct configuration *, const char *);
 
 #ifdef	__cplusplus
