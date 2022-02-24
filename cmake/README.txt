@@ -1,6 +1,6 @@
 google-cloud-c
 
-Very simple HTTPS interface built atop libcurl.
+Google Cloud Client library in C.
 
 ------------------------------------------------------------------------
 
