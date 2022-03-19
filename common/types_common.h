@@ -1,5 +1,5 @@
-#ifndef PP_TYPES_COMMON_H
-#define PP_TYPES_COMMON_H
+#ifndef GOOGLE_CLOUD_C_TYPES_COMMON_H
+#define GOOGLE_CLOUD_C_TYPES_COMMON_H
 
 #ifdef	__cplusplus
 #include <cstdlib>
@@ -105,4 +105,4 @@ extern GOOGLE_CLOUD_C_COMMON_EXPORT void cleanup_struct_configuration(struct con
 }
 #endif
 
-#endif /* PP_TYPES_COMMON_H */
+#endif /* !GOOGLE_CLOUD_C_TYPES_COMMON_H */

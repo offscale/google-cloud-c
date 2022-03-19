@@ -1,5 +1,5 @@
-#ifndef PP_CLOUD_AUTH_H
-#define PP_CLOUD_AUTH_H
+#ifndef GOOGLE_CLOUD_C_CLOUD_AUTH_H
+#define GOOGLE_CLOUD_C_CLOUD_AUTH_H
 
 #include <stdlib.h>
 #include <string.h>
@@ -13,7 +13,6 @@
 #else
 #define C89STRINGUTILS_IMPLEMENTATION
 #include <c89stringutils_string_extras.h>
-#undef C89STRINGUTILS_IMPLEMENTATION
 #endif
 
 #define DEBUG_SERVER_RESPONSE(name) fprintf(response.status_code == 200 ? stdout : stderr, \
@@ -45,4 +44,4 @@ extern GOOGLE_CLOUD_C_EXPORT struct ServerResponse gcloud_post(CURLU *, const ch
 extern GOOGLE_CLOUD_C_EXPORT struct ServerResponse gcloud_put(CURLU *, const char *, const char *, struct curl_slist *);
 extern GOOGLE_CLOUD_C_EXPORT struct ServerResponse gcloud_get(CURLU *, const char *, struct curl_slist *);
 
-#endif /* PP_CLOUD_AUTH_H */
+#endif /* !GOOGLE_CLOUD_C_CLOUD_AUTH_H */

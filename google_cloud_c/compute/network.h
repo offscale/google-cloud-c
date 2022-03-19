@@ -1,5 +1,5 @@
-#ifndef PP_NETWORK_H
-#define PP_NETWORK_H
+#ifndef GOOGLE_CLOUD_C_NETWORK_H
+#define GOOGLE_CLOUD_C_NETWORK_H
 
 #include <acquire_stdbool.h>
 #include <parson.h>
@@ -57,4 +57,4 @@ extern GOOGLE_CLOUD_C_EXPORT struct OptionalNetwork network_get(const char *netw
 
 extern GOOGLE_CLOUD_C_EXPORT struct OptionalNetwork network_create(const char *network_name);
 
-#endif /* PP_NETWORK_H */
+#endif /* !GOOGLE_CLOUD_C_NETWORK_H */

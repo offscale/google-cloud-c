@@ -1,5 +1,5 @@
-#ifndef PP_ZONES_H
-#define PP_ZONES_H
+#ifndef GOOGLE_CLOUD_C_ZONES_H
+#define GOOGLE_CLOUD_C_ZONES_H
 
 #include <acquire_stdbool.h>
 #include <parson.h>
@@ -32,4 +32,4 @@ struct Zones {
 
 extern GOOGLE_CLOUD_C_EXPORT struct Zones zone_list();
 
-#endif /* PP_ZONES_H */
+#endif /* !GOOGLE_CLOUD_C_ZONES_H */

@@ -116,3 +116,6 @@ struct StatusAndArrayCStrArray compute(const struct configuration *const config,
 
     return StatusAndArrayCStrArrayNull;
 }
+
+extern struct StatusAndCstr
+get_notification_configuration(const struct configuration *, const char *);

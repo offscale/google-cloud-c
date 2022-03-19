@@ -11,6 +11,8 @@ set(Header_Files
         "compute/instance.h"
         "compute/network.h"
         "compute/zones.h"
+
+        "storage/notification_configs.h"
 )
 
 source_group("Header Files" FILES "${Header_Files}")
@@ -23,6 +25,8 @@ set(Source_Files
         "compute/instance.c"
         "compute/network.c"
         "compute/zones.c"
+
+        "storage/notification_configs.c"
         )
 source_group("Source Files" FILES "${Source_Files}")
 

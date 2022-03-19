@@ -1,5 +1,5 @@
-#ifndef PP_COMPUTE_H
-#define PP_COMPUTE_H
+#ifndef GOOGLE_CLOUD_C_COMPUTE_H
+#define GOOGLE_CLOUD_C_COMPUTE_H
 
 #include <types_common.h>
 #include <acquire_stdbool.h>
@@ -45,4 +45,4 @@ get_instance_ip(const struct configuration *, const char *);
 } /*extern "C"*/
 #endif
 
-#endif /* PP_COMPUTE_H */
+#endif /* !GOOGLE_CLOUD_C_COMPUTE_H */

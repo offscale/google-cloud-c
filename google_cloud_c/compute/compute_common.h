@@ -1,5 +1,5 @@
-#ifndef PP_COMPUTE_COMMON_H
-#define PP_COMPUTE_COMMON_H
+#ifndef GOOGLE_CLOUD_C_COMPUTE_COMMON_H
+#define GOOGLE_CLOUD_C_COMPUTE_COMMON_H
 
 #include <acquire_stdbool.h>
 #include <google_cloud_c_export.h>
@@ -45,4 +45,4 @@ namespace Compute {
 };
 */
 
-#endif /* PP_COMPUTE_COMMON_H */
+#endif /* !GOOGLE_CLOUD_C_COMPUTE_COMMON_H */

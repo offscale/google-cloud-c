@@ -1,5 +1,5 @@
-#ifndef PP_FIREWALL_H
-#define PP_FIREWALL_H
+#ifndef GOOGLE_CLOUD_C_FIREWALL_H
+#define GOOGLE_CLOUD_C_FIREWALL_H
 
 #include <stdio.h>
 #include <acquire_stdbool.h>
@@ -28,4 +28,4 @@ extern GOOGLE_CLOUD_C_EXPORT struct OptionalFirewall firewall_create(const char 
 
 extern GOOGLE_CLOUD_C_EXPORT struct OptionalFirewall firewall_get(const char *);
 
-#endif /* PP_FIREWALL_H */
+#endif /* !GOOGLE_CLOUD_C_FIREWALL_H */

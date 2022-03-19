@@ -1,5 +1,5 @@
-#ifndef PP_INSTANCE_H
-#define PP_INSTANCE_H
+#ifndef GOOGLE_CLOUD_C_INSTANCE_H
+#define GOOGLE_CLOUD_C_INSTANCE_H
 
 #include <types_common.h>
 #include "../compute.h"
@@ -149,4 +149,4 @@ private:
 };
 */
 
-#endif /* PP_INSTANCE_H */
+#endif /* !GOOGLE_CLOUD_C_INSTANCE_H */
