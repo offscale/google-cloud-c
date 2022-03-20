@@ -9,7 +9,7 @@ extern "C" {
 #include "firewall.h"
 #include "network.h"
 #include <google_cloud_c_export.h>
-#include <types_common.h>
+#include <google_cloud_c_types_common.h>
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
 #include <synchapi.h>

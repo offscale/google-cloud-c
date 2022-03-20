@@ -6,7 +6,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 #include <google_cloud_c_export.h>
-#include <types_common.h>
+#include <google_cloud_c_types_common.h>
 
 /* A subscription to receive Pub/Sub notifications.
  * https://cloud.google.com/storage/docs/json_api/v1/notifications#resource */

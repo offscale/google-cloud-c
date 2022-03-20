@@ -6,4 +6,4 @@
 #define GOOGLE_CLOUD_C_VERSION_PATCH @google_cloud_c_VERSION_PATCH@
 #define GOOGLE_CLOUD_C_VERSION       "@google_cloud_c_VERSION@"
 
-#endif /* GOOGLE_CLOUD_C_CONFIG_H */
+#endif /* !GOOGLE_CLOUD_C_CONFIG_H */

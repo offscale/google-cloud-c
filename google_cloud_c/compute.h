@@ -1,7 +1,7 @@
 #ifndef GOOGLE_CLOUD_C_COMPUTE_H
 #define GOOGLE_CLOUD_C_COMPUTE_H
 
-#include <types_common.h>
+#include <google_cloud_c_types_common.h>
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,9 +1,9 @@
 set(LIBRARY_NAME "${PROJECT_NAME}_common")
 
-set(Header_Files "types_common.h" "google_cloud_c_stdbool.h")
+set(Header_Files "google_cloud_c_types_common.h" "google_cloud_c_stdbool.h")
 source_group("${LIBRARY_NAME} Header Files" FILES "${Header_Files}")
 
-set(Source_Files "types_common.c")
+set(Source_Files "google_cloud_c_types_common.c")
 source_group("${LIBRARY_NAME} Source Files" FILES "${Source_Files}")
 
 add_library("${LIBRARY_NAME}" "${Header_Files}" "${Source_Files}")

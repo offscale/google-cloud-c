@@ -1,6 +1,6 @@
 include("release/CPackConfig.cmake")
 
 set(CPACK_INSTALL_CMAKE_PROJECTS
-        "debug;google-cloud-c;ALL;/"
-        "release;google-cloud-c;ALL;/"
+        "debug;google_cloud_c;ALL;/"
+        "release;google_cloud_c;ALL;/"
 )

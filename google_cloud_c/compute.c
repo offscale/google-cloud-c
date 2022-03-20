@@ -2,7 +2,7 @@
 #include "compute/instance.h"
 #include "compute/zones.h"
 #include <assert.h>
-#include <types_common.h>
+#include <google_cloud_c_types_common.h>
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
 #define strdup _strdup
