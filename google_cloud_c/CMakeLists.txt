@@ -15,6 +15,8 @@ set(Header_Files
         "project/project.h"
 
         "storage/notification_configs.h"
+
+        "userinfo/userinfo.h"
 )
 
 source_group("Header Files" FILES "${Header_Files}")
@@ -31,6 +33,8 @@ set(Source_Files
         "project/project.c"
 
         "storage/notification_configs.c"
+
+        "userinfo/userinfo.c"
         )
 source_group("Source Files" FILES "${Source_Files}")
 

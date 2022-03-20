@@ -1,6 +1,6 @@
-#include <json_common.h>
 #include "instance.h"
 #include "compute_common.h"
+#include <json_common.h>
 
 struct InstanceContext INSTANCE_CONTEXT = {NULL, NULL, NULL};
 
