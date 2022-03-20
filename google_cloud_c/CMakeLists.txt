@@ -12,6 +12,8 @@ set(Header_Files
         "compute/network.h"
         "compute/zones.h"
 
+        "project/project.h"
+
         "storage/notification_configs.h"
 )
 
@@ -26,6 +28,8 @@ set(Source_Files
         "compute/network.c"
         "compute/zones.c"
 
+        "project/project.c"
+
         "storage/notification_configs.c"
         )
 source_group("Source Files" FILES "${Source_Files}")
@@ -35,10 +39,11 @@ add_library("${LIBRARY_NAME}" "${LIBRARY_TYPE_FLAG}" "${Header_Files}" "${Source
 target_include_directories(
         "${LIBRARY_NAME}"
         PUBLIC
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
-        #"$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/compute>"
-        #"$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../morestd>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/compute>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/project>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/storage>"
         "$<INSTALL_INTERFACE:include>"
 )
 

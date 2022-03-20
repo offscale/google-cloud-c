@@ -1,6 +1,6 @@
 set(LIBRARY_NAME "${PROJECT_NAME}_common")
 
-set(Header_Files "types_common.h" "acquire_stdbool.h")
+set(Header_Files "types_common.h" "google_cloud_c_stdbool.h")
 source_group("${LIBRARY_NAME} Header Files" FILES "${Header_Files}")
 
 set(Source_Files "types_common.c")

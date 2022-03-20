@@ -2,20 +2,28 @@
 #define GOOGLE_CLOUD_C_FIREWALL_H
 
 #include <stdio.h>
-#include <acquire_stdbool.h>
 
 #include "cloud_auth.h"
 #include <google_cloud_c_export.h>
 
+#ifdef __cplusplus
+#include <cstdbool>
+extern "C" {
+#elif __STDC_VERSION__ >= 199901L
+#include <stdbool.h>
+#else
+#include <google_cloud_c_stdbool.h>
+#endif /* __cplusplus */
+
 struct Firewall {
-    const char * name;
+  const char *name;
 };
 
 extern GOOGLE_CLOUD_C_EXPORT const struct Firewall EMPTY_FIREWALL;
 
 struct OptionalFirewall {
-    bool set;
-    struct Firewall firewall;
+  bool set;
+  struct Firewall firewall;
 };
 
 /* =============
@@ -24,8 +32,13 @@ struct OptionalFirewall {
 
 extern GOOGLE_CLOUD_C_EXPORT bool firewall_exists(const char *);
 
-extern GOOGLE_CLOUD_C_EXPORT struct OptionalFirewall firewall_create(const char *, const char *);
+extern GOOGLE_CLOUD_C_EXPORT struct OptionalFirewall
+firewall_create(const char *, const char *);
 
 extern GOOGLE_CLOUD_C_EXPORT struct OptionalFirewall firewall_get(const char *);
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif /* !GOOGLE_CLOUD_C_FIREWALL_H */

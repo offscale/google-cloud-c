@@ -2,9 +2,8 @@
 #define GOOGLE_CLOUD_C_COMPUTE_H
 
 #include <types_common.h>
-#include <acquire_stdbool.h>
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -36,13 +35,14 @@ extern GOOGLE_CLOUD_C_EXPORT struct StatusAndArrayCStrArray
 compute(const struct configuration *, const char *, bool);
 
 extern GOOGLE_CLOUD_C_EXPORT struct StatusAndCstrAndCStr
-create_fw_net_instance(const struct configuration *, const struct InstanceIncomplete *);
+create_fw_net_instance(const struct configuration *,
+                       const struct InstanceIncomplete *);
 
 extern GOOGLE_CLOUD_C_EXPORT struct StatusAndCstr
 get_instance_ip(const struct configuration *, const char *);
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 } /*extern "C"*/
-#endif
+#endif /* __cplusplus */
 
 #endif /* !GOOGLE_CLOUD_C_COMPUTE_H */
