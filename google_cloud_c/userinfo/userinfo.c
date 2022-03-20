@@ -10,6 +10,7 @@ struct Oauth2UserInfo oauth2_user_info_parse(const JSON_Object *);
 /* undocumented by Google? */
 struct Oauth2UserInfo userinfo_get(void) {
   CURLU *urlp = curl_url();
+  CURLUcode rc = curl_url_set(urlp, CURLUPART_URL, "https://www.googleapis.com/oauth2/v3/userinfo", 0);
   struct curl_slist *headers = NULL;
   struct ServerResponse response =
       https_wrapper(urlp, NULL, NULL, set_auth_and_json_headers(headers));
