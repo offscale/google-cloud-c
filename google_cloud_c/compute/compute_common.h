@@ -11,6 +11,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 #include <google_cloud_c_export.h>
+#include <parson.h>
 
 struct GoogleCloudOperation {
   const char *id, *name, *zone, *operationType, *targetLink, *targetId, *status,

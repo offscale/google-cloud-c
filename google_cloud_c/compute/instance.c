@@ -1,3 +1,4 @@
+#include <json_common.h>
 #include "instance.h"
 #include "compute_common.h"
 

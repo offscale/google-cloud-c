@@ -1,3 +1,4 @@
+#include <json_common.h>
 #include "network.h"
 
 const struct RoutingConfig routingConfigNull = {""};
