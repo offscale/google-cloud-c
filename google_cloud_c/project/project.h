@@ -28,7 +28,7 @@ enum LifecycleState {
 struct Project {
   const char *projectNumber;
   const char *projectId;
-  enum LifecycleState *lifecycleState;
+  enum LifecycleState lifecycleState;
   const char *name;
   const char *createTime;
   /*"labels": {*/ /* Label values must be between 0 and 63 characters long
@@ -38,6 +38,10 @@ struct Project {
 };
 
 extern GOOGLE_CLOUD_C_EXPORT bool project_exists(const char *project_id);
+
+extern GOOGLE_CLOUD_C_EXPORT struct Project project_get(const char *project_id);
+
+extern GOOGLE_CLOUD_C_EXPORT const struct Project *project_list();
 
 #ifdef __cplusplus
 }

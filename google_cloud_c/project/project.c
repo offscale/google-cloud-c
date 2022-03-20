@@ -1,4 +1,9 @@
 #include "project.h"
+#include <json_common.h>
+#include <parson.h>
+
+enum LifecycleState str_to_LifecycleState(const char *);
+struct Project project_parse(const JSON_Object *);
 
 bool project_exists(const char *project_id) {
   /* CHECK IF PROJECT EXISTS */
@@ -8,68 +13,90 @@ bool project_exists(const char *project_id) {
   bool project_exists = false;
   {
     char *path;
-    asprintf(&path,
-             "https://cloudresourcemanager.googleapis.com/v1/projects/%s",
-             project_id);
-    struct ServerResponse response = gcloud_get(NULL, path, NULL);
-    DEBUG_SERVER_RESPONSE("projects_get_response");
-    project_exists = response.status_code == 200;
+    {
+      asprintf(&path, "/v1/projects/%s", project_id);
+      {
+        struct ServerResponse response =
+            gcloud_cloud_resource_get(NULL, path, NULL);
+        DEBUG_SERVER_RESPONSE("projects_get_response");
+        project_exists = response.status_code == 200;
+      }
+    }
   }
   return project_exists;
 }
 
-const JSON_Object *get_project(const char *google_access_token) {
+struct Project project_get(const char *project_id) {
+  /* https://cloud.google.com/resource-manager/reference/rest/v1/projects/get
+   * GET https://cloudresourcemanager.googleapis.com/v1/projects/{projectId} */
+  char *path;
+  asprintf(&path, "/v1/projects/%s", project_id);
+  {
+    struct ServerResponse response =
+        gcloud_cloud_resource_get(NULL, path, NULL);
+    DEBUG_SERVER_RESPONSE("projects_get_response");
+
+    if_bad_status_exit(&response);
+
+    return project_parse(
+        json_value_get_object(json_parse_string(response.body)));
+  }
+}
+
+const struct Project *project_list() {
   /* https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
    * GET https://cloudresourcemanager.googleapis.com/v1/projects
    * */
-  CURLU *urlp = curl_url();
-  CURLUcode rc = CURLUE_OK;
-  struct curl_slist *headers = NULL;
-  char *auth_header;
-  struct ServerResponse response = {CURLE_OK, NULL, 100, NULL};
+  struct ServerResponse response =
+      gcloud_cloud_resource_get(NULL, "/v1/projects", NULL);
 
-  rc = curl_url_set(urlp, CURLUPART_SCHEME, "https", 0);
-  rc = curl_url_set(urlp, CURLUPART_HOST, "cloudresourcemanager.googleapis.com",
-                    0);
-  rc = curl_url_set(urlp, CURLUPART_PATH, "/v1/projects", 0);
-  if (rc != CURLUE_OK)
-    return NULL;
-
-  asprintf(&auth_header, "Authorization: Bearer %s", google_access_token);
-  headers = curl_slist_append(headers, auth_header);
-  response = https_json_get(urlp, headers);
-  free(auth_header);
-  DEBUG_SERVER_RESPONSE("get_project");
-  if (response.status_code > 299 || response.body == NULL ||
-      response.code != CURLE_OK) {
-    fprintf(stderr, "request failed to get projects\n\n%s\n", response.body);
-    exit(EXIT_FAILURE);
-  }
+  DEBUG_SERVER_RESPONSE("project_list");
   if_bad_status_exit(&response);
 
   const JSON_Value *json_value = json_parse_string(response.body);
   const JSON_Array *projects_items_json =
       json_object_get_array(json_value_get_object(json_value), "projects");
   const size_t projects_items_n = json_array_get_count(projects_items_json);
-  if (projects_items_n == 0)
-    no_projects_error();
+  /* if (projects_items_n == 0) return NULL; */
+  struct Project *projects =
+      (struct Project *)malloc(projects_items_n * sizeof(struct Project));
   size_t i;
   for (i = 0; i < projects_items_n; i++) {
-    const JSON_Object *project_obj =
-        json_array_get_object(projects_items_json, i);
-    if (strcmp(json_object_get_string(project_obj, "lifecycleState"),
-               "ACTIVE") == 0) {
-      const char *projectId = json_object_get_string(project_obj, "projectId");
-      const size_t projectId_n = strlen(projectId);
-      const bool is_quickstart =
-          (projectId_n > 11 /* len("quickstart-") */
-           && projectId[0] == 'q' && projectId[1] == 'u' &&
-           projectId[2] == 'i' && projectId[3] == 'c' && projectId[4] == 'k' &&
-           projectId[5] == 's' && projectId[6] == 't' && projectId[7] == 'a' &&
-           projectId[8] == 'r' && projectId[9] == 't' && projectId[10] == '-');
-      if (!is_quickstart)
-        return project_obj;
-    }
+    const struct Project project =
+        project_parse(json_array_get_object(projects_items_json, i));
+    projects[i] = project;
   }
   return NULL;
+}
+
+/* Utility functions */
+
+enum LifecycleState str_to_LifecycleState(const char *state) {
+  if (strcmp(state, "LIFECYCLE_STATE_UNSPECIFIED") == 0)
+    return LIFECYCLE_STATE_UNSPECIFIED;
+  else if (strcmp(state, "ACTIVE") == 0)
+    return ACTIVE;
+  else if (strcmp(state, "DELETE_REQUESTED") == 0)
+    return DELETE_REQUESTED;
+  return DELETE_IN_PROGRESS /* unused */;
+}
+
+struct Project project_parse(const JSON_Object *project_obj) {
+  struct Project project;
+  if (json_object_has_value(project_obj, "parent")) {
+    JSON_Object *parent_obj = json_object_get_object(project_obj, "parent");
+    struct ResourceId parent;
+    parent.type = json_object_get_string(parent_obj, "type");
+    parent.id = json_object_get_string(parent_obj, "id");
+    project.parent = &parent;
+  }
+
+  project.projectNumber = json_object_get_string(project_obj, "projectNumber");
+  project.projectId = json_object_get_string(project_obj, "projectId");
+  project.lifecycleState = str_to_LifecycleState(
+      json_object_get_string(project_obj, "lifecycleState"));
+  project.name = json_object_get_string(project_obj, "name");
+  project.createTime = json_object_get_string(project_obj, "createTime");
+
+  return project;
 }

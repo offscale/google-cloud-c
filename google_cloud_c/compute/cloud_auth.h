@@ -41,8 +41,6 @@ extern GOOGLE_CLOUD_C_EXPORT struct AuthContext set_auth_context(const char *,
 extern GOOGLE_CLOUD_C_EXPORT struct curl_slist *
 set_auth_and_json_headers(struct curl_slist *);
 
-extern GOOGLE_CLOUD_C_EXPORT CURLU *set_url_path(CURLU *, const char *);
-
 extern GOOGLE_CLOUD_C_EXPORT CURLU *set_body(CURLU *, const char *);
 
 extern GOOGLE_CLOUD_C_EXPORT struct ServerResponse
@@ -51,6 +49,15 @@ extern GOOGLE_CLOUD_C_EXPORT struct ServerResponse
 gcloud_put(CURLU *, const char *, const char *, struct curl_slist *);
 extern GOOGLE_CLOUD_C_EXPORT struct ServerResponse
 gcloud_get(CURLU *, const char *, struct curl_slist *);
+
+extern GOOGLE_CLOUD_C_EXPORT struct ServerResponse
+gcloud_cloud_resource_post(CURLU *, const char *, const char *,
+                           struct curl_slist *);
+extern GOOGLE_CLOUD_C_EXPORT struct ServerResponse
+gcloud_cloud_resource_put(CURLU *, const char *, const char *,
+                          struct curl_slist *);
+extern GOOGLE_CLOUD_C_EXPORT struct ServerResponse
+gcloud_cloud_resource_get(CURLU *, const char *, struct curl_slist *);
 
 #ifdef __cplusplus
 }
