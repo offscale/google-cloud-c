@@ -11,12 +11,17 @@ struct Oauth2UserInfo oauth2_user_info_parse(const JSON_Object *);
 struct Oauth2UserInfo userinfo_get(void) {
   CURLU *urlp = curl_url();
   CURLUcode rc = curl_url_set(urlp, CURLUPART_URL, "https://www.googleapis.com/oauth2/v3/userinfo", 0);
-  struct curl_slist *headers = NULL;
-  struct ServerResponse response =
-      https_wrapper(urlp, NULL, NULL, set_auth_and_json_headers(headers));
-  if_bad_status_exit(&response);
-  return oauth2_user_info_parse(
-      json_value_get_object(json_parse_string(response.body)));
+  {
+    char *access_token;
+    asprintf(&access_token, "access_token=%s", AUTH_CONTEXT.google_access_token);
+    rc = curl_url_set(urlp, CURLUPART_QUERY, access_token, 0);
+  }
+  {
+    struct ServerResponse response = https_json_post(urlp, NULL, NULL);
+    if_bad_status_exit(&response);
+    return oauth2_user_info_parse(
+        json_value_get_object(json_parse_string(response.body)));
+  }
 }
 
 /* Utility functions */

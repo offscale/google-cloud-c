@@ -36,7 +36,7 @@ struct curl_slist *set_auth_and_json_headers(struct curl_slist *headers) {
     }
 #undef ACCESS_TOKEN_SIZE
   }
-  {
+  if (AUTH_CONTEXT.project_id != NULL) {
     char *goog_user_project;
     asprintf(&goog_user_project, "X-Goog-User-Project: %s",
              AUTH_CONTEXT.project_id);
