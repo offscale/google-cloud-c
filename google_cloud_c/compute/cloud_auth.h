@@ -15,7 +15,6 @@ extern "C" {
 #if defined(_GNU_SOURCE) || defined(HAVE_ASPRINTF)
 #include <stdio.h>
 #else
-#define C89STRINGUTILS_IMPLEMENTATION
 #include <c89stringutils_string_extras.h>
 #endif
 
