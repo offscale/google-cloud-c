@@ -1,4 +1,4 @@
-#include "compute_common.h"
+#include <compute/compute_common.h>
 #include <parson.h>
 
 const struct GoogleCloudOperation EMPTY_GOOGLE_CLOUD_OPERATION = {

@@ -1,5 +1,5 @@
-#include "instance.h"
-#include "compute_common.h"
+#include <compute/compute_common.h>
+#include <compute/instance.h>
 #include <json_common.h>
 
 struct InstanceContext INSTANCE_CONTEXT = {NULL, NULL, NULL};
@@ -213,17 +213,19 @@ const char *instance_to_json(const struct InstanceIncomplete *instance) {
 
 struct OptionalInstance
 instance_insert(const struct InstanceIncomplete *instance,
-                const char *network_name) {
+                const char *network_name, const char *shell_script) {
   /* CREATE THE INSTANCE (with startup script) */
   /* https://cloud.google.com/compute/docs/reference/rest/v1/instances/insert
    * POST
    * https://compute.googleapis.com/compute/v1/projects/{project}/zones/{zone}/instances
    */
 
-  const char *shell_script = "#!/bin/bash\\n\\n"
-                             "apt-get update\\n"
-                             "apt-get install -y apache2\\n"
-                             "echo gscripppt > /var/www/html/index.html\\n";
+  shell_script = shell_script == NULL
+                     ? "#!/bin/bash\\n\\n"
+                       "apt-get update\\n"
+                       "apt-get install -y apache2\\n"
+                       "echo gscripppt > /var/www/html/index.html\\n"
+                     : shell_script;
 
   char *path, *body;
   asprintf(&path, "/v1/projects/%s/zones/%s/instances", AUTH_CONTEXT.project_id,
@@ -338,10 +340,9 @@ instance_insert(const struct InstanceIncomplete *instance,
   return optionalInstance;
 }
 
-struct OptionalInstance
-instance_incomplete_create_all(const struct InstanceIncomplete *instance,
-                               const char *network_name,
-                               const char *firewall_name) {
+struct OptionalInstance instance_incomplete_create_all(
+    const struct InstanceIncomplete *instance, const char *network_name,
+    const char *firewall_name, const char *shell_script) {
   /* Creates network, firewall, and instance */
 
   /* TODO: Proper request/response handling with structs and all for network and
@@ -423,7 +424,7 @@ instance_incomplete_create_all(const struct InstanceIncomplete *instance,
 
   struct OptionalInstance optionalInstance;
   if (!instance_existent) {
-    optionalInstance = instance_insert(instance, network_name);
+    optionalInstance = instance_insert(instance, network_name, shell_script);
     if (optionalInstance.instance.name == NULL)
       optionalInstance.instance.name = instance->name;
     printf("Creating instance: \"%s\"\n", optionalInstance.instance.name);

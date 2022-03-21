@@ -1,7 +1,7 @@
-#include "compute/cloud_auth.h"
-#include "compute/instance.h"
-#include "compute/zones.h"
 #include <assert.h>
+#include <compute/cloud_auth.h>
+#include <compute/instance.h>
+#include <compute/zones.h>
 #include <google_cloud_c_types_common.h>
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
@@ -10,7 +10,8 @@
 
 struct StatusAndCstrAndCStr
 create_fw_net_instance(const struct configuration *const config,
-                       const struct InstanceIncomplete *const instance) {
+                       const struct InstanceIncomplete *const instance,
+                       const char *shell_script) {
   puts("create_fw_net_instance");
   set_auth_context(config->google_project_id, config->google_access_token);
   INSTANCE_CONTEXT.zone = config->google_zone;
@@ -18,7 +19,8 @@ create_fw_net_instance(const struct configuration *const config,
       instance_incomplete_create_all(
           instance,
           /*network_name*/ NULL,
-          /*firewall_name*/ NULL); /* instance_create_all */
+          /*firewall_name*/ NULL,
+          /*shell_script*/ shell_script); /* instance_create_all */
 
   if (!optionalInstance.set) {
     const struct StatusAndCstrAndCStr instance_name_ip = {EXIT_FAILURE, NULL, 0,

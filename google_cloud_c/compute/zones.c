@@ -1,4 +1,4 @@
-#include "zones.h"
+#include <compute/zones.h>
 #include <json_common.h>
 
 struct Zones zone_list() {

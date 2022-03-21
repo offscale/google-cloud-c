@@ -40,15 +40,13 @@ source_group("Source Files" FILES "${Source_Files}")
 
 add_library("${LIBRARY_NAME}" "${LIBRARY_TYPE_FLAG}" "${Header_Files}" "${Source_Files}")
 
+include(GNUInstallDirs)
 target_include_directories(
         "${LIBRARY_NAME}"
         PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/compute>"
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/project>"
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/storage>"
-        "$<INSTALL_INTERFACE:include>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
 find_package(unofficial-parson CONFIG REQUIRED)
@@ -98,7 +96,6 @@ set_property(TARGET "${LIBRARY_NAME}" PROPERTY VERSION "1.0.0")
 set_property(TARGET "${LIBRARY_NAME}" PROPERTY SOVERSION "1")
 
 # install rules
-include(GNUInstallDirs)
 set(installable_libs "${PROJECT_NAME}_compiler_flags" "${PROJECT_NAME}_common" "${LIBRARY_NAME}")
 if (TARGET "${DEPENDANT_LIBRARY}")
   list(APPEND installable_libs "${DEPENDANT_LIBRARY}")
@@ -110,4 +107,6 @@ install(TARGETS ${installable_libs}
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
 install(FILES "${_export_file}" ${Header_Files}
         TYPE "INCLUDE")
+# Do I need to loop over headers to add folder prefix and install directly to dest `${CMAKE_INSTALL_INCLUDEDIR}/name`?
+
 install(EXPORT "${LIBRARY_NAME}Targets" DESTINATION "${CMAKE_INSTALL_DATADIR}/${LIBRARY_NAME}")

@@ -1,8 +1,8 @@
-#ifndef GOOGLE_CLOUD_C_GOOGLE_CLOUD_C_PROJECT_PROJECT_H
-#define GOOGLE_CLOUD_C_GOOGLE_CLOUD_C_PROJECT_PROJECT_H
+#ifndef GOOGLE_CLOUD_C_PROJECT_H
+#define GOOGLE_CLOUD_C_PROJECT_H
 
-#include "cloud_auth.h"
 #include <c89stringutils_string_extras.h>
+#include <compute/cloud_auth.h>
 
 #ifdef __cplusplus
 #include <cstdbool>
@@ -47,4 +47,4 @@ extern GOOGLE_CLOUD_C_EXPORT const struct Project *project_list();
 }
 #endif /* __cplusplus */
 
-#endif /* !GOOGLE_CLOUD_C_GOOGLE_CLOUD_C_PROJECT_PROJECT_H */
+#endif /* !GOOGLE_CLOUD_C_PROJECT_H */

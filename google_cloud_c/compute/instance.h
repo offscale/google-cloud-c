@@ -5,9 +5,9 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#include "compute.h"
-#include "firewall.h"
-#include "network.h"
+#include <compute.h>
+#include <compute/firewall.h>
+#include <compute/network.h>
 #include <google_cloud_c_export.h>
 #include <google_cloud_c_types_common.h>
 
@@ -124,7 +124,7 @@ extern GOOGLE_CLOUD_C_EXPORT struct Instances instances_list();
 extern GOOGLE_CLOUD_C_EXPORT bool instance_exists(const char *instance_name);
 
 extern GOOGLE_CLOUD_C_EXPORT struct OptionalInstance
-instance_insert(const struct InstanceIncomplete *, const char *);
+instance_insert(const struct InstanceIncomplete *, const char *, const char *);
 
 extern GOOGLE_CLOUD_C_EXPORT struct OptionalInstance
 instance_get(const char *instance_name);
@@ -134,7 +134,7 @@ instance_from_json(const JSON_Object *);
 
 extern GOOGLE_CLOUD_C_EXPORT struct OptionalInstance
 instance_incomplete_create_all(const struct InstanceIncomplete *, const char *,
-                               const char *);
+                               const char *, const char *);
 
 /*
 private:

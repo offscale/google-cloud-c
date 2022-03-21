@@ -9,7 +9,7 @@ extern "C" {
 
 #include <google_cloud_c_export.h>
 
-#include "compute/instance.h"
+#include <compute/instance.h>
 
 /*
 struct CInstance {
@@ -36,7 +36,7 @@ compute(const struct configuration *, const char *, bool);
 
 extern GOOGLE_CLOUD_C_EXPORT struct StatusAndCstrAndCStr
 create_fw_net_instance(const struct configuration *,
-                       const struct InstanceIncomplete *);
+                       const struct InstanceIncomplete *, const char *);
 
 extern GOOGLE_CLOUD_C_EXPORT struct StatusAndCstr
 get_instance_ip(const struct configuration *, const char *);
