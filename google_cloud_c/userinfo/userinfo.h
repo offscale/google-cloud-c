@@ -1,5 +1,5 @@
-#ifndef GOOGLE_CLOUD_C_GOOGLE_CLOUD_C_USERINFO_USERINFO_H
-#define GOOGLE_CLOUD_C_GOOGLE_CLOUD_C_USERINFO_USERINFO_H
+#ifndef GOOGLE_CLOUD_C_USERINFO_USERINFO_H
+#define GOOGLE_CLOUD_C_USERINFO_USERINFO_H
 
 #ifdef __cplusplus
 #include <cstdbool>
@@ -67,4 +67,4 @@ extern GOOGLE_CLOUD_C_EXPORT struct Oauth2UserInfo userinfo_get(const char *);
 }
 #endif /* __cplusplus */
 
-#endif /* !GOOGLE_CLOUD_C_GOOGLE_CLOUD_C_USERINFO_USERINFO_H */
+#endif /* !GOOGLE_CLOUD_C_USERINFO_USERINFO_H */

@@ -37,6 +37,11 @@ configure_file(
 add_subdirectory("common")
 add_subdirectory("${PROJECT_NAME}")
 
+include(CTest)
+if (BUILD_TESTING)
+    add_subdirectory("google_cloud_c_tests")
+endif (BUILD_TESTING)
+
 include(GNUInstallDirs)
 
 install(

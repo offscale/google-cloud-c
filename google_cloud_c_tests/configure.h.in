@@ -1,0 +1,12 @@
+#ifndef GOOGLE_CLOUD_C_CONFIG_H
+#define GOOGLE_CLOUD_C_CONFIG_H
+
+#define _@TARGET_ARCH@_
+
+/* https://github.com/abseil/abseil-cpp/pull/705 until merge */
+#define _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING
+
+#define CLIENT_ID                     "@CLIENT_ID@"
+#define CLIENT_SECRET                 "@CLIENT_SECRET@"
+
+#endif /* !GOOGLE_CLOUD_C_CONFIG_H */

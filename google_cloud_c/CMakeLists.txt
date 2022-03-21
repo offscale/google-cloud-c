@@ -1,5 +1,4 @@
 get_filename_component(LIBRARY_NAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
-string(REPLACE " " "_" LIBRARY_NAME "${LIBRARY_NAME}")
 
 set(Header_Files
         "compute.h"
@@ -64,20 +63,21 @@ set(_libs "unofficial::parson::parson"
 
 target_link_libraries("${LIBRARY_NAME}" PRIVATE "${_libs}")
 
-target_link_libraries("${LIBRARY_NAME}" PUBLIC "${_pub_libs}")
-
 find_package(cauthflow CONFIG REQUIRED)
 target_link_libraries(
         "${LIBRARY_NAME}"
-        PRIVATE
-        cauthflow cauthflow_utils
-        cauthflow_google_auth cauthflow_compiler_flags)
+        PUBLIC
+        "cauthflow"
+        "cauthflow_utils"
+        "cauthflow_google_auth"
+        "cauthflow_compiler_flags"
+)
 
 find_path(C89STRINGUTILS_INCLUDE_DIRS "c89stringutils_string_extras.h")
 
 target_include_directories("${LIBRARY_NAME}" PRIVATE "${C89STRINGUTILS_INCLUDE_DIRS}")
 
-target_link_libraries("${LIBRARY_NAME}" PRIVATE "${PROJECT_NAME}_common")
+target_link_libraries("${LIBRARY_NAME}" PUBLIC "${PROJECT_NAME}_common")
 
 set_target_properties(
         "${LIBRARY_NAME}"
