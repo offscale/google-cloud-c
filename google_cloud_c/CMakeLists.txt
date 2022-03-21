@@ -1,8 +1,6 @@
 get_filename_component(LIBRARY_NAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 string(REPLACE " " "_" LIBRARY_NAME "${LIBRARY_NAME}")
 
-include(GenerateExportHeader)
-
 set(Header_Files
         "compute.h"
         "compute/cloud_auth.h"
@@ -88,6 +86,7 @@ set_target_properties(
         C
 )
 
+include(GenerateExportHeader)
 set(_export_file "${CMAKE_CURRENT_BINARY_DIR}/${LIBRARY_NAME}_export.h")
 generate_export_header("${LIBRARY_NAME}" EXPORT_FILE_NAME "${_export_file}")
 
@@ -105,8 +104,17 @@ install(TARGETS ${installable_libs}
         ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
-install(FILES "${_export_file}" ${Header_Files}
+install(FILES "${_export_file}"
         TYPE "INCLUDE")
-# Do I need to loop over headers to add folder prefix and install directly to dest `${CMAKE_INSTALL_INCLUDEDIR}/name`?
+foreach(Header_File ${Header_Files})
+  get_filename_component(base_name "${Header_File}" NAME)
+  if (base_name STREQUAL "${Header_File}")
+    install(FILES "${Header_File}" TYPE "INCLUDE")
+  else ()
+    get_filename_component(base_dir "${Header_File}" DIRECTORY)
+    install(FILES "${Header_File}"
+            DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${base_dir}")
+  endif ()
+endforeach(Header_File ${Header_Files})
 
 install(EXPORT "${LIBRARY_NAME}Targets" DESTINATION "${CMAKE_INSTALL_DATADIR}/${LIBRARY_NAME}")
