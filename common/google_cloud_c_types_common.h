@@ -1,4 +1,4 @@
-#ifndef GOOGLE_CLOUD_C_TYPES_COMMON_H
+#if !defined(GCLOUD_BUCKET_C_TYPES_COMMON_H) && !defined(GOOGLE_CLOUD_C_TYPES_COMMON_H)
 #define GOOGLE_CLOUD_C_TYPES_COMMON_H
 
 #ifdef __cplusplus
@@ -23,10 +23,13 @@ typedef SSIZE_T ssize_t;
 
 #include <google_cloud_c_common_export.h>
 
+#ifndef ERROR_OR_TYPE
+#define ERROR_OR_TYPE
 struct ErrorOrType {
   int error;
   void *type;
 };
+#endif /* !ERROR_OR_TYPE */
 
 struct ErrorOrIntArray {
   int error;
@@ -108,4 +111,4 @@ cleanup_struct_configuration(struct configuration *);
 }
 #endif /* __cplusplus */
 
-#endif /* !GOOGLE_CLOUD_C_TYPES_COMMON_H */
+#endif /* !defined(GCLOUD_BUCKET_C_TYPES_COMMON_H) && !defined(GOOGLE_CLOUD_C_TYPES_COMMON_H) */
