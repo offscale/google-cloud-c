@@ -21,13 +21,13 @@ typedef unsigned long num_type;
 
 TEST x_instance_list_should_be(void) {
   /* TODO: Actually test things */
-  auth();
-  set_auth_context(PROJECT_ID, ACCESS_TOKEN);
-  {
-    struct Instances instances = instances_list();
-    PASS();
-  }
+  struct Instances instances = instances_list();
+  PASS();
 }
 
 /* Suites can group multiple tests with common setup. */
-SUITE(instance_suite) { RUN_TEST(x_instance_list_should_be); }
+SUITE(instance_suite) {
+  auth();
+  set_auth_context(PROJECT_ID, ACCESS_TOKEN);
+  RUN_TEST(x_instance_list_should_be);
+}

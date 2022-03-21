@@ -19,8 +19,10 @@ struct curl_slist *set_auth_and_json_headers(struct curl_slist *headers) {
   headers = curl_slist_append(headers, "charset: utf-8");
 
   if (AUTH_CONTEXT.google_access_token != NULL) {
-    /*  2048? As per https://developers.google.com/identity/protocols/oauth2 */
-#define ACCESS_TOKEN_SIZE 166
+    /*  2048? As per https://developers.google.com/identity/protocols/oauth2
+     *  512? As per refresh token docs on ^
+     * */
+#define ACCESS_TOKEN_SIZE 512
     {
       char bearer[ACCESS_TOKEN_SIZE + /*strlen("Authorization: Bearer ")*/ 22 +
                   1] = "Authorization: Bearer ";
