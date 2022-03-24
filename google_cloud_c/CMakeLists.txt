@@ -8,7 +8,7 @@ endforeach (lib "common" "compute" "project" "storage" "userinfo" "multi")
 
 # install rules
 include(GNUInstallDirs)
-list(APPEND installable_libs "${PROJECT_NAME}_compiler_flags")
+list(APPEND installable_libs "${PROJECT_NAME}" "${PROJECT_NAME}_compiler_flags")
 if (TARGET "${DEPENDANT_LIBRARY}")
   list(APPEND installable_libs "${DEPENDANT_LIBRARY}")
 endif (TARGET "${DEPENDANT_LIBRARY}")
