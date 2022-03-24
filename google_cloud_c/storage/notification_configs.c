@@ -1,7 +1,7 @@
-#include <compute/cloud_auth.h>
+#include <google_cloud_c/compute/cloud_auth.h>
+#include <google_cloud_c/storage/notification_configs.h>
 #include <json_common.h>
 #include <parson.h>
-#include <storage/notification_configs.h>
 
 const struct Notification EMPTY_NOTIFICATION = {NULL, NULL, NULL, NULL,
                                                 NULL, NULL, NULL, NULL};

@@ -7,10 +7,10 @@ extern "C" {
 #elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
-#include <google_cloud_c_stdbool.h>
+#include <google_cloud_c/common/google_cloud_c_stdbool.h>
 #endif /* __cplusplus */
 
-#include <google_cloud_c_export.h>
+#include <google_cloud_c/compute/google_cloud_c_compute_export.h>
 #include <parson.h>
 
 struct GoogleCloudOperation {
@@ -23,10 +23,10 @@ struct OptionalGoogleCloudOperation {
   struct GoogleCloudOperation googleCloudOperation;
 };
 
-extern GOOGLE_CLOUD_C_EXPORT const struct GoogleCloudOperation
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct GoogleCloudOperation
     EMPTY_GOOGLE_CLOUD_OPERATION;
 
-extern GOOGLE_CLOUD_C_EXPORT struct OptionalGoogleCloudOperation
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalGoogleCloudOperation
 google_cloud_operation_from_json(const JSON_Object *);
 
 /*

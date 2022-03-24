@@ -7,13 +7,13 @@ extern "C" {
 #elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
-#include <google_cloud_c_stdbool.h>
+#include <google_cloud_c/common/google_cloud_c_stdbool.h>
 #endif /* __cplusplus */
 
 #include <parson.h>
 
-#include <compute/cloud_auth.h>
-#include <google_cloud_c_export.h>
+#include <google_cloud_c/compute/cloud_auth.h>
+#include <google_cloud_c/compute/google_cloud_c_compute_export.h>
 
 struct Operation {
   const char *id, *name, *operationType, *targetLink, *targetId, *status, *user,
@@ -24,7 +24,8 @@ struct RoutingConfig {
   const char *routingMode;
 };
 
-extern GOOGLE_CLOUD_C_EXPORT const struct RoutingConfig routingConfigNull;
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct RoutingConfig
+    routingConfigNull;
 
 struct Network {
   const char *id, *creationTimestamp, *name, *selfLink;
@@ -34,7 +35,7 @@ struct Network {
   const char *kind;
 };
 
-extern GOOGLE_CLOUD_C_EXPORT const struct Network EMPTY_NETWORK;
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Network EMPTY_NETWORK;
 
 struct OptionalNetwork {
   bool set;
@@ -45,12 +46,12 @@ struct OptionalNetwork {
  * |  NETWORK  |
  * ============= */
 
-extern GOOGLE_CLOUD_C_EXPORT bool network_exists(const char *);
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT bool network_exists(const char *);
 
-extern GOOGLE_CLOUD_C_EXPORT struct OptionalNetwork
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalNetwork
 network_get(const char *network_name);
 
-extern GOOGLE_CLOUD_C_EXPORT struct OptionalNetwork
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalNetwork
 network_create(const char *network_name);
 
 #ifdef __cplusplus

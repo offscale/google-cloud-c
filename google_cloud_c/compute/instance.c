@@ -1,5 +1,5 @@
-#include <compute/compute_common.h>
-#include <compute/instance.h>
+#include <google_cloud_c/compute/compute_common.h>
+#include <google_cloud_c/compute/instance.h>
 #include <json_common.h>
 
 struct InstanceContext INSTANCE_CONTEXT = {NULL, NULL, NULL};

@@ -34,6 +34,16 @@ if (NOT DEFINED TARGET_ARCH)
     set(TARGET_ARCH ${CMAKE_HOST_SYSTEM_PROCESSOR})
 endif (NOT DEFINED TARGET_ARCH)
 
+# Suppose I could parse the ini file on disk and put the vars here
+#set(G_ACCESS_TOKEN        "$ENV{G_ACCESS_TOKEN}")
+#set(G_ACCESS_TOKEN_EXPIRY "$ENV{G_ACCESS_TOKEN_EXPIRY}")
+if (NOT DEFINED G_REFRESH_TOKEN)
+    message(FATAL_ERROR "Set missing definition with -DG_REFRESH_TOKEN=<refresh_token>")
+endif (NOT DEFINED G_REFRESH_TOKEN)
+if (NOT DEFINED G_PROJECT_ID)
+    message(FATAL_ERROR "Set missing definition with -DG_PROJECT_ID=<project_id>")
+endif (NOT DEFINED G_PROJECT_ID)
+
 configure_file("configure.h.in" "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_configure.h" @ONLY)
 
 ###############
@@ -53,6 +63,7 @@ target_include_directories(
         PRIVATE
         "$<BUILD_INTERFACE:${DOWNLOAD_DIR}>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
 target_link_libraries(
@@ -63,5 +74,5 @@ target_link_libraries(
 )
 
 add_test(NAME "${EXEC_NAME}"
-        COMMAND "${EXEC_NAME}"
-        WORKING_DIRECTORY "${PROJECT_BINARY_DIR}")
+         COMMAND "${EXEC_NAME}"
+         WORKING_DIRECTORY "${PROJECT_BINARY_DIR}")

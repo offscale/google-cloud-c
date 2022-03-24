@@ -7,6 +7,7 @@
 
 const char *REFRESH_TOKEN = NULL;
 const char *ACCESS_TOKEN = NULL;
+time_t ACCESS_TOKEN_EXPIRY = 0;
 const char *PROJECT_ID = NULL;
 
 const char *get_file_contents(const char *);
@@ -14,6 +15,7 @@ const char *get_file_contents(const char *);
 void auth() {
 #define REFRESH_FILEPATH "refresh_token.txt"
 #define ACCESS_FILEPATH "access_token.txt"
+#define ACCESS_TOKEN_EXPIRY_FILEPATH "access_token_expiry.txt"
 #define PROJECT_ID_FILEPATH "project_id.txt"
   if (REFRESH_TOKEN != NULL && ACCESS_TOKEN != NULL && PROJECT_ID != NULL)
     return;
@@ -22,9 +24,12 @@ void auth() {
     PROJECT_ID = strdup(get_file_contents(PROJECT_ID_FILEPATH));
     /* just delete the access token on auth error and try again,
      * no need for proper handling dance */
-    if (access(ACCESS_FILEPATH, F_OK) == 0)
+    if (access(ACCESS_FILEPATH, F_OK) == 0) {
       ACCESS_TOKEN = strdup(get_file_contents(ACCESS_FILEPATH));
-    else {
+      char *end;
+      ACCESS_TOKEN_EXPIRY = strtol(
+          strdup(get_file_contents(ACCESS_TOKEN_EXPIRY_FILEPATH)), &end, 10);
+    } else {
       struct GoogleCloudProject google_cloud_project = get_google_auth(
           CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN, redirect_dance);
       FILE *fh = fopen(ACCESS_FILEPATH, "wt");
@@ -32,8 +37,9 @@ void auth() {
       fclose(fh);
     }
   } else {
-    struct GoogleCloudProject google_cloud_project = get_google_auth(
-        CLIENT_ID, CLIENT_SECRET, /*refresh_token*/ NULL, redirect_dance);
+    struct GoogleCloudProject google_cloud_project =
+        get_google_auth(CLIENT_ID, CLIENT_SECRET,
+                        /*refresh_token*/ REFRESH_TOKEN, redirect_dance);
 
     FILE *fh = fopen(REFRESH_FILEPATH, "wt");
     fputs(google_cloud_project.google_refresh_token, fh);
@@ -45,6 +51,11 @@ void auth() {
     fclose(fh);
     ACCESS_TOKEN = google_cloud_project.google_access_token;
 
+    fh = fopen(ACCESS_TOKEN_EXPIRY_FILEPATH, "wt");
+    fprintf(fh, "%ld", google_cloud_project.google_access_token_expiry);
+    fclose(fh);
+    ACCESS_TOKEN_EXPIRY = google_cloud_project.google_access_token_expiry;
+
     fh = fopen(PROJECT_ID_FILEPATH, "wt");
     fputs(google_cloud_project.projectId, fh);
     fclose(fh);
@@ -52,6 +63,7 @@ void auth() {
   }
 #undef REFRESH_FILEPATH
 #undef ACCESS_FILEPATH
+#undef ACCESS_TOKEN_EXPIRY_FILEPATH
 #undef PROJECT_ID_FILEPATH
 }
 

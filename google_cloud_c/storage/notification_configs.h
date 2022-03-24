@@ -5,8 +5,8 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#include <google_cloud_c_export.h>
-#include <google_cloud_c_types_common.h>
+#include <google_cloud_c/common/google_cloud_c_types_common.h>
+#include <google_cloud_c/multi/google_cloud_c_multi_export.h>
 
 /* A subscription to receive Pub/Sub notifications.
  * https://cloud.google.com/storage/docs/json_api/v1/notifications#resource */
@@ -32,9 +32,9 @@ struct OptionalNotification {
   struct Notification notification;
 };
 
-extern GOOGLE_CLOUD_C_EXPORT const struct Notification EMPTY_NOTIFICATION;
+extern GOOGLE_CLOUD_C_MULTI_EXPORT const struct Notification EMPTY_NOTIFICATION;
 
-extern GOOGLE_CLOUD_C_EXPORT struct OptionalNotification
+extern GOOGLE_CLOUD_C_MULTI_EXPORT struct OptionalNotification
 get_notification_configuration(const struct configuration *, const char *);
 
 #ifdef __cplusplus

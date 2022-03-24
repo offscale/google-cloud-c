@@ -7,13 +7,13 @@ extern "C" {
 #elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
-#include <google_cloud_c_stdbool.h>
+#include <google_cloud_c/common/google_cloud_c_stdbool.h>
 #endif /* __cplusplus */
 
 #include <parson.h>
 
-#include <compute/cloud_auth.h>
-#include <google_cloud_c_export.h>
+#include <google_cloud_c/compute/cloud_auth.h>
+#include <google_cloud_c/compute/google_cloud_c_compute_export.h>
 
 struct Zone {
   const char *id;
@@ -38,7 +38,7 @@ struct Zones {
  * |   ZONES   |
  * ============= */
 
-extern GOOGLE_CLOUD_C_EXPORT struct Zones zone_list();
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Zones zone_list();
 
 #ifdef __cplusplus
 }

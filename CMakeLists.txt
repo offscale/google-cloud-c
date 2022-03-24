@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.12)
 project(google_cloud_c VERSION 0.0.1 LANGUAGES C)
 
 set(CMAKE_C_STANDARD 90)
@@ -34,7 +34,6 @@ configure_file(
         "${PROJECT_NAME}Config.h"
 )
 
-add_subdirectory("common")
 add_subdirectory("${PROJECT_NAME}")
 
 include(CTest)

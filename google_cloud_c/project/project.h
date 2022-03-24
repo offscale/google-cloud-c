@@ -1,8 +1,7 @@
 #ifndef GOOGLE_CLOUD_C_PROJECT_H
 #define GOOGLE_CLOUD_C_PROJECT_H
 
-#include <c89stringutils_string_extras.h>
-#include <compute/cloud_auth.h>
+#include <google_cloud_c/compute/cloud_auth.h>
 
 #ifdef __cplusplus
 #include <cstdbool>
@@ -10,8 +9,9 @@ extern "C" {
 #elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
-#include <google_cloud_c_stdbool.h>
+#include <google_cloud_c/common/google_cloud_c_stdbool.h>
 #endif /* __cplusplus */
+#include <google_cloud_c/project/google_cloud_c_project_export.h>
 
 struct ResourceId {
   const char *type;
@@ -37,11 +37,13 @@ struct Project {
   struct ResourceId *parent;
 };
 
-extern GOOGLE_CLOUD_C_EXPORT bool project_exists(const char *project_id);
+extern GOOGLE_CLOUD_C_PROJECT_EXPORT bool
+project_exists(const char *project_id);
 
-extern GOOGLE_CLOUD_C_EXPORT struct Project project_get(const char *project_id);
+extern GOOGLE_CLOUD_C_PROJECT_EXPORT struct Project
+project_get(const char *project_id);
 
-extern GOOGLE_CLOUD_C_EXPORT const struct Project *project_list();
+extern GOOGLE_CLOUD_C_PROJECT_EXPORT const struct Project *project_list();
 
 #ifdef __cplusplus
 }

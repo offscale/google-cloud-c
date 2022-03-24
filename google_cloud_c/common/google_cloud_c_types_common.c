@@ -1,4 +1,4 @@
-#include <google_cloud_c_types_common.h>
+#include <google_cloud_c/common/google_cloud_c_types_common.h>
 
 const struct StatusAndArrayCStrArray StatusAndArrayCStrArrayNull = {
     EXIT_FAILURE, NULL, 0};

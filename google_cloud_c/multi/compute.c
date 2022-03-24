@@ -1,8 +1,8 @@
 #include <assert.h>
-#include <compute/cloud_auth.h>
-#include <compute/instance.h>
-#include <compute/zones.h>
-#include <google_cloud_c_types_common.h>
+#include <google_cloud_c/common/google_cloud_c_types_common.h>
+#include <google_cloud_c/compute/cloud_auth.h>
+#include <google_cloud_c/compute/instance.h>
+#include <google_cloud_c/compute/zones.h>
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
 #define strdup _strdup

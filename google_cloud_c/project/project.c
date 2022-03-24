@@ -1,6 +1,6 @@
+#include <google_cloud_c/project/project.h>
 #include <json_common.h>
 #include <parson.h>
-#include <project/project.h>
 
 enum LifecycleState str_to_LifecycleState(const char *);
 struct Project project_parse(const JSON_Object *);

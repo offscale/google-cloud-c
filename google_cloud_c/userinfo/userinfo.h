@@ -10,11 +10,11 @@ extern "C" {
 #if __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
-#include <google_cloud_c_stdbool.h>
+#include <google_cloud_c/common/google_cloud_c_stdbool.h>
 #endif /* __STDC_VERSION__ >= 199901L */
 #endif /* __cplusplus */
 
-#include <google_cloud_c_export.h>
+#include <google_cloud_c/userinfo/google_cloud_c_userinfo_export.h>
 
 struct UserInfo {
   const char *localId;
@@ -61,7 +61,8 @@ struct Oauth2UserInfo {
   bool email_verified;
 };
 
-extern GOOGLE_CLOUD_C_EXPORT struct Oauth2UserInfo userinfo_get(const char *);
+extern GOOGLE_CLOUD_C_USERINFO_EXPORT struct Oauth2UserInfo
+userinfo_get(const char *);
 
 #ifdef __cplusplus
 }

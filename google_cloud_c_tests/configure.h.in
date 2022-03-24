@@ -9,4 +9,9 @@
 #define CLIENT_ID                     "@CLIENT_ID@"
 #define CLIENT_SECRET                 "@CLIENT_SECRET@"
 
+#cmakedefine G_ACCESS_TOKEN                "@G_ACCESS_TOKEN@"
+#cmakedefine G_ACCESS_TOKEN_EXPIRY         @G_ACCESS_TOKEN_EXPIRY@
+#cmakedefine G_REFRESH_TOKEN               "@G_REFRESH_TOKEN@"
+#cmakedefine G_PROJECT_ID                  "@G_PROJECT_ID@"
+
 #endif /* !GOOGLE_CLOUD_C_CONFIG_H */

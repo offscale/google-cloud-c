@@ -11,7 +11,7 @@ extern "C" {
 #if __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
-#include <google_cloud_c_stdbool.h>
+#include <google_cloud_c/common/google_cloud_c_stdbool.h>
 #endif /* __STDC_VERSION__ >= 199901L */
 #endif /* __cplusplus */
 
@@ -22,7 +22,7 @@ typedef SSIZE_T ssize_t;
 #include <sys/types.h>
 #endif
 
-#include <google_cloud_c_common_export.h>
+#include <google_cloud_c/common/google_cloud_c_common_export.h>
 
 #ifndef ERROR_OR_TYPE
 #define ERROR_OR_TYPE
