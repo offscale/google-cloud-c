@@ -1,13 +1,17 @@
-#if __STDC_VERSION__ >= 199901L
+#ifdef __cplusplus
+#include <cstdbool>
+extern "C" {
+#elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
 #else
 #include <google_cloud_c/common/google_cloud_c_stdbool.h>
-#endif /* __STDC_VERSION__ >= 199901L */
+#endif /* __cplusplus */
+
+#include <greatest.h>
 
 #include <google_cloud_c_configure.h>
 
 #include "persist_auth.h"
-#include <greatest.h>
 
 #ifdef _MSC_VER
 #define NUM_FORMAT "%zu"
@@ -66,8 +70,8 @@ TEST x_create_fw_net_instance_should_be(void) {
   }
   cleanup_struct_cstr_cstr(&createComputeResp);
 
-  /* TODO: Actually test things */
   struct Instances instances = instances_list();
+  ASSERT_GT(instances.size, 0);
   PASS();
 }
 
@@ -76,4 +80,9 @@ SUITE(instance_suite) {
   auth();
   set_auth_context(PROJECT_ID, ACCESS_TOKEN);
   RUN_TEST(x_instance_list_should_be);
+  RUN_TEST(x_create_fw_net_instance_should_be);
 }
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */

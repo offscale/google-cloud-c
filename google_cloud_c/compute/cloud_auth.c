@@ -1,4 +1,4 @@
-#include "cloud_auth.h"
+#include <google_cloud_c/compute/cloud_auth.h>
 
 extern CURLU *set_compute_url_path(CURLU *, const char *);
 

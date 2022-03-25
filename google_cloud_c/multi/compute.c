@@ -6,7 +6,7 @@
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
 #define strdup _strdup
-#endif
+#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
 
 struct StatusAndCstrAndCStr
 create_fw_net_instance(const struct configuration *const config,

@@ -9,13 +9,13 @@
 
 #ifdef bool
 #undef bool
-#endif
+#endif /* bool */
 #ifdef true
 #undef true
-#endif
+#endif /* true */
 #ifdef false
 #undef false
-#endif
+#endif /* false */
 
 #include <stdlib.h>
 

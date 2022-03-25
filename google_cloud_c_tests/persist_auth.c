@@ -1,9 +1,11 @@
-#include "persist_auth.h"
-#include "google_cloud_c_configure.h"
-#include <cauthflow_server.h>
-#include <google_auth.h>
 #include <stdio.h>
 #include <unistd.h>
+
+#include <cauthflow_server.h>
+#include <google_auth.h>
+
+#include "google_cloud_c_configure.h"
+#include "persist_auth.h"
 
 const char *REFRESH_TOKEN = NULL;
 const char *ACCESS_TOKEN = NULL;

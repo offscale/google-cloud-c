@@ -1,15 +1,13 @@
 #ifndef GOOGLE_CLOUD_C_COMPUTE_H
 #define GOOGLE_CLOUD_C_COMPUTE_H
 
-#include <google_cloud_c/common/google_cloud_c_types_common.h>
-
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
-#include <google_cloud_c/multi/google_cloud_c_multi_export.h>
-
+#include <google_cloud_c/common/google_cloud_c_types_common.h>
 #include <google_cloud_c/compute/instance.h>
+#include <google_cloud_c/multi/google_cloud_c_multi_export.h>
 
 /*
 struct CInstance {

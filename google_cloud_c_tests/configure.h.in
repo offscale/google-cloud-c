@@ -6,8 +6,8 @@
 /* https://github.com/abseil/abseil-cpp/pull/705 until merge */
 #define _SILENCE_CXX17_RESULT_OF_DEPRECATION_WARNING
 
-#define CLIENT_ID                     "@CLIENT_ID@"
-#define CLIENT_SECRET                 "@CLIENT_SECRET@"
+#define CLIENT_ID                          "@CLIENT_ID@"
+#define CLIENT_SECRET                      "@CLIENT_SECRET@"
 
 #cmakedefine G_ACCESS_TOKEN                "@G_ACCESS_TOKEN@"
 #cmakedefine G_ACCESS_TOKEN_EXPIRY         @G_ACCESS_TOKEN_EXPIRY@

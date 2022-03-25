@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "cloud_auth.h"
+#include <google_cloud_c/compute/cloud_auth.h>
 #include <google_cloud_c/compute/google_cloud_c_compute_export.h>
 
 #ifdef __cplusplus

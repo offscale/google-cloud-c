@@ -10,8 +10,9 @@ extern "C" {
 #include <google_cloud_c/common/google_cloud_c_stdbool.h>
 #endif /* __cplusplus */
 
-#include <google_cloud_c/compute/google_cloud_c_compute_export.h>
 #include <parson.h>
+
+#include <google_cloud_c/compute/google_cloud_c_compute_export.h>
 
 struct GoogleCloudOperation {
   const char *id, *name, *zone, *operationType, *targetLink, *targetId, *status,

@@ -15,7 +15,7 @@ extern "C" {
 #endif /* __STDC_VERSION__ >= 199901L */
 #endif /* __cplusplus */
 
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 #include <BaseTsd.h>
 typedef SSIZE_T ssize_t;
 #else

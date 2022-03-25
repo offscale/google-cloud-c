@@ -15,15 +15,14 @@ extern "C" {
 #if defined(_GNU_SOURCE) || defined(HAVE_ASPRINTF)
 #include <stdio.h>
 #else
-#undef C89STRINGUTILS_IMPLEMENTATION
 #include <c89stringutils_string_extras.h>
 #endif
+
+#include <google_cloud_c/compute/google_cloud_c_compute_export.h>
 
 #define DEBUG_SERVER_RESPONSE(name)                                            \
   fprintf(response.status_code == 200 ? stdout : stderr, name ": %ld\t%s\n",   \
           response.status_code, response.body == NULL ? "" : response.body)
-
-#include <google_cloud_c/compute/google_cloud_c_compute_export.h>
 
 /* ============
  * |   AUTH   |

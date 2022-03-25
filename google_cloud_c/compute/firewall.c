@@ -1,4 +1,4 @@
-#include "firewall.h"
+#include <google_cloud_c/compute/firewall.h>
 
 const struct Firewall EMPTY_FIREWALL = {NULL};
 

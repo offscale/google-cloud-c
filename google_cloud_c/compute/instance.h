@@ -16,7 +16,7 @@ extern "C" {
 
 #ifdef interface
 #undef interface
-#endif
+#endif /* interface */
 
 #else
 

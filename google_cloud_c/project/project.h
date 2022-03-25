@@ -1,8 +1,6 @@
 #ifndef GOOGLE_CLOUD_C_PROJECT_H
 #define GOOGLE_CLOUD_C_PROJECT_H
 
-#include <google_cloud_c/compute/cloud_auth.h>
-
 #ifdef __cplusplus
 #include <cstdbool>
 extern "C" {
@@ -11,6 +9,8 @@ extern "C" {
 #else
 #include <google_cloud_c/common/google_cloud_c_stdbool.h>
 #endif /* __cplusplus */
+
+#include <google_cloud_c/compute/cloud_auth.h>
 #include <google_cloud_c/project/google_cloud_c_project_export.h>
 
 struct ResourceId {
