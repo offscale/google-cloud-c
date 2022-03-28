@@ -40,6 +40,9 @@ get_notification_configuration(const struct configuration *, const char *);
 extern GOOGLE_CLOUD_C_MULTI_EXPORT struct OptionalNotification
 insert_bucket_notification(const char *, const char *);
 
+extern GOOGLE_CLOUD_C_MULTI_EXPORT struct OptionalNotification
+get_bucket_notification(const char *, const char *);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
