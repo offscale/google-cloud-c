@@ -28,8 +28,8 @@ typedef unsigned long num_type;
 #include <google_cloud_c/compute/instance.h>
 
 TEST x_instance_list_should_be(void) {
-  /* TODO: Actually test things */
   struct Instances instances = instances_list();
+  ASSERT_GT(instances.size, 0);
   PASS();
 }
 

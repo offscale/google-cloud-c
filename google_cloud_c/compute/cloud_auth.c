@@ -101,6 +101,30 @@ CURLU *set_cloud_resource_url_path(CURLU *urlp, const char *path) {
   return urlp;
 }
 
+CURLU *set_storage_api_url_path(CURLU *urlp, const char *path) {
+  CURLUcode rc;
+  const size_t path_n = strlen(path);
+  if (urlp == NULL)
+    urlp = curl_url();
+  curl_url_set(urlp, CURLUPART_SCHEME, "https", 0);
+  rc = curl_url_set(urlp, CURLUPART_HOST, "storage.googleapis.com", 0);
+  assert(rc == CURLUE_OK);
+  assert(path_n > 0);
+  {
+    unsigned short j = path[0] == '/' ? 1 : 0;
+    if (path[j] == 'v' && /* path[1 + j] == '1' && */ path[2 + j] == '/') {
+      rc = curl_url_set(urlp, CURLUPART_PATH, path, 0);
+    } else {
+      char *appended_path;
+      asprintf(&appended_path, "/v1%s%s", path[0] == '/' ? "" : "/", path);
+      rc = curl_url_set(urlp, CURLUPART_PATH, appended_path, 0);
+    }
+    assert(rc == CURLUE_OK);
+  }
+
+  return urlp;
+}
+
 /*
 CURLU * set_body(CURLU *urlp, const char *path) {
     return urlp;
@@ -145,6 +169,26 @@ struct ServerResponse gcloud_cloud_resource_put(CURLU *urlp, const char *path,
 struct ServerResponse gcloud_cloud_resource_get(CURLU *urlp, const char *path,
                                                 struct curl_slist *headers) {
   return https_wrapper(set_cloud_resource_url_path(urlp, path), NULL, NULL,
+                       set_auth_and_json_headers(headers));
+}
+
+struct ServerResponse gcloud_storage_post(CURLU *urlp, const char *path,
+                                          const char *body,
+                                          struct curl_slist *headers) {
+  return https_wrapper(set_storage_api_url_path(urlp, path), make_request_post,
+                       body, set_auth_and_json_headers(headers));
+}
+
+struct ServerResponse gcloud_storage_put(CURLU *urlp, const char *path,
+                                         const char *body,
+                                         struct curl_slist *headers) {
+  return https_wrapper(set_storage_api_url_path(urlp, path), make_request_put,
+                       body, set_auth_and_json_headers(headers));
+}
+
+struct ServerResponse gcloud_storage_get(CURLU *urlp, const char *path,
+                                         struct curl_slist *headers) {
+  return https_wrapper(set_storage_api_url_path(urlp, path), NULL, NULL,
                        set_auth_and_json_headers(headers));
 }
 

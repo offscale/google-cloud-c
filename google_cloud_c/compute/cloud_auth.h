@@ -58,6 +58,13 @@ gcloud_cloud_resource_put(CURLU *, const char *, const char *,
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct ServerResponse
 gcloud_cloud_resource_get(CURLU *, const char *, struct curl_slist *);
 
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct ServerResponse
+gcloud_storage_post(CURLU *, const char *, const char *, struct curl_slist *);
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct ServerResponse
+gcloud_storage_put(CURLU *, const char *, const char *, struct curl_slist *);
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct ServerResponse
+gcloud_storage_get(CURLU *, const char *, struct curl_slist *);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
