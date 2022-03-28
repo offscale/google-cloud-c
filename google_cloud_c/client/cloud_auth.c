@@ -113,11 +113,25 @@ CURLU *set_storage_api_url_path(CURLU *urlp, const char *path) {
   return urlp;
 }
 
+CURLU *set_pubsub_api_url_path(CURLU *urlp, const char *path) {
+  CURLUcode rc;
+  const size_t path_n = strlen(path);
+  if (urlp == NULL)
+    urlp = curl_url();
+  curl_url_set(urlp, CURLUPART_SCHEME, "https", 0);
+  rc = curl_url_set(urlp, CURLUPART_HOST, "pubsub.googleapis.com", 0);
+  rc = curl_url_set(urlp, CURLUPART_PATH, path, 0);
+
+  return urlp;
+}
+
 /*
 CURLU * set_body(CURLU *urlp, const char *path) {
     return urlp;
 }
 */
+
+/* gcloud auth */
 
 struct ServerResponse gcloud_post(CURLU *urlp, const char *path,
                                   const char *body,
@@ -137,6 +151,8 @@ struct ServerResponse gcloud_get(CURLU *urlp, const char *path,
   return https_wrapper(set_compute_url_path(urlp, path), NULL, NULL,
                        set_auth_and_json_headers(headers));
 }
+
+/* gcloud resource */
 
 struct ServerResponse gcloud_cloud_resource_post(CURLU *urlp, const char *path,
                                                  const char *body,
@@ -160,6 +176,8 @@ struct ServerResponse gcloud_cloud_resource_get(CURLU *urlp, const char *path,
                        set_auth_and_json_headers(headers));
 }
 
+/* gcloud storage */
+
 struct ServerResponse gcloud_storage_post(CURLU *urlp, const char *path,
                                           const char *body,
                                           struct curl_slist *headers) {
@@ -180,21 +198,24 @@ struct ServerResponse gcloud_storage_get(CURLU *urlp, const char *path,
                        set_auth_and_json_headers(headers));
 }
 
-/*
-Request Auth::make_request(const char *path, const char *verb) const {
-    const URL u = URL("https://compute.googleapis.com/compute" + path);
-    Request req;
-    req.verb = verb;
-    req.uri.protocol = "HTTP";
-    req.uri.protocol_version = "1.0";
-    req.uri.use_ssl = true;
-    req.uri.port = 443;
-    req.uri.host = u.domain;
-    req.uri.path = u.path;
-    req.uri.querystring = u.encoded_querystring();
-    req.uri.fragment = u.fragment;
-    req.headers.push_back("HOST: " + req.uri.host);
-    req.headers.push_back("Authorization: Bearer " +
-std::string(google_access_token)); return req;
+/* gcloud pubsub */
+
+struct ServerResponse gcloud_pubsub_post(CURLU *urlp, const char *path,
+                                         const char *body,
+                                         struct curl_slist *headers) {
+  return https_wrapper(set_pubsub_api_url_path(urlp, path), make_request_post,
+                       body, set_auth_and_json_headers(headers));
 }
-*/
+
+struct ServerResponse gcloud_pubsub_put(CURLU *urlp, const char *path,
+                                        const char *body,
+                                        struct curl_slist *headers) {
+  return https_wrapper(set_pubsub_api_url_path(urlp, path), make_request_put,
+                       body, set_auth_and_json_headers(headers));
+}
+
+struct ServerResponse gcloud_pubsub_get(CURLU *urlp, const char *path,
+                                        struct curl_slist *headers) {
+  return https_wrapper(set_pubsub_api_url_path(urlp, path), NULL, NULL,
+                       set_auth_and_json_headers(headers));
+}

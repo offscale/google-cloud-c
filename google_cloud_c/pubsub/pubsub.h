@@ -14,6 +14,12 @@ extern "C" {
 
 enum PubSubState { STATE_UNSPECIFIED, ACTIVE, RESOURCE_ERROR };
 
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT enum PubSubState
+str_to_PubSubState(const char *);
+
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
+    PubSubState_to_str(enum PubSubState);
+
 /*
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions#Subscription
  */
@@ -54,8 +60,14 @@ struct OptionalSubscription {
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const struct Subscription
     EMPTY_SUBSCRIPTION;
 
-struct OptionalSubscription GOOGLE_CLOUD_C_PUBSUB_EXPORT
-get_pubsub_subscription();
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct OptionalSubscription
+get_pubsub_subscription(const char *);
+
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct OptionalSubscription
+create_pubsub_subscription(const char *, struct Subscription);
+
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT bool
+delete_pubsub_subscription(const char *subscription_id);
 
 #ifdef __cplusplus
 }
