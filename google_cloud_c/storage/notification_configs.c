@@ -34,7 +34,7 @@ get_notification_configuration(const struct configuration *config,
 struct OptionalNotification
 get_bucket_notification(const char *bucket_name, const char *notification_id) {
   char *path;
-  asprintf(&path, "/v1/b/%s/notificationConfigs/%s", bucket_name,
+  asprintf(&path, "/storage/v1/b/%s/notificationConfigs/%s", bucket_name,
            notification_id);
   struct ServerResponse response = gcloud_storage_get(NULL, path, NULL);
   /*free(path);*/
@@ -49,7 +49,7 @@ get_bucket_notification(const char *bucket_name, const char *notification_id) {
 struct OptionalNotification insert_bucket_notification(const char *bucket_name,
                                                        const char *topic) {
   char *path, *body;
-  asprintf(&path, "/v1/b/%s/notificationConfigs", bucket_name);
+  asprintf(&path, "/storage/v1/b/%s/notificationConfigs", bucket_name);
   asprintf(&body, "{\"topic\": \"%s\", \"payload_format\": \"JSON_API_V1\"}",
            topic);
   struct ServerResponse response = gcloud_storage_post(NULL, path, body, NULL);
