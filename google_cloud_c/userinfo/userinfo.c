@@ -1,7 +1,7 @@
 /* https://cloud.google.com/identity-platform/docs/reference/rest/v1/UserInfo */
 #include <curl/urlapi.h>
 #include <curl_simple_https.h>
-#include <google_cloud_c/compute/cloud_auth.h>
+#include <google_cloud_c/client/cloud_auth.h>
 #include <google_cloud_c/userinfo/userinfo.h>
 #include <json_common.h>
 

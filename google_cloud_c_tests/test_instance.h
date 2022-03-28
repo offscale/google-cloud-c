@@ -24,7 +24,7 @@ typedef int num_type;
 typedef unsigned long num_type;
 #endif /* _MSC_VER */
 
-#include <google_cloud_c/compute/cloud_auth.h>
+#include <google_cloud_c/client/cloud_auth.h>
 #include <google_cloud_c/compute/instance.h>
 
 TEST x_instance_list_should_be(void) {

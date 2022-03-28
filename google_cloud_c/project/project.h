@@ -10,7 +10,7 @@ extern "C" {
 #include <google_cloud_c/common/google_cloud_c_stdbool.h>
 #endif /* __cplusplus */
 
-#include <google_cloud_c/compute/cloud_auth.h>
+#include <google_cloud_c/client/cloud_auth.h>
 #include <google_cloud_c/project/google_cloud_c_project_export.h>
 
 struct ResourceId {

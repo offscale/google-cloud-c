@@ -1,7 +1,7 @@
 #include <json_common.h>
 #include <parson.h>
 
-#include <google_cloud_c/compute/cloud_auth.h>
+#include <google_cloud_c/client/cloud_auth.h>
 #include <google_cloud_c/storage/notification_configs.h>
 
 const struct Notification EMPTY_NOTIFICATION = {NULL, NULL, NULL, NULL,
@@ -34,7 +34,8 @@ get_notification_configuration(const struct configuration *config,
 struct OptionalNotification
 get_bucket_notification(const char *bucket_name, const char *notification_id) {
   char *path;
-  asprintf(&path, "/v1/b/%s/notificationConfigs", bucket_name);
+  asprintf(&path, "/v1/b/%s/notificationConfigs/%s", bucket_name,
+           notification_id);
   struct ServerResponse response = gcloud_storage_get(NULL, path, NULL);
   /*free(path);*/
   DEBUG_SERVER_RESPONSE("get_bucket_notification");

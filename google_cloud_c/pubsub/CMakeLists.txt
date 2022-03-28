@@ -1,23 +1,10 @@
 get_filename_component(DIRNAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 set(LIBRARY_NAME "${PROJECT_NAME}_${DIRNAME}")
 
-set(Header_Files
-        "compute_common.h"
-        "firewall.h"
-        "instance.h"
-        "network.h"
-        "zones.h"
-        )
-
+set(Header_Files "pubsub.h")
 source_group("Header Files" FILES "${Header_Files}")
 
-set(Source_Files
-        "compute_common.c"
-        "firewall.c"
-        "instance.c"
-        "network.c"
-        "zones.c"
-        )
+set(Source_Files "pubsub.c")
 source_group("Source Files" FILES "${Source_Files}")
 
 add_library("${LIBRARY_NAME}" "${LIBRARY_TYPE_FLAG}" "${Header_Files}" "${Source_Files}")
@@ -44,28 +31,15 @@ else ()
     get_curl(CURL_LINK_LIBRARIES)
 endif ()
 
-set(_libs "unofficial::parson::parson"
-        "libcurl-simple-https"
-        "${CURL_LINK_LIBRARIES}")
-
-target_link_libraries("${LIBRARY_NAME}" PRIVATE "${_libs}")
-
-find_package(cauthflow CONFIG REQUIRED)
 target_link_libraries(
         "${LIBRARY_NAME}"
-        PUBLIC
-        "cauthflow"
-        "cauthflow_utils"
-        "cauthflow_google_auth"
-        "cauthflow_compiler_flags"
-        "${PROJECT_NAME}_multi"
+        PRIVATE
+        "unofficial::parson::parson"
+        "libcurl-simple-https"
+        "${CURL_LINK_LIBRARIES}"
+        "${PROJECT_NAME}_common"
+        "${PROJECT_NAME}_compute"
 )
-
-find_path(C89STRINGUTILS_INCLUDE_DIRS "c89stringutils_string_extras.h")
-
-target_include_directories("${LIBRARY_NAME}" PRIVATE "${C89STRINGUTILS_INCLUDE_DIRS}")
-
-target_link_libraries("${LIBRARY_NAME}" PUBLIC "${PROJECT_NAME}_common")
 
 set_target_properties(
         "${LIBRARY_NAME}"
