@@ -1,5 +1,6 @@
-#include <google_cloud_c/compute/zones.h>
 #include <json_common.h>
+
+#include <google_cloud_c/compute/zones.h>
 
 struct Zones zone_list() {
   /* https://cloud.google.com/compute/docs/reference/rest/v1/zones/list

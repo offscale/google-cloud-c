@@ -1,15 +1,12 @@
-#include <json_common.h>
 #include <parson.h>
+
+#include <json_common.h>
 
 #include <google_cloud_c/client/cloud_auth.h>
 #include <google_cloud_c/pubsub/pubsub.h>
 
 const struct Subscription EMPTY_SUBSCRIPTION = {
     NULL, NULL, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, STATE_UNSPECIFIED};
-
-struct Subscription subscription_from_json(const JSON_Object *);
-
-const char *subscription_to_json(struct Subscription);
 
 /* Gets the configuration details of a subscription.
  * GET https://pubsub.googleapis.com/v1/{subscription}
@@ -62,8 +59,8 @@ create_pubsub_subscription(const char *subscription_id,
 }
 
 /* Deletes an existing subscription. All messages retained in the subscription
- * are immediately dropped. DELETE
- * https://pubsub.googleapis.com/v1/{subscription}
+ * are immediately dropped.
+ * DELETE https://pubsub.googleapis.com/v1/{subscription}
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/delete
  * */
 bool delete_pubsub_subscription(const char *subscription_id) {

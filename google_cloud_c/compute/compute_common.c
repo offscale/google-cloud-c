@@ -1,5 +1,6 @@
-#include <google_cloud_c/compute/compute_common.h>
 #include <parson.h>
+
+#include <google_cloud_c/compute/compute_common.h>
 
 const struct GoogleCloudOperation EMPTY_GOOGLE_CLOUD_OPERATION = {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL,

@@ -1,5 +1,6 @@
-#include <google_cloud_c/compute/network.h>
 #include <json_common.h>
+
+#include <google_cloud_c/compute/network.h>
 
 const struct RoutingConfig routingConfigNull = {""};
 

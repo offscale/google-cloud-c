@@ -60,14 +60,32 @@ struct OptionalSubscription {
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const struct Subscription
     EMPTY_SUBSCRIPTION;
 
+/* Gets the configuration details of a subscription.
+ * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/get
+ */
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct OptionalSubscription
 get_pubsub_subscription(const char *);
 
+/* Creates a subscription to a given topic.
+ * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/create
+ */
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct OptionalSubscription
 create_pubsub_subscription(const char *, struct Subscription);
 
+/* Deletes an existing subscription. All messages retained in the subscription
+ * are immediately dropped.
+ * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/delete
+ * */
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT bool
 delete_pubsub_subscription(const char *subscription_id);
+
+/* utility functions */
+
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Subscription
+subscription_from_json(const JSON_Object *);
+
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
+    subscription_to_json(struct Subscription);
 
 #ifdef __cplusplus
 }

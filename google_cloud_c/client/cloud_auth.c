@@ -103,7 +103,6 @@ CURLU *set_cloud_resource_url_path(CURLU *urlp, const char *path) {
 
 CURLU *set_storage_api_url_path(CURLU *urlp, const char *path) {
   CURLUcode rc;
-  const size_t path_n = strlen(path);
   if (urlp == NULL)
     urlp = curl_url();
   curl_url_set(urlp, CURLUPART_SCHEME, "https", 0);
@@ -115,7 +114,6 @@ CURLU *set_storage_api_url_path(CURLU *urlp, const char *path) {
 
 CURLU *set_pubsub_api_url_path(CURLU *urlp, const char *path) {
   CURLUcode rc;
-  const size_t path_n = strlen(path);
   if (urlp == NULL)
     urlp = curl_url();
   curl_url_set(urlp, CURLUPART_SCHEME, "https", 0);

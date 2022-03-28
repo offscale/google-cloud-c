@@ -1,9 +1,12 @@
 /* https://cloud.google.com/identity-platform/docs/reference/rest/v1/UserInfo */
 #include <curl/urlapi.h>
+
 #include <curl_simple_https.h>
+
+#include <json_common.h>
+
 #include <google_cloud_c/client/cloud_auth.h>
 #include <google_cloud_c/userinfo/userinfo.h>
-#include <json_common.h>
 
 struct Oauth2UserInfo oauth2_user_info_parse(const JSON_Object *);
 

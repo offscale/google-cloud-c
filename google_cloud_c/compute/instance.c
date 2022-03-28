@@ -1,6 +1,7 @@
+#include <json_common.h>
+
 #include <google_cloud_c/compute/compute_common.h>
 #include <google_cloud_c/compute/instance.h>
-#include <json_common.h>
 
 struct InstanceContext INSTANCE_CONTEXT = {NULL, NULL, NULL};
 
@@ -27,96 +28,6 @@ const struct Instance EMPTY_INSTANCE = {NULL,
                                         NULL};
 
 const struct Instances EMPTY_INSTANCES = {NULL, 0};
-
-struct OptionalInstance instance_from_json(const JSON_Object *jsonObject) {
-  assert(!json_object_has_value(jsonObject, "operationType"));
-  struct NetworkInterface *networkInterfaces;
-
-  if (!json_object_has_value(jsonObject, "name")) {
-    const struct OptionalInstance optionalInstance = {false, EMPTY_INSTANCE};
-    return optionalInstance;
-  }
-
-  {
-    const JSON_Array *network_json_items =
-        json_object_get_array(jsonObject, "networkInterfaces");
-    const size_t network_json_items_n =
-        json_array_get_count(network_json_items);
-    size_t i;
-    networkInterfaces = (struct NetworkInterface *)malloc(
-        network_json_items_n * sizeof(struct NetworkInterface));
-    for (i = 0; i < network_json_items_n; i++) {
-      const JSON_Object *network_json =
-          json_array_get_object(network_json_items, i);
-      struct AccessConfigs *accessConfigs;
-      {
-        const JSON_Array *ac_json_items =
-            json_object_get_array(network_json, "accessConfigs");
-        const size_t ac_json_items_n = json_array_get_count(ac_json_items);
-        size_t j;
-        accessConfigs = (struct AccessConfigs *)malloc(
-            ac_json_items_n * sizeof(struct AccessConfigs));
-        for (j = 0; j < ac_json_items_n; j++) {
-          const JSON_Object *ac_json = json_array_get_object(ac_json_items, i);
-          const struct AccessConfigs ac = {
-              json_object_get_string(ac_json, "type"),
-              json_object_get_string(ac_json, "name"),
-              json_object_get_string(ac_json, "natIP"),
-              json_object_get_string(ac_json, "networkTier"),
-              json_object_get_string(ac_json, "kind")};
-
-          accessConfigs[j] = ac;
-        }
-      }
-
-      const struct NetworkInterface networkInterface = {
-          json_object_get_string(network_json, "network"),
-          json_object_get_string(network_json, "subnetwork"),
-          json_object_get_string(network_json, "networkIP"),
-          json_object_get_string(network_json, "name"), accessConfigs};
-      networkInterfaces[i] = networkInterface;
-    }
-  }
-
-  struct Metadata metadata = {NULL /*std::vector<struct Item>()*/, ""};
-
-  struct Scheduling scheduling = {"", true, true};
-
-  struct ShieldedInstanceConfig shieldedInstanceConfig = {false, true, true};
-
-  struct ShieldedInstanceIntegrityPolicy shieldedInstanceIntegrityPolicy = {
-      true};
-
-  const struct Instance instance = {
-      json_object_get_string(jsonObject, "id"),
-      json_object_get_string(jsonObject, "creationTimestamp"),
-      json_object_get_string(jsonObject, "name"),
-      json_object_get_string(jsonObject, "machineType"),
-      json_object_get_string(jsonObject, "status"),
-      json_object_get_string(jsonObject, "zone"),
-
-      networkInterfaces,
-
-      NULL /*std::vector<struct Disk>()*/,
-
-      &metadata,
-
-      json_object_get_string(jsonObject, "selfLink"),
-
-      &scheduling,
-
-      json_object_get_string(jsonObject, "cpuPlatform"),
-      json_object_get_string(jsonObject, "labelFingerprint"),
-      (bool)json_object_get_boolean(jsonObject, "startRestricted"),
-      (bool)json_object_get_boolean(jsonObject, "deletionProtection"),
-      &shieldedInstanceConfig,
-      &shieldedInstanceIntegrityPolicy,
-      json_object_get_string(jsonObject, "fingerprint"),
-      json_object_get_string(jsonObject, "lastStartTimestamp"),
-      json_object_get_string(jsonObject, "kind")};
-  const struct OptionalInstance optionalInstance = {true, instance};
-  return optionalInstance;
-}
 
 bool instance_exists(const char *instance_name) {
   /* CHECK IF INSTANCE EXISTS */
@@ -193,22 +104,6 @@ struct OptionalInstance instance_get(const char *instance_name) {
   const JSON_Object *json_object = json_value_get_object(json_item);
 
   return instance_from_json(json_object);
-}
-
-const char *instance_to_json(const struct InstanceIncomplete *instance) {
-  char *instance_json_str;
-  asprintf(&instance_json_str,
-           "{\n"
-           "  \"name\": \"%s\",\n"
-           "  \"zone\": \"%s\",\n"
-           "  \"machineType\": \"%s\",\n"
-           "  \"cpuPlatform\": \"%s\",\n"
-           "  \"hostname\": \"%s\",\n"
-           "  \"kind\": \"%s\"\n"
-           "}",
-           instance->name, instance->zone, instance->machineType,
-           instance->cpuPlatform, instance->hostname, instance->kind);
-  return instance_json_str;
 }
 
 struct OptionalInstance
@@ -456,5 +351,113 @@ struct OptionalInstance instance_incomplete_create_all(
   } else
     optionalInstance = instance_get((*instance).name);
 
+  return optionalInstance;
+}
+
+/* Utility functions */
+
+const char *instance_to_json(const struct InstanceIncomplete *instance) {
+  char *instance_json_str;
+  asprintf(&instance_json_str,
+           "{\n"
+           "  \"name\": \"%s\",\n"
+           "  \"zone\": \"%s\",\n"
+           "  \"machineType\": \"%s\",\n"
+           "  \"cpuPlatform\": \"%s\",\n"
+           "  \"hostname\": \"%s\",\n"
+           "  \"kind\": \"%s\"\n"
+           "}",
+           instance->name, instance->zone, instance->machineType,
+           instance->cpuPlatform, instance->hostname, instance->kind);
+  return instance_json_str;
+}
+
+struct OptionalInstance instance_from_json(const JSON_Object *jsonObject) {
+  assert(!json_object_has_value(jsonObject, "operationType"));
+  struct NetworkInterface *networkInterfaces;
+
+  if (!json_object_has_value(jsonObject, "name")) {
+    const struct OptionalInstance optionalInstance = {false, EMPTY_INSTANCE};
+    return optionalInstance;
+  }
+
+  {
+    const JSON_Array *network_json_items =
+        json_object_get_array(jsonObject, "networkInterfaces");
+    const size_t network_json_items_n =
+        json_array_get_count(network_json_items);
+    size_t i;
+    networkInterfaces = (struct NetworkInterface *)malloc(
+        network_json_items_n * sizeof(struct NetworkInterface));
+    for (i = 0; i < network_json_items_n; i++) {
+      const JSON_Object *network_json =
+          json_array_get_object(network_json_items, i);
+      struct AccessConfigs *accessConfigs;
+      {
+        const JSON_Array *ac_json_items =
+            json_object_get_array(network_json, "accessConfigs");
+        const size_t ac_json_items_n = json_array_get_count(ac_json_items);
+        size_t j;
+        accessConfigs = (struct AccessConfigs *)malloc(
+            ac_json_items_n * sizeof(struct AccessConfigs));
+        for (j = 0; j < ac_json_items_n; j++) {
+          const JSON_Object *ac_json = json_array_get_object(ac_json_items, i);
+          const struct AccessConfigs ac = {
+              json_object_get_string(ac_json, "type"),
+              json_object_get_string(ac_json, "name"),
+              json_object_get_string(ac_json, "natIP"),
+              json_object_get_string(ac_json, "networkTier"),
+              json_object_get_string(ac_json, "kind")};
+
+          accessConfigs[j] = ac;
+        }
+      }
+
+      const struct NetworkInterface networkInterface = {
+          json_object_get_string(network_json, "network"),
+          json_object_get_string(network_json, "subnetwork"),
+          json_object_get_string(network_json, "networkIP"),
+          json_object_get_string(network_json, "name"), accessConfigs};
+      networkInterfaces[i] = networkInterface;
+    }
+  }
+
+  struct Metadata metadata = {NULL /*std::vector<struct Item>()*/, ""};
+
+  struct Scheduling scheduling = {"", true, true};
+
+  struct ShieldedInstanceConfig shieldedInstanceConfig = {false, true, true};
+
+  struct ShieldedInstanceIntegrityPolicy shieldedInstanceIntegrityPolicy = {
+      true};
+
+  const struct Instance instance = {
+      json_object_get_string(jsonObject, "id"),
+      json_object_get_string(jsonObject, "creationTimestamp"),
+      json_object_get_string(jsonObject, "name"),
+      json_object_get_string(jsonObject, "machineType"),
+      json_object_get_string(jsonObject, "status"),
+      json_object_get_string(jsonObject, "zone"),
+
+      networkInterfaces,
+
+      NULL /*std::vector<struct Disk>()*/,
+
+      &metadata,
+
+      json_object_get_string(jsonObject, "selfLink"),
+
+      &scheduling,
+
+      json_object_get_string(jsonObject, "cpuPlatform"),
+      json_object_get_string(jsonObject, "labelFingerprint"),
+      (bool)json_object_get_boolean(jsonObject, "startRestricted"),
+      (bool)json_object_get_boolean(jsonObject, "deletionProtection"),
+      &shieldedInstanceConfig,
+      &shieldedInstanceIntegrityPolicy,
+      json_object_get_string(jsonObject, "fingerprint"),
+      json_object_get_string(jsonObject, "lastStartTimestamp"),
+      json_object_get_string(jsonObject, "kind")};
+  const struct OptionalInstance optionalInstance = {true, instance};
   return optionalInstance;
 }

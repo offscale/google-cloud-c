@@ -38,6 +38,8 @@ struct Zones {
  * |   ZONES   |
  * ============= */
 
+/* Retrieves the list of Zone resources available to the specified project.
+ * https://cloud.google.com/compute/docs/reference/rest/v1/zones/list */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Zones zone_list();
 
 #ifdef __cplusplus

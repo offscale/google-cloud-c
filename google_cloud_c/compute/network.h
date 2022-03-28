@@ -46,11 +46,18 @@ struct OptionalNetwork {
  * |  NETWORK  |
  * ============= */
 
+/* CHECK IF NETWORK EXISTS
+ * https://cloud.google.com/compute/docs/reference/rest/v1/networks/get */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT bool network_exists(const char *);
 
+/* Returns the specified network.
+ * https://cloud.google.com/compute/docs/reference/rest/v1/networks/get */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalNetwork
 network_get(const char *network_name);
 
+/* Creates a network in the specified project using the data included in the
+ * request.
+ * https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalNetwork
 network_create(const char *network_name);
 

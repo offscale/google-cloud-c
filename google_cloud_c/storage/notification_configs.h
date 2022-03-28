@@ -34,14 +34,20 @@ struct OptionalNotification {
 
 extern GOOGLE_CLOUD_C_MULTI_EXPORT const struct Notification EMPTY_NOTIFICATION;
 
+/* View a Pub/Sub notification configuration on a given bucket
+ * https://cloud.google.com/storage/docs/json_api/v1/notifications/get */
 extern GOOGLE_CLOUD_C_MULTI_EXPORT struct OptionalNotification
 get_notification_configuration(const struct configuration *, const char *);
 
-extern GOOGLE_CLOUD_C_MULTI_EXPORT struct OptionalNotification
-insert_bucket_notification(const char *, const char *);
-
+/* View a Pub/Sub notification configuration on a given bucket.
+ * https://cloud.google.com/storage/docs/json_api/v1/notifications/get */
 extern GOOGLE_CLOUD_C_MULTI_EXPORT struct OptionalNotification
 get_bucket_notification(const char *, const char *);
+
+/* Creates a Pub/Sub notification configuration for a given bucket.
+ * https://cloud.google.com/storage/docs/json_api/v1/notifications/insert */
+extern GOOGLE_CLOUD_C_MULTI_EXPORT struct OptionalNotification
+insert_bucket_notification(const char *, const char *);
 
 #ifdef __cplusplus
 }

@@ -26,7 +26,7 @@ extern "C" {
 #define ERROR_CALL_NOT_IMPLEMENTED ENOATTR
 #endif
 
-// struct InstanceIncomplete cinstance_to_instance(const struct CInstance *);
+/* struct InstanceIncomplete cinstance_to_instance(const struct CInstance *); */
 
 struct AccessConfigs {
   const char *type, *name, *natIP, *networkTier, *kind;
@@ -115,36 +115,40 @@ struct InstanceContext {
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct InstanceContext INSTANCE_CONTEXT;
 
+/* Retrieves the list of instances contained within the specified zone.
+ * https://cloud.google.com/compute/docs/reference/rest/v1/instances/list
+ * */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Instances instances_list();
 
-// struct Instance instance_create_all(const struct InstanceIncomplete *);
+/* struct Instance instance_create_all(const struct InstanceIncomplete *);
 
-// struct Instance instance_create_all(const struct CInstance *);
+ * struct Instance instance_create_all(const struct CInstance *); */
 
+/* Returns the specified Instance resource.
+ * https://cloud.google.com/compute/docs/reference/rest/v1/instances/get */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT bool
 instance_exists(const char *instance_name);
 
+/* Creates an instance resource in the specified project using the data included
+ * in the request.
+ * https://cloud.google.com/compute/docs/reference/rest/v1/instances/insert */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalInstance
 instance_insert(const struct InstanceIncomplete *, const char *, const char *);
 
+/* Returns the specified Instance resource.
+ * https://cloud.google.com/compute/docs/reference/rest/v1/instances/get */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalInstance
 instance_get(const char *instance_name);
+
+/* Utility functions */
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalInstance
 instance_from_json(const JSON_Object *);
 
+/* Creates network, firewall, and instance */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalInstance
 instance_incomplete_create_all(const struct InstanceIncomplete *, const char *,
                                const char *, const char *);
-
-/*
-private:
-    static std::string instance_to_json(const struct InstanceIncomplete
-&instance) ;
-
-    struct Instance from(const json &_json) const;
-};
-*/
 
 #ifdef __cplusplus
 }

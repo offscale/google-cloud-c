@@ -30,11 +30,21 @@ struct OptionalFirewall {
  * |  FIREWALL |
  * ============= */
 
+/* Check if firewall exists
+ * https://cloud.google.com/compute/docs/reference/rest/v1/firewalls/get
+ */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT bool firewall_exists(const char *);
 
+/* Creates a firewall rule in the specified project using the data included in
+ * the request.
+ * https://cloud.google.com/compute/docs/reference/rest/v1/firewalls/insert
+ * */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalFirewall
 firewall_create(const char *, const char *);
 
+/* Returns the specified firewall.
+ * https://cloud.google.com/compute/docs/reference/rest/v1/firewalls/get
+ */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalFirewall
 firewall_get(const char *);
 
