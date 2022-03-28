@@ -12,17 +12,47 @@ extern "C" {
 
 #include <google_cloud_c/pubsub/google_cloud_c_pubsub_export.h>
 
+enum PubSubState { STATE_UNSPECIFIED, ACTIVE, RESOURCE_ERROR };
+
+/*
+ * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions#Subscription
+ */
 struct Subscription {
+  const char *name;
   const char *topic;
-  /* TODO:
-   * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions#Subscription
+  /* "pushConfig": {
+    object (PushConfig)
+  } */
+  int ackDeadlineSeconds;
+  bool retainAckedMessages;
+  const char *messageRetentionDuration;
+  const char **labels;
+  bool enableMessageOrdering;
+  /* "expirationPolicy": {
+    object (ExpirationPolicy)
+  } */
+
+  const char *filter;
+  /* "deadLetterPolicy": {
+    object (DeadLetterPolicy)
+  }
+   "retryPolicy": {
+    object (RetryPolicy)
+  }
    */
+  bool detached;
+  bool enableExactlyOnceDelivery;
+  const char *topicMessageRetentionDuration;
+  enum PubSubState state;
 };
 
 struct OptionalSubscription {
   bool set;
   struct Subscription subscription;
 };
+
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const struct Subscription
+    EMPTY_SUBSCRIPTION;
 
 struct OptionalSubscription GOOGLE_CLOUD_C_PUBSUB_EXPORT
 get_pubsub_subscription();
