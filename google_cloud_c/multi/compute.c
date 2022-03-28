@@ -1,4 +1,5 @@
 #include <assert.h>
+
 #include <google_cloud_c/client/cloud_auth.h>
 #include <google_cloud_c/common/google_cloud_c_types_common.h>
 #include <google_cloud_c/compute/instance.h>

@@ -66,11 +66,32 @@ target_include_directories(
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
+if (MSVC)
+    find_package(CURL CONFIG REQUIRED)
+    set(CURL_LINK_LIBRARIES CURL::libcurl)
+else ()
+    include(${CMAKE_SOURCE_DIR}/cmake/modules/FindCurlCustom.cmake)
+    get_curl(CURL_LINK_LIBRARIES)
+endif ()
+
+find_package(unofficial-parson CONFIG REQUIRED)
+find_package(libcurl-simple-https CONFIG REQUIRED)
+
 target_link_libraries(
         "${EXEC_NAME}"
         PRIVATE
         "${PROJECT_NAME}_compiler_flags"
         "${PROJECT_NAME}"
+)
+
+find_package(cauthflow CONFIG REQUIRED)
+target_link_libraries(
+        "${EXEC_NAME}"
+        PRIVATE
+        "cauthflow"
+        "cauthflow_utils"
+        "cauthflow_google_auth"
+        "cauthflow_compiler_flags"
 )
 
 add_test(NAME "${EXEC_NAME}"

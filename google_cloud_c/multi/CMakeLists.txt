@@ -22,8 +22,7 @@ target_include_directories(
 target_link_libraries(
         "${LIBRARY_NAME}"
         PUBLIC
-        "${PROJECT_NAME}_common"
-        "${PROJECT_NAME}_compute"
+        "${PROJECT_NAME}_client"
 )
 
 set_target_properties(

@@ -108,6 +108,7 @@ CURLU *set_storage_api_url_path(CURLU *urlp, const char *path) {
     urlp = curl_url();
   curl_url_set(urlp, CURLUPART_SCHEME, "https", 0);
   rc = curl_url_set(urlp, CURLUPART_HOST, "storage.googleapis.com", 0);
+  rc = curl_url_set(urlp, CURLUPART_PATH, path, 0);
 
   return urlp;
 }

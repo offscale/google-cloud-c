@@ -33,10 +33,15 @@ endif ()
 
 target_link_libraries(
         "${LIBRARY_NAME}"
-        PRIVATE
+        PUBLIC
         "unofficial::parson::parson"
         "libcurl-simple-https"
         "${CURL_LINK_LIBRARIES}"
+)
+
+target_link_libraries(
+        "${LIBRARY_NAME}"
+        PRIVATE
         "${PROJECT_NAME}_common"
         "${PROJECT_NAME}_compute"
 )

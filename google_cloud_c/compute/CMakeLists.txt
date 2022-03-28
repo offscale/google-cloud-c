@@ -34,38 +34,18 @@ target_include_directories(
 )
 
 find_package(unofficial-parson CONFIG REQUIRED)
-find_package(libcurl-simple-https CONFIG REQUIRED)
+target_link_libraries(
+        "${LIBRARY_NAME}"
+        PRIVATE
+        "unofficial::parson::parson"
+)
 
-if (MSVC)
-    find_package(CURL CONFIG REQUIRED)
-    set(CURL_LINK_LIBRARIES CURL::libcurl)
-else ()
-    include(${CMAKE_SOURCE_DIR}/cmake/modules/FindCurlCustom.cmake)
-    get_curl(CURL_LINK_LIBRARIES)
-endif ()
-
-set(_libs "unofficial::parson::parson"
-        "libcurl-simple-https"
-        "${CURL_LINK_LIBRARIES}")
-
-target_link_libraries("${LIBRARY_NAME}" PRIVATE "${_libs}")
-
-find_package(cauthflow CONFIG REQUIRED)
 target_link_libraries(
         "${LIBRARY_NAME}"
         PUBLIC
-        "cauthflow"
-        "cauthflow_utils"
-        "cauthflow_google_auth"
-        "cauthflow_compiler_flags"
         "${PROJECT_NAME}_multi"
+        "${PROJECT_NAME}_common"
 )
-
-find_path(C89STRINGUTILS_INCLUDE_DIRS "c89stringutils_string_extras.h")
-
-target_include_directories("${LIBRARY_NAME}" PRIVATE "${C89STRINGUTILS_INCLUDE_DIRS}")
-
-target_link_libraries("${LIBRARY_NAME}" PUBLIC "${PROJECT_NAME}_common")
 
 set_target_properties(
         "${LIBRARY_NAME}"

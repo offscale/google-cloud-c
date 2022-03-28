@@ -20,25 +20,10 @@ target_include_directories(
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-find_package(unofficial-parson CONFIG REQUIRED)
-find_package(libcurl-simple-https CONFIG REQUIRED)
-
-if (MSVC)
-    find_package(CURL CONFIG REQUIRED)
-    set(CURL_LINK_LIBRARIES CURL::libcurl)
-else ()
-    include(${CMAKE_SOURCE_DIR}/cmake/modules/FindCurlCustom.cmake)
-    get_curl(CURL_LINK_LIBRARIES)
-endif ()
-
 target_link_libraries(
         "${LIBRARY_NAME}"
-        PRIVATE
-        "unofficial::parson::parson"
-        "libcurl-simple-https"
-        "${CURL_LINK_LIBRARIES}"
-        "${PROJECT_NAME}_common"
-        "${PROJECT_NAME}_compute"
+        PUBLIC
+        "${PROJECT_NAME}_client"
 )
 
 set_target_properties(
