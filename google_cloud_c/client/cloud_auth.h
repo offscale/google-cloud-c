@@ -43,12 +43,16 @@ set_auth_and_json_headers(struct curl_slist *);
 extern GOOGLE_CLOUD_C_CLIENT_EXPORT CURLU *set_body(CURLU *, const char *);
 
 extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
+gcloud_get(CURLU *, const char *, struct curl_slist *);
+extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
 gcloud_post(CURLU *, const char *, const char *, struct curl_slist *);
 extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
 gcloud_put(CURLU *, const char *, const char *, struct curl_slist *);
 extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
-gcloud_get(CURLU *, const char *, struct curl_slist *);
+gcloud_delete(CURLU *, const char *, const char *, struct curl_slist *);
 
+extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
+gcloud_cloud_resource_get(CURLU *, const char *, struct curl_slist *);
 extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
 gcloud_cloud_resource_post(CURLU *, const char *, const char *,
                            struct curl_slist *);
@@ -56,23 +60,26 @@ extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
 gcloud_cloud_resource_put(CURLU *, const char *, const char *,
                           struct curl_slist *);
 extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
-gcloud_cloud_resource_get(CURLU *, const char *, struct curl_slist *);
+gcloud_cloud_resource_delete(CURLU *, const char *, const char *,
+                             struct curl_slist *);
 
+extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
+gcloud_storage_get(CURLU *, const char *, struct curl_slist *);
 extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
 gcloud_storage_post(CURLU *, const char *, const char *, struct curl_slist *);
 extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
 gcloud_storage_put(CURLU *, const char *, const char *, struct curl_slist *);
 extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
-gcloud_storage_get(CURLU *, const char *, struct curl_slist *);
-
-extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
-gcloud_pubsub_post(CURLU *, const char *, const char *, struct curl_slist *);
-
-extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
-gcloud_pubsub_put(CURLU *, const char *, const char *, struct curl_slist *);
+gcloud_storage_delete(CURLU *, const char *, const char *, struct curl_slist *);
 
 extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
 gcloud_pubsub_get(CURLU *, const char *, struct curl_slist *);
+extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
+gcloud_pubsub_post(CURLU *, const char *, const char *, struct curl_slist *);
+extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
+gcloud_pubsub_put(CURLU *, const char *, const char *, struct curl_slist *);
+extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct ServerResponse
+gcloud_pubsub_delete(CURLU *, const char *, const char *, struct curl_slist *);
 
 #ifdef __cplusplus
 }

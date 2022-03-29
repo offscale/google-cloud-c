@@ -131,6 +131,12 @@ CURLU * set_body(CURLU *urlp, const char *path) {
 
 /* gcloud auth */
 
+struct ServerResponse gcloud_get(CURLU *urlp, const char *path,
+                                 struct curl_slist *headers) {
+  return https_wrapper(set_compute_url_path(urlp, path), NULL, NULL,
+                       set_auth_and_json_headers(headers));
+}
+
 struct ServerResponse gcloud_post(CURLU *urlp, const char *path,
                                   const char *body,
                                   struct curl_slist *headers) {
@@ -144,13 +150,20 @@ struct ServerResponse gcloud_put(CURLU *urlp, const char *path,
                        set_auth_and_json_headers(headers));
 }
 
-struct ServerResponse gcloud_get(CURLU *urlp, const char *path,
-                                 struct curl_slist *headers) {
-  return https_wrapper(set_compute_url_path(urlp, path), NULL, NULL,
-                       set_auth_and_json_headers(headers));
+struct ServerResponse gcloud_delete(CURLU *urlp, const char *path,
+                                    const char *body,
+                                    struct curl_slist *headers) {
+  return https_wrapper(set_compute_url_path(urlp, path), make_request_delete,
+                       body, set_auth_and_json_headers(headers));
 }
 
 /* gcloud resource */
+
+struct ServerResponse gcloud_cloud_resource_get(CURLU *urlp, const char *path,
+                                                struct curl_slist *headers) {
+  return https_wrapper(set_cloud_resource_url_path(urlp, path), NULL, NULL,
+                       set_auth_and_json_headers(headers));
+}
 
 struct ServerResponse gcloud_cloud_resource_post(CURLU *urlp, const char *path,
                                                  const char *body,
@@ -168,13 +181,22 @@ struct ServerResponse gcloud_cloud_resource_put(CURLU *urlp, const char *path,
                        set_auth_and_json_headers(headers));
 }
 
-struct ServerResponse gcloud_cloud_resource_get(CURLU *urlp, const char *path,
-                                                struct curl_slist *headers) {
-  return https_wrapper(set_cloud_resource_url_path(urlp, path), NULL, NULL,
+struct ServerResponse gcloud_cloud_resource_delete(CURLU *urlp,
+                                                   const char *path,
+                                                   const char *body,
+                                                   struct curl_slist *headers) {
+  return https_wrapper(set_cloud_resource_url_path(urlp, path),
+                       make_request_delete, body,
                        set_auth_and_json_headers(headers));
 }
 
 /* gcloud storage */
+
+struct ServerResponse gcloud_storage_get(CURLU *urlp, const char *path,
+                                         struct curl_slist *headers) {
+  return https_wrapper(set_storage_api_url_path(urlp, path), NULL, NULL,
+                       set_auth_and_json_headers(headers));
+}
 
 struct ServerResponse gcloud_storage_post(CURLU *urlp, const char *path,
                                           const char *body,
@@ -190,13 +212,21 @@ struct ServerResponse gcloud_storage_put(CURLU *urlp, const char *path,
                        body, set_auth_and_json_headers(headers));
 }
 
-struct ServerResponse gcloud_storage_get(CURLU *urlp, const char *path,
-                                         struct curl_slist *headers) {
-  return https_wrapper(set_storage_api_url_path(urlp, path), NULL, NULL,
+struct ServerResponse gcloud_storage_delete(CURLU *urlp, const char *path,
+                                            const char *body,
+                                            struct curl_slist *headers) {
+  return https_wrapper(set_storage_api_url_path(urlp, path),
+                       make_request_delete, body,
                        set_auth_and_json_headers(headers));
 }
 
 /* gcloud pubsub */
+
+struct ServerResponse gcloud_pubsub_get(CURLU *urlp, const char *path,
+                                        struct curl_slist *headers) {
+  return https_wrapper(set_pubsub_api_url_path(urlp, path), NULL, NULL,
+                       set_auth_and_json_headers(headers));
+}
 
 struct ServerResponse gcloud_pubsub_post(CURLU *urlp, const char *path,
                                          const char *body,
@@ -212,8 +242,9 @@ struct ServerResponse gcloud_pubsub_put(CURLU *urlp, const char *path,
                        body, set_auth_and_json_headers(headers));
 }
 
-struct ServerResponse gcloud_pubsub_get(CURLU *urlp, const char *path,
-                                        struct curl_slist *headers) {
-  return https_wrapper(set_pubsub_api_url_path(urlp, path), NULL, NULL,
-                       set_auth_and_json_headers(headers));
+struct ServerResponse gcloud_pubsub_delete(CURLU *urlp, const char *path,
+                                           const char *body,
+                                           struct curl_slist *headers) {
+  return https_wrapper(set_pubsub_api_url_path(urlp, path), make_request_delete,
+                       body, set_auth_and_json_headers(headers));
 }

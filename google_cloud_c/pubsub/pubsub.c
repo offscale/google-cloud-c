@@ -68,7 +68,8 @@ bool delete_pubsub_subscription(const char *subscription_id) {
   asprintf(&path, "/v1/%s", subscription_id);
 
   {
-    struct ServerResponse response = gcloud_pubsub_get(NULL, path, NULL);
+    struct ServerResponse response =
+        gcloud_pubsub_delete(NULL, path, NULL, NULL);
     /* free(path) */
     return response.status_code == 200;
   }
