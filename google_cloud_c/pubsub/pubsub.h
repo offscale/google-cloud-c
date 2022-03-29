@@ -60,6 +60,33 @@ struct OptionalSubscription {
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const struct Subscription
     EMPTY_SUBSCRIPTION;
 
+/* https://cloud.google.com/pubsub/docs/reference/rest/v1/PubsubMessage */
+struct PubsubMessage {
+  const char *data, *messageId, *publishTime, *orderingKey;
+  /* "attributes": {
+      string: string,
+      ...
+    }, */
+};
+
+/* https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/pull#ReceivedMessage
+ */
+struct ReceivedMessage {
+  const char *ackId;
+  struct PubsubMessage message;
+  int deliveryAttempt;
+};
+
+struct ReceivedMessages {
+  struct ReceivedMessage *receivedMessages;
+};
+
+struct AckIds {
+  const char **ackIds;
+};
+
+const char *AckIds_to_json_str(struct AckIds);
+
 /* Gets the configuration details of a subscription.
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/get
  */
@@ -71,6 +98,21 @@ get_pubsub_subscription(const char *);
  */
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct OptionalSubscription
 create_pubsub_subscription(const char *, struct Subscription);
+
+/* Pulls messages from the server.
+ * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/pull
+ * */
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct ReceivedMessages
+pull_pubsub_subscription(const char *subscription_id);
+
+/* Acknowledges the messages associated with the ackIds in the
+ * AcknowledgeRequest. The Pub/Sub system can remove the relevant messages from
+ * the subscription.
+ * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/acknowledge
+ * */
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT bool
+acknowledge_pubsub_subscription(const char *subscription_id,
+                                struct AckIds ack_ids);
 
 /* Deletes an existing subscription. All messages retained in the subscription
  * are immediately dropped.
@@ -86,6 +128,8 @@ subscription_from_json(const JSON_Object *);
 
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
     subscription_to_json(struct Subscription);
+
+struct ReceivedMessages receivedMessages_from_json(const JSON_Object *);
 
 #ifdef __cplusplus
 }
