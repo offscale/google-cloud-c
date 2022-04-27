@@ -26,6 +26,13 @@ target_link_libraries(
         "${PROJECT_NAME}_client"
 )
 
+find_package(unofficial-parson CONFIG REQUIRED)
+target_link_libraries(
+        "${LIBRARY_NAME}"
+        PRIVATE
+        "unofficial::parson::parson"
+)
+
 set_target_properties(
         "${LIBRARY_NAME}"
         PROPERTIES

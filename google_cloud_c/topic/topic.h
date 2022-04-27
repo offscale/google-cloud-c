@@ -12,6 +12,8 @@ extern "C" {
 
 #include <google_cloud_c/topic/google_cloud_c_topic_export.h>
 
+#include <parson.h>
+
 /*
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics#MessageStoragePolicy
  */

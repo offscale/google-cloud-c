@@ -10,6 +10,8 @@ extern "C" {
 #include <google_cloud_c/common/google_cloud_c_stdbool.h>
 #endif /* __cplusplus */
 
+#include <parson.h>
+
 #include <google_cloud_c/pubsub/google_cloud_c_pubsub_export.h>
 
 enum PubSubState { STATE_UNSPECIFIED, ACTIVE, RESOURCE_ERROR };
