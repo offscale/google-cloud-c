@@ -3,7 +3,7 @@
 #include <json_common.h>
 
 #include <google_cloud_c/client/cloud_auth.h>
-#include <google_cloud_c/topic/topic.h>
+#include <google_cloud_c/pubsub/topic.h>
 
 const struct Topic EMPTY_TOPIC = {NULL,  NULL, NULL, NULL, ENCODING_UNSPECIFIED,
                                   false, NULL};
@@ -124,28 +124,36 @@ struct Topic topic_from_json(const JSON_Object *jsonObject) {
 
 const char *SchemaSettings_to_json(struct SchemaSettings schemaSettings) {
   char *s;
-  asprintf(&s,
-           "{"
-           "  \"schema\": \"%s\","
-           "  \"encoding\": \"%s\""
-           "}",
-           schemaSettings.schema, Encoding_to_str(schemaSettings.encoding));
+  jasprintf(&s, "{");
+  if (schemaSettings.schema != NULL && strlen(schemaSettings.schema) > 0)
+    jasprintf(&s, "  \"schema\": \"%s\",", schemaSettings.schema);
+  if (schemaSettings.encoding)
+    jasprintf(&s, "  \"encoding\": \"%s\"",
+              Encoding_to_str(schemaSettings.encoding));
+  jasprintf(&s, "\0");
+  s[strlen(s) - 1] = '}';
   return s;
 }
 
 const char *topic_to_json(struct Topic topic) {
   char *s;
-  asprintf(&s,
-           "{"
-           "  \"name\": \"%s\","
-           "  \"kmsKeyName\": \"%s\","
-           "  \"satisfiesPzs\": %ld,"
-           "  \"messageRetentionDuration\": \"%s\","
-           "  \"schemaSettings\": %s"
-           "}",
-           /* TODO: MessageStoragePolicy */
-           topic.name, topic.kmsKeyName, topic.satisfiesPzs,
-           topic.messageRetentionDuration,
-           SchemaSettings_to_json(topic.schemaSettings));
+  jasprintf(&s, "{");
+  if (topic.name != NULL && strlen(topic.name) > 0)
+    jasprintf(&s, "  \"name\": \"%s\",", topic.name);
+  if (topic.kmsKeyName != NULL && strlen(topic.kmsKeyName) > 0)
+    jasprintf(&s, "  \"kmsKeyName\": \"%s\",", topic.kmsKeyName);
+  if (topic.satisfiesPzs)
+    jasprintf(&s, "  \"satisfiesPzs\": %ld,", topic.satisfiesPzs);
+  if (topic.messageRetentionDuration != NULL &&
+      strlen(topic.messageRetentionDuration) > 0)
+    jasprintf(&s, "  \"messageRetentionDuration\": \"%s\",",
+              topic.messageRetentionDuration);
+  /* TODO: MessageStoragePolicy */
+  if (topic.schemaSettings.schema != NULL &&
+      strlen(topic.schemaSettings.schema) > 0)
+    jasprintf(&s, "  \"schemaSettings\": %s",
+              SchemaSettings_to_json(topic.schemaSettings));
+  jasprintf(&s, "\0");
+  s[strlen(s) - 1] = '}';
   return s;
 }

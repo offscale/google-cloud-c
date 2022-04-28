@@ -3,7 +3,7 @@
 #include <json_common.h>
 
 #include <google_cloud_c/client/cloud_auth.h>
-#include <google_cloud_c/pubsub/pubsub.h>
+#include <google_cloud_c/pubsub/subscription.h>
 
 const struct Subscription EMPTY_SUBSCRIPTION = {
     NULL, NULL, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, STATE_UNSPECIFIED};

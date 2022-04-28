@@ -1,10 +1,10 @@
 add_library("${PROJECT_NAME}" INTERFACE)
-foreach (lib "common" "client" "compute" "project" "pubsub" "storage" "topic" "userinfo" "multi")
+foreach (lib "common" "client" "compute" "project" "pubsub" "storage" "userinfo" "multi")
   add_subdirectory("${lib}")
   set(lib_name "${PROJECT_NAME}_${lib}")
   list(APPEND installable_libs "${lib_name}")
   target_link_libraries("${PROJECT_NAME}" INTERFACE "${lib_name}")
-endforeach (lib "common" "client" "compute" "project" "pubsub" "storage" "topic" "userinfo" "multi")
+endforeach (lib "common" "client" "compute" "project" "pubsub" "storage" "userinfo" "multi")
 
 # install rules
 include(GNUInstallDirs)

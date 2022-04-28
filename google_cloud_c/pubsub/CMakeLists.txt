@@ -1,10 +1,10 @@
 get_filename_component(DIRNAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 set(LIBRARY_NAME "${PROJECT_NAME}_${DIRNAME}")
 
-set(Header_Files "pubsub.h")
+set(Header_Files "subscription.h" "topic.h")
 source_group("Header Files" FILES "${Header_Files}")
 
-set(Source_Files "pubsub.c")
+set(Source_Files "subscription.c" "topic.c")
 source_group("Source Files" FILES "${Source_Files}")
 
 add_library("${LIBRARY_NAME}" "${LIBRARY_TYPE_FLAG}" "${Header_Files}" "${Source_Files}")
