@@ -160,30 +160,29 @@ struct Subscription subscription_from_json(const JSON_Object *jsonObject) {
 }
 
 const char *subscription_to_json(struct Subscription subscription) {
-  char *s;
-  asprintf(&s,
-           "{"
-           "  \"name\": \"%s\","
-           "  \"topic\": \"%s\","
-           "  \"ackDeadlineSeconds\": %d,"
-           "  \"retainAckedMessages\": %lu,"
-           "  \"messageRetentionDuration\": \"%s\","
-           /* "  \"labels\": \"%s\"," */
-           "  \"enableMessageOrdering\": %lu,"
-           "  \"filter\": \"%s\","
-           "  \"detached\": %lu,"
-           "  \"enableExactlyOnceDelivery\": %lu,"
-           "  \"topicMessageRetentionDuration\": \"%s\","
-           "  \"state\": \"%s\""
-           "}",
-           subscription.name, subscription.topic,
-           subscription.ackDeadlineSeconds, subscription.retainAckedMessages,
-           subscription.messageRetentionDuration,
-           /* subscription.labels, */
-           subscription.enableMessageOrdering, subscription.filter,
-           subscription.detached, subscription.enableExactlyOnceDelivery,
-           subscription.topicMessageRetentionDuration,
-           PubSubState_to_str(subscription.state));
+  char *s=NULL;
+  jasprintf(&s, "{");
+  if (subscription.name != NULL && strlen(subscription.name) > 0)
+    jasprintf(&s, "  \"name\": \"%s\",", subscription.name);
+  if (subscription.topic != NULL && strlen(subscription.topic) > 0)
+    jasprintf(&s, "  \"topic\": \"%s\",", subscription.topic);
+  if (subscription.ackDeadlineSeconds)
+    jasprintf(&s, "  \"ackDeadlineSeconds\": %d,", subscription.ackDeadlineSeconds);
+  if (subscription.retainAckedMessages)
+    jasprintf(&s, "  \"retainAckedMessages\": %lu,", subscription.retainAckedMessages);
+  if (subscription.messageRetentionDuration != NULL && strlen(subscription.messageRetentionDuration) > 0)
+    jasprintf(&s, "  \"messageRetentionDuration\": \"%s\",", subscription.messageRetentionDuration);
+  /* "  \"labels\": \"%s\"," */
+  jasprintf(&s, "  \"enableMessageOrdering\": \"%s\",", subscription.enableMessageOrdering);
+  if (subscription.filter != NULL && strlen(subscription.filter) > 0)
+    jasprintf(&s, "  \"filter\": \"%s\",", subscription.filter);
+  jasprintf(&s, "  \"detached\": %lu,"
+                "  \"enableExactlyOnceDelivery\": %lu,",
+                subscription.detached,
+                subscription.enableExactlyOnceDelivery);
+  if (subscription.topicMessageRetentionDuration != NULL && strlen(subscription.topicMessageRetentionDuration) > 0)
+    jasprintf(&s, "  \"topicMessageRetentionDuration\": \"%s\",", subscription.topicMessageRetentionDuration);
+  jasprintf(&s, "  \"state\": \"%s\"}", PubSubState_to_str(subscription.state));
   return s;
 }
 

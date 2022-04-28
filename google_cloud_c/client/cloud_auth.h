@@ -32,6 +32,10 @@ struct AuthContext {
   const char *project_id, *google_access_token;
 };
 
+struct GClient {
+  struct ServerResponse(*client);
+};
+
 extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct AuthContext AUTH_CONTEXT;
 
 extern GOOGLE_CLOUD_C_CLIENT_EXPORT struct AuthContext
