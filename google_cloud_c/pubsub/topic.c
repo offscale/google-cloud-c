@@ -123,7 +123,7 @@ struct Topic topic_from_json(const JSON_Object *jsonObject) {
 }
 
 const char *SchemaSettings_to_json(struct SchemaSettings schemaSettings) {
-  char *s;
+  char *s=NULL;
   jasprintf(&s, "{");
   if (schemaSettings.schema != NULL && strlen(schemaSettings.schema) > 0)
     jasprintf(&s, "  \"schema\": \"%s\",", schemaSettings.schema);
@@ -136,7 +136,7 @@ const char *SchemaSettings_to_json(struct SchemaSettings schemaSettings) {
 }
 
 const char *topic_to_json(struct Topic topic) {
-  char *s;
+  char *s=NULL;
   jasprintf(&s, "{");
   if (topic.name != NULL && strlen(topic.name) > 0)
     jasprintf(&s, "  \"name\": \"%s\",", topic.name);
