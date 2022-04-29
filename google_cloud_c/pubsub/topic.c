@@ -98,8 +98,9 @@ const char *Encoding_to_str(enum Encoding encoding) {
 struct Topic topic_from_json(const JSON_Object *jsonObject) {
   struct Topic topic;
 
-  topic.name = json_object_get_string(jsonObject, "name");
-  {
+  if (json_object_has_value(jsonObject, "name"))
+    topic.name = json_object_get_string(jsonObject, "name");
+  if (json_object_has_value(jsonObject, "messageStoragePolicy")) {
     const JSON_Object *jsonMessageStoragePolicy =
         json_object_get_object(jsonObject, "messageStoragePolicy");
     struct MessageStoragePolicy messageStoragePolicy;
@@ -108,25 +109,32 @@ struct Topic topic_from_json(const JSON_Object *jsonObject) {
                                              "allowedPersistenceRegions");
     topic.messageStoragePolicy = messageStoragePolicy;
   }
-  topic.kmsKeyName = json_object_get_string(jsonObject, "kmsKeyName");
-  {
+  if (json_object_has_value(jsonObject, "kmsKeyName"))
+    topic.kmsKeyName = json_object_get_string(jsonObject, "kmsKeyName");
+  if (json_object_has_value(jsonObject, "SchemaSettings")) {
     const JSON_Object *jsonSchemaSettings =
         json_object_get_object(jsonObject, "SchemaSettings");
     struct SchemaSettings schemaSettings;
-    schemaSettings.schema = json_object_get_string(jsonObject, "schema");
-    schemaSettings.encoding =
-        str_to_Encoding(json_object_get_string(jsonSchemaSettings, "encoding"));
+    if (json_object_has_value(jsonSchemaSettings, "schema"))
+      schemaSettings.schema =
+          json_object_get_string(jsonSchemaSettings, "schema");
+    if (json_object_has_value(jsonSchemaSettings, "encoding"))
+      schemaSettings.encoding = str_to_Encoding(
+          json_object_get_string(jsonSchemaSettings, "encoding"));
     topic.schemaSettings = schemaSettings;
   }
-  topic.satisfiesPzs = (bool)json_object_get_boolean(jsonObject, "kmsKeyName");
-  topic.messageRetentionDuration =
-      json_object_get_string(jsonObject, "messageRetentionDuration");
+  if (json_object_has_value(jsonObject, "satisfiesPzs"))
+    topic.satisfiesPzs =
+        (bool)json_object_get_boolean(jsonObject, "kmsKeyName");
+  if (json_object_has_value(jsonObject, "messageRetentionDuration"))
+    topic.messageRetentionDuration =
+        json_object_get_string(jsonObject, "messageRetentionDuration");
 
   return topic;
 }
 
 const char *SchemaSettings_to_json(struct SchemaSettings schemaSettings) {
-  char *s=NULL;
+  char *s = NULL;
   jasprintf(&s, "{");
   if (schemaSettings.schema != NULL && strlen(schemaSettings.schema) > 0)
     jasprintf(&s, "  \"schema\": \"%s\",", schemaSettings.schema);
@@ -139,7 +147,7 @@ const char *SchemaSettings_to_json(struct SchemaSettings schemaSettings) {
 }
 
 const char *topic_to_json(struct Topic topic) {
-  char *s=NULL;
+  char *s = NULL;
   jasprintf(&s, "{");
   if (topic.name != NULL && strlen(topic.name) > 0)
     jasprintf(&s, "  \"name\": \"%s\",", topic.name);

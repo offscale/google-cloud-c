@@ -140,53 +140,73 @@ const char *PubSubState_to_str(enum PubSubState state) {
 struct Subscription subscription_from_json(const JSON_Object *jsonObject) {
   struct Subscription subscription;
 
-  subscription.name = json_object_get_string(jsonObject, "name");
-  subscription.topic = json_object_get_string(jsonObject, "topic");
-  subscription.ackDeadlineSeconds =
-      (int)json_object_get_number(jsonObject, "ackDeadlineSeconds");
-  subscription.retainAckedMessages =
-      (bool)json_object_get_boolean(jsonObject, "retainAckedMessages");
-  subscription.messageRetentionDuration =
-      json_object_get_string(jsonObject, "messageRetentionDuration");
-  subscription.labels =
-      (const char **)json_object_get_array(jsonObject, "labels");
-  subscription.enableMessageOrdering =
-      (bool)json_object_get_boolean(jsonObject, "name");
-  subscription.filter = json_object_get_string(jsonObject, "filter");
-  subscription.detached = (bool)json_object_get_boolean(jsonObject, "detached");
-  subscription.enableExactlyOnceDelivery =
-      (bool)json_object_get_boolean(jsonObject, "enableExactlyOnceDelivery");
-  subscription.topicMessageRetentionDuration =
-      json_object_get_string(jsonObject, "topicMessageRetentionDuration");
-  subscription.state =
-      str_to_PubSubState(json_object_get_string(jsonObject, "state"));
+  if (json_object_has_value(jsonObject, "name"))
+    subscription.name = json_object_get_string(jsonObject, "name");
+  if (json_object_has_value(jsonObject, "topic"))
+    subscription.topic = json_object_get_string(jsonObject, "topic");
+  if (json_object_has_value(jsonObject, "ackDeadlineSeconds"))
+    subscription.ackDeadlineSeconds =
+        (int)json_object_get_number(jsonObject, "ackDeadlineSeconds");
+  if (json_object_has_value(jsonObject, "retainAckedMessages"))
+    subscription.retainAckedMessages =
+        (bool)json_object_get_boolean(jsonObject, "retainAckedMessages");
+  if (json_object_has_value(jsonObject, "messageRetentionDuration"))
+    subscription.messageRetentionDuration =
+        json_object_get_string(jsonObject, "messageRetentionDuration");
+  if (json_object_has_value(jsonObject, "labels"))
+    subscription.labels =
+        (const char **)json_object_get_array(jsonObject, "labels");
+  if (json_object_has_value(jsonObject, "enableMessageOrdering"))
+    subscription.enableMessageOrdering =
+        (bool)json_object_get_boolean(jsonObject, "enableMessageOrdering");
+  if (json_object_has_value(jsonObject, "filter"))
+    subscription.filter = json_object_get_string(jsonObject, "filter");
+  if (json_object_has_value(jsonObject, "detached"))
+    subscription.detached =
+        (bool)json_object_get_boolean(jsonObject, "detached");
+  if (json_object_has_value(jsonObject, "enableExactlyOnceDelivery"))
+    subscription.enableExactlyOnceDelivery =
+        (bool)json_object_get_boolean(jsonObject, "enableExactlyOnceDelivery");
+  if (json_object_has_value(jsonObject, "topicMessageRetentionDuration"))
+    subscription.topicMessageRetentionDuration =
+        json_object_get_string(jsonObject, "topicMessageRetentionDuration");
+  if (json_object_has_value(jsonObject, "state"))
+    subscription.state =
+        str_to_PubSubState(json_object_get_string(jsonObject, "state"));
 
   return subscription;
 }
 
 const char *subscription_to_json(struct Subscription subscription) {
-  char *s=NULL;
+  char *s = NULL;
   jasprintf(&s, "{");
   if (subscription.name != NULL && strlen(subscription.name) > 0)
     jasprintf(&s, "  \"name\": \"%s\",", subscription.name);
   if (subscription.topic != NULL && strlen(subscription.topic) > 0)
     jasprintf(&s, "  \"topic\": \"%s\",", subscription.topic);
   if (subscription.ackDeadlineSeconds)
-    jasprintf(&s, "  \"ackDeadlineSeconds\": %d,", subscription.ackDeadlineSeconds);
+    jasprintf(&s, "  \"ackDeadlineSeconds\": %d,",
+              subscription.ackDeadlineSeconds);
   if (subscription.retainAckedMessages)
-    jasprintf(&s, "  \"retainAckedMessages\": %lu,", subscription.retainAckedMessages);
-  if (subscription.messageRetentionDuration != NULL && strlen(subscription.messageRetentionDuration) > 0)
-    jasprintf(&s, "  \"messageRetentionDuration\": \"%s\",", subscription.messageRetentionDuration);
+    jasprintf(&s, "  \"retainAckedMessages\": %lu,",
+              subscription.retainAckedMessages);
+  if (subscription.messageRetentionDuration != NULL &&
+      strlen(subscription.messageRetentionDuration) > 0)
+    jasprintf(&s, "  \"messageRetentionDuration\": \"%s\",",
+              subscription.messageRetentionDuration);
   /* "  \"labels\": \"%s\"," */
-  jasprintf(&s, "  \"enableMessageOrdering\": \"%s\",", subscription.enableMessageOrdering);
+  jasprintf(&s, "  \"enableMessageOrdering\": \"%s\",",
+            subscription.enableMessageOrdering);
   if (subscription.filter != NULL && strlen(subscription.filter) > 0)
     jasprintf(&s, "  \"filter\": \"%s\",", subscription.filter);
-  jasprintf(&s, "  \"detached\": %lu,"
-                "  \"enableExactlyOnceDelivery\": %lu,",
-                subscription.detached,
-                subscription.enableExactlyOnceDelivery);
-  if (subscription.topicMessageRetentionDuration != NULL && strlen(subscription.topicMessageRetentionDuration) > 0)
-    jasprintf(&s, "  \"topicMessageRetentionDuration\": \"%s\",", subscription.topicMessageRetentionDuration);
+  jasprintf(&s,
+            "  \"detached\": %lu,"
+            "  \"enableExactlyOnceDelivery\": %lu,",
+            subscription.detached, subscription.enableExactlyOnceDelivery);
+  if (subscription.topicMessageRetentionDuration != NULL &&
+      strlen(subscription.topicMessageRetentionDuration) > 0)
+    jasprintf(&s, "  \"topicMessageRetentionDuration\": \"%s\",",
+              subscription.topicMessageRetentionDuration);
   jasprintf(&s, "  \"state\": \"%s\"}", PubSubState_to_str(subscription.state));
   return s;
 }
