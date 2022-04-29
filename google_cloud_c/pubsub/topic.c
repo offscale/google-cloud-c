@@ -18,6 +18,7 @@ struct OptionalTopic get_topic(const char *topic_id) {
 
   {
     struct ServerResponse response = gcloud_pubsub_get(NULL, path, NULL);
+    DEBUG_SERVER_RESPONSE("get_topic_response");
     if (response.status_code == 200 && strlen(response.body) > 0) {
       struct OptionalTopic optionalTopic = {
           true, topic_from_json(json_value_get_object(
@@ -41,6 +42,7 @@ struct OptionalTopic create_topic(const char *topic_id, struct Topic topic) {
   {
     struct ServerResponse response =
         gcloud_pubsub_put(NULL, path, topic_to_json(topic), NULL);
+    DEBUG_SERVER_RESPONSE("create_topic_response");
     if (response.status_code == 200 && strlen(response.body) > 0) {
       struct OptionalTopic optionalTopic = {
           true, topic_from_json(json_value_get_object(
@@ -64,6 +66,7 @@ bool delete_topic(const char *topic_id) {
   {
     struct ServerResponse response =
         gcloud_pubsub_delete(NULL, path, NULL, NULL);
+    DEBUG_SERVER_RESPONSE("delete_topic_response");
     /* free(path) */
     return response.status_code == 200;
   }

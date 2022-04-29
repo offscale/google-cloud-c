@@ -19,6 +19,7 @@ get_pubsub_subscription(const char *subscription_id) {
 
   {
     struct ServerResponse response = gcloud_pubsub_get(NULL, path, NULL);
+    DEBUG_SERVER_RESPONSE("get_pubsub_subscription_response");
     if (response.status_code == 200 && strlen(response.body) > 0) {
       struct OptionalSubscription optionalSubscription = {
           true, subscription_from_json(json_value_get_object(
@@ -45,6 +46,7 @@ create_pubsub_subscription(const char *subscription_id,
   {
     struct ServerResponse response =
         gcloud_pubsub_put(NULL, path, subscription_to_json(subscription), NULL);
+    DEBUG_SERVER_RESPONSE("create_pubsub_subscription_response");
     if (response.status_code == 200 && strlen(response.body) > 0) {
       struct OptionalSubscription optionalSubscription = {
           true, subscription_from_json(json_value_get_object(
@@ -68,6 +70,7 @@ struct ReceivedMessages pull_pubsub_subscription(const char *subscription_id) {
 
   {
     struct ServerResponse response = gcloud_pubsub_post(NULL, path, NULL, NULL);
+    DEBUG_SERVER_RESPONSE("pull_pubsub_subscription_response");
     return receivedMessages_from_json(json_value_get_object(
         if_error_exit(json_parse_string(response.body), false)));
   }
@@ -87,6 +90,7 @@ bool acknowledge_pubsub_subscription(const char *subscription_id,
   {
     struct ServerResponse response =
         gcloud_pubsub_post(NULL, path, AckIds_to_json_str(ack_ids), NULL);
+    DEBUG_SERVER_RESPONSE("acknowledge_pubsub_subscription_response");
     /* free(path) */
     return response.status_code == 200;
   }
@@ -104,6 +108,7 @@ bool delete_pubsub_subscription(const char *subscription_id) {
   {
     struct ServerResponse response =
         gcloud_pubsub_delete(NULL, path, NULL, NULL);
+    DEBUG_SERVER_RESPONSE("delete_pubsub_subscription_response");
     /* free(path) */
     return response.status_code == 200;
   }
