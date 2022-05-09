@@ -16,16 +16,13 @@ struct Policy getIamPolicy(const char *resource,
   {
     CURLUcode rc;
     CURLU *urlp = curl_url();
-    rc = curl_url_set(urlp, CURLUPART_SCHEME, "https", 0);
-    rc = curl_url_set(urlp, CURLUPART_HOST, "pubsub.googleapis.com", 0);
-    /*rc = curl_url_set(urlp, CURLUPART_PATH, path, 0);*/
 
     if (getPolicyOptions != NULL)
       rc = curl_url_set(urlp, CURLUPART_QUERY,
                         GetPolicyOptions_to_json(getPolicyOptions), 0);
 
     {
-      struct ServerResponse response = gcloud_get(urlp, path, NULL);
+      struct ServerResponse response = gcloud_pubsub_get(urlp, path, NULL);
       DEBUG_SERVER_RESPONSE("getIamPolicy");
       assert(response.status_code == 200 && strlen(response.body) > 0);
       const JSON_Value *json_item =
@@ -43,22 +40,14 @@ struct Policy setIamPolicy(const char *resource, struct Policy *policy) {
   char *path;
   asprintf(&path, "/v1/%s:setIamPolicy", resource);
   {
-    CURLUcode rc;
-    CURLU *urlp = curl_url();
-    curl_url_set(urlp, CURLUPART_SCHEME, "https", 0);
-    rc = curl_url_set(urlp, CURLUPART_HOST, "pubsub.googleapis.com", 0);
-    /*rc = curl_url_set(urlp, CURLUPART_PATH, path, 0);*/
-
-    {
-      struct ServerResponse response =
-          gcloud_post(urlp, path, policy_to_json(policy), NULL);
-      DEBUG_SERVER_RESPONSE("setIamPolicy");
-      assert(response.status_code == 200 && strlen(response.body) > 0);
-      const JSON_Value *json_item =
-          if_error_exit(json_parse_string(response.body), false);
-      const JSON_Object *json_object = json_value_get_object(json_item);
-      return policy_from_json(json_object);
-    }
+    struct ServerResponse response =
+        gcloud_pubsub_post(NULL, path, policy_to_json(policy), NULL);
+    DEBUG_SERVER_RESPONSE("setIamPolicy");
+    assert(response.status_code == 200 && strlen(response.body) > 0);
+    const JSON_Value *json_item =
+        if_error_exit(json_parse_string(response.body), false);
+    const JSON_Object *json_object = json_value_get_object(json_item);
+    return policy_from_json(json_object);
   }
 }
 
