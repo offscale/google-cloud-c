@@ -52,8 +52,8 @@ CURLU *set_compute_url_path(CURLU *urlp, const char *path) {
   const size_t path_n = path == NULL ? 0 : strlen(path);
   if (urlp == NULL)
     urlp = curl_url();
-  IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_SCHEME, "https", 0));
   IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_HOST, "compute.googleapis.com", 0));
+  IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_SCHEME, "https", 0));
   /*IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_PORT, "443", 0);*/
   assert(path != NULL && path_n > 0);
   {
@@ -76,9 +76,9 @@ CURLU *set_cloud_resource_url_path(CURLU *urlp, const char *path) {
   const size_t path_n = path == NULL ? 0 : strlen(path);
   if (urlp == NULL)
     urlp = curl_url();
-  IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_SCHEME, "https", 0));
   IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_HOST,
                             "cloudresourcemanager.googleapis.com", 0));
+  IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_SCHEME, "https", 0));
   assert(path_n > 0);
   if (path != NULL) {
     unsigned short j = path[0] == '/' ? 1 : 0;
@@ -98,8 +98,8 @@ CURLU *set_storage_api_url_path(CURLU *urlp, const char *path) {
   if (urlp == NULL)
     urlp = curl_url();
 
-  IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_SCHEME, "https", 0));
   IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_HOST, "storage.googleapis.com", 0));
+  IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_SCHEME, "https", 0));
 
   if (path != NULL)
     IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_PATH, path, 0));
@@ -111,8 +111,8 @@ CURLU *set_pubsub_api_url_path(CURLU *urlp, const char *path) {
   if (urlp == NULL)
     urlp = curl_url();
 
-  IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_SCHEME, "https", 0));
   IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_HOST, "pubsub.googleapis.com", 0));
+  IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_SCHEME, "https", 0));
 
   if (path != NULL)
     IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_PATH, path, 0));
