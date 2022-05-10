@@ -2,12 +2,15 @@
 #define GOOGLE_CLOUD_C_CLIENT_CLOUD_AUTH_H
 
 #ifdef __cplusplus
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
 extern "C" {
-#endif /* __cplusplus */
-
+#else
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#endif /* __cplusplus */
 
 #include <curl/curl.h>
 #include <curl_simple_https.h>
@@ -16,11 +19,7 @@ extern "C" {
   if ((rc) != CURLUE_OK)                                                       \
   fprintf(stderr, "curl_url_set failed: %s\n", curl_url_strerror(rc))
 
-#if defined(_GNU_SOURCE) || defined(HAVE_ASPRINTF)
-#include <stdio.h>
-#else
 #include <c89stringutils_string_extras.h>
-#endif
 
 #include <google_cloud_c/client/google_cloud_c_client_export.h>
 
