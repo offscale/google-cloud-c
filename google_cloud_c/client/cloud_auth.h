@@ -12,7 +12,9 @@ extern "C" {
 #include <curl/curl.h>
 #include <curl_simple_https.h>
 
-#define IS_CURLUE_OK(rc) if((rc) != CURLUE_OK) fprintf(stderr, "curl_url_set failed: %s\n", curl_url_strerror(rc))
+#define IS_CURLUE_OK(rc)                                                       \
+  if ((rc) != CURLUE_OK)                                                       \
+  fprintf(stderr, "curl_url_set failed: %s\n", curl_url_strerror(rc))
 
 #if defined(_GNU_SOURCE) || defined(HAVE_ASPRINTF)
 #include <stdio.h>

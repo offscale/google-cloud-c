@@ -25,7 +25,7 @@ find_package(libcurl-simple-https CONFIG REQUIRED)
 
 if (MSVC)
     find_package(CURL CONFIG REQUIRED)
-    set(CURL_LINK_LIBRARIES CURL::libcurl)
+    set(CURL_LINK_LIBRARIES "CURL::libcurl")
 else ()
     include(${CMAKE_SOURCE_DIR}/cmake/modules/FindCurlCustom.cmake)
     get_curl(CURL_LINK_LIBRARIES)
@@ -39,12 +39,12 @@ target_link_libraries(
         "${CURL_LINK_LIBRARIES}"
 )
 
-target_link_libraries(
-        "${LIBRARY_NAME}"
-        PRIVATE
-        "${PROJECT_NAME}_common"
-        "${PROJECT_NAME}_compute"
-)
+#target_link_libraries(
+#        "${LIBRARY_NAME}"
+#        PRIVATE
+#        "${PROJECT_NAME}_common"
+#        "${PROJECT_NAME}_compute"
+#)
 
 set_target_properties(
         "${LIBRARY_NAME}"

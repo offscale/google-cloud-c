@@ -137,4 +137,4 @@ struct ReceivedMessages receivedMessages_from_json(const JSON_Object *);
 }
 #endif /* __cplusplus */
 
-#endif /* GOOGLE_CLOUD_C_PUBSUB_PUBSUB_H */
+#endif /* !GOOGLE_CLOUD_C_PUBSUB_PUBSUB_H */

@@ -60,9 +60,9 @@ CURLU *set_compute_url_path(CURLU *urlp, const char *path) {
     unsigned short j = path[0] == '/' ? 1 : 0;
     if (path[j] == 'c' && path[1 + j] == 'o' && path[2 + j] == 'm' &&
         path[3 + j] == 'p' && path[4 + j] == 'u' && path[5 + j] == 't' &&
-        path[6 + j] == 'e' && (path[7 + j] == '/' || path[7 + j] == '\0'))
+        path[6 + j] == 'e' && (path[7 + j] == '/' || path[7 + j] == '\0')) {
       IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_PATH, path, 0));
-    else {
+    } else {
       char *appended_path;
       asprintf(&appended_path, "/compute%s%s", path[0] == '/' ? "" : "/", path);
       IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_PATH, appended_path, 0));
@@ -82,9 +82,9 @@ CURLU *set_cloud_resource_url_path(CURLU *urlp, const char *path) {
   assert(path_n > 0);
   if (path != NULL) {
     unsigned short j = path[0] == '/' ? 1 : 0;
-    if (path[j] == 'v' && /* path[1 + j] == '1' && */ path[2 + j] == '/')
+    if (path[j] == 'v' && /* path[1 + j] == '1' && */ path[2 + j] == '/') {
       IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_PATH, path, 0));
-    else {
+    } else {
       char *appended_path;
       asprintf(&appended_path, "/v1%s%s", path[0] == '/' ? "" : "/", path);
       IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_PATH, appended_path, 0));
