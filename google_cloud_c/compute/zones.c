@@ -1,5 +1,3 @@
-#include <json_common.h>
-
 #include <google_cloud_c/compute/zones.h>
 
 struct Zones zone_list() {
@@ -8,39 +6,51 @@ struct Zones zone_list() {
   char *path;
   asprintf(&path, "/compute/v1/projects/%s/zones", AUTH_CONTEXT.project_id);
 
-  struct ServerResponse response = gcloud_get(NULL, path, NULL);
-  DEBUG_SERVER_RESPONSE("zone_list");
-  assert(response.status_code == 200);
+  {
+    struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    DEBUG_SERVER_RESPONSE("zone_list");
+    if (response.status_code == 200 && response.body != NULL &&
+        response.body[0] != '\0') {
+      const JSON_Value *zones_json_item = json_parse_string(response.body);
+      const JSON_Array *zone_json_items = json_object_get_array(
+          json_value_get_object(zones_json_item), "items");
+      const size_t zone_json_items_n = json_array_get_count(zone_json_items);
+      size_t i;
 
-  const JSON_Value *zones_json_item =
-      if_error_exit(json_parse_string(response.body), false);
-  const JSON_Array *zone_json_items =
-      json_object_get_array(json_value_get_object(zones_json_item), "items");
-  const size_t zone_json_items_n = json_array_get_count(zone_json_items);
-  size_t i;
-
-  struct Zone *zones =
-      (struct Zone *)malloc(zone_json_items_n * sizeof(struct Zone));
-  for (i = 0; i < zone_json_items_n; i++) {
-    const JSON_Object *zone_json = json_array_get_object(zone_json_items, i);
-    const struct Zone zone = {
-        /* id */ json_object_get_string(zone_json, "id"),
-        /* creationTimestamp */
-        json_object_get_string(zone_json, "creationTimestamp"),
-        /* name */ json_object_get_string(zone_json, "name"),
-        /* description */ json_object_get_string(zone_json, "description"),
-        /* status */ json_object_get_string(zone_json, "status"),
-        // /* deprecated */ zone.object.at("deprecated").object,
-        /* region */ json_object_get_string(zone_json, "region"),
-        /* selfLink */ json_object_get_string(zone_json, "selfLink"),
-        /* availableCpuPlatforms */
-        NULL, // zone.object.at("availableCpuPlatforms").array,
-        /* supportsPzs */
-        (bool)json_object_get_boolean(zone_json, "supportsPzs"),
-        /* kind */ json_object_get_string(zone_json, "kind"),
-    };
-    zones[i] = zone;
+      struct Zone *zones =
+          (struct Zone *)malloc(zone_json_items_n * sizeof(struct Zone));
+      for (i = 0; i < zone_json_items_n; i++)
+        zones[i] = zone_from_json(json_array_get_object(zone_json_items, i));
+      {
+        struct Zones _zones;
+        _zones.arr = zones;
+        _zones.size = zone_json_items_n;
+        return _zones;
+      }
+    } else {
+      const struct Zones _zones = {NULL, 0};
+      fputs("Empty response.body", stderr);
+      return _zones;
+    }
   }
-  const struct Zones _zones = {zones, zone_json_items_n};
-  return _zones;
+}
+
+/* utility functions */
+
+struct Zone zone_from_json(const JSON_Object *jsonObject) {
+  struct Zone zone;
+
+  zone.id = json_object_get_string(jsonObject, "id");
+  zone.creationTimestamp =
+      json_object_get_string(jsonObject, "creationTimestamp");
+  zone.name = json_object_get_string(jsonObject, "name");
+  zone.description = json_object_get_string(jsonObject, "description");
+  zone.status = json_object_get_string(jsonObject, "status");
+  zone.region = json_object_get_string(jsonObject, "region");
+  zone.selfLink = json_object_get_string(jsonObject, "selfLink");
+  zone.availableCpuPlatforms = NULL;
+  zone.supportsPzs = (bool)json_object_get_boolean(jsonObject, "supportsPzs");
+  zone.kind = json_object_get_string(jsonObject, "kind");
+
+  return zone;
 }

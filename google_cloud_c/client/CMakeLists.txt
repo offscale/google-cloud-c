@@ -39,13 +39,6 @@ target_link_libraries(
         "${CURL_LINK_LIBRARIES}"
 )
 
-#target_link_libraries(
-#        "${LIBRARY_NAME}"
-#        PRIVATE
-#        "${PROJECT_NAME}_common"
-#        "${PROJECT_NAME}_compute"
-#)
-
 set_target_properties(
         "${LIBRARY_NAME}"
         PROPERTIES

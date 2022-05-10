@@ -3,7 +3,6 @@
 #define GOOGLE_CLOUD_C_TYPES_COMMON_H
 
 #ifdef __cplusplus
-#include <cstdbool>
 #include <cstdlib>
 extern "C" {
 #else

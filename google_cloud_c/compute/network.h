@@ -2,7 +2,6 @@
 #define GOOGLE_CLOUD_C_NETWORK_H
 
 #ifdef __cplusplus
-#include <cstdbool>
 extern "C" {
 #elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
@@ -60,6 +59,11 @@ network_get(const char *network_name);
  * https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalNetwork
 network_create(const char *network_name);
+
+/* utility functions */
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Network
+network_from_json(const JSON_Object *);
 
 #ifdef __cplusplus
 }

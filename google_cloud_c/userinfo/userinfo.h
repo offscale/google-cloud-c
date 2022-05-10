@@ -2,7 +2,6 @@
 #define GOOGLE_CLOUD_C_USERINFO_USERINFO_H
 
 #ifdef __cplusplus
-#include <cstdbool>
 #include <cstdlib>
 extern "C" {
 #else
@@ -61,8 +60,16 @@ struct Oauth2UserInfo {
   bool email_verified;
 };
 
-extern GOOGLE_CLOUD_C_USERINFO_EXPORT struct Oauth2UserInfo
+struct OptionalOauth2UserInfo {
+  bool set;
+  struct Oauth2UserInfo oauth2UserInfo;
+};
+
+extern GOOGLE_CLOUD_C_USERINFO_EXPORT struct OptionalOauth2UserInfo
 userinfo_get(const char *);
+
+extern GOOGLE_CLOUD_C_USERINFO_EXPORT const struct Oauth2UserInfo
+    oauth2UserInfoNull;
 
 #ifdef __cplusplus
 }

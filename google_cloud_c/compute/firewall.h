@@ -7,7 +7,6 @@
 #include <google_cloud_c/compute/google_cloud_c_compute_export.h>
 
 #ifdef __cplusplus
-#include <cstdbool>
 extern "C" {
 #elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
@@ -47,6 +46,11 @@ firewall_create(const char *, const char *);
  */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalFirewall
 firewall_get(const char *);
+
+/* Utility functions */
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Firewall
+Firewall_from_name(const char *);
 
 #ifdef __cplusplus
 }

@@ -1,7 +1,5 @@
 #include <parson.h>
 
-#include <json_common.h>
-
 #include <google_cloud_c/client/cloud_auth.h>
 #include <google_cloud_c/pubsub/topic.h>
 
@@ -18,16 +16,16 @@ struct OptionalTopic get_topic(const char *topic_id) {
 
   {
     struct ServerResponse response = gcloud_pubsub_get(NULL, path, NULL);
+    struct OptionalTopic optionalTopic;
     DEBUG_SERVER_RESPONSE("get_topic_response");
-    if (response.status_code == 200 && strlen(response.body) > 0) {
-      struct OptionalTopic optionalTopic = {
-          true, topic_from_json(json_value_get_object(
-                    if_error_exit(json_parse_string(response.body), false)))};
-      return optionalTopic;
-    } else {
-      const struct OptionalTopic optionalTopic = {false, EMPTY_TOPIC};
-      return optionalTopic;
-    }
+    if (response.status_code == 200 && response.body != NULL &&
+        response.body[0] != '\0')
+      optionalTopic.set = true,
+      optionalTopic.topic = topic_from_json(
+          json_value_get_object(json_parse_string(response.body)));
+    else
+      optionalTopic.set = false, optionalTopic.topic = EMPTY_TOPIC;
+    return optionalTopic;
   }
 }
 
@@ -42,16 +40,16 @@ struct OptionalTopic create_topic(const char *topic_id, struct Topic topic) {
   {
     struct ServerResponse response =
         gcloud_pubsub_put(NULL, path, topic_to_json(topic), NULL);
+    struct OptionalTopic optionalTopic;
     DEBUG_SERVER_RESPONSE("create_topic_response");
-    if (response.status_code == 200 && strlen(response.body) > 0) {
-      struct OptionalTopic optionalTopic = {
-          true, topic_from_json(json_value_get_object(
-                    if_error_exit(json_parse_string(response.body), false)))};
-      return optionalTopic;
-    } else {
-      const struct OptionalTopic optionalTopic = {false, EMPTY_TOPIC};
-      return optionalTopic;
-    }
+    if (response.status_code == 200 && response.body != NULL &&
+        response.body[0] != '\0')
+      optionalTopic.set = true,
+      optionalTopic.topic = topic_from_json(
+          json_value_get_object(json_parse_string(response.body)));
+    else
+      optionalTopic.set = false, optionalTopic.topic = EMPTY_TOPIC;
+    return optionalTopic;
   }
 }
 

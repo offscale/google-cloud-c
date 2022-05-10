@@ -69,22 +69,40 @@ struct OptionalFirewall firewall_create(const char *network_name,
            "networks/%s\"\n"
            "}",
            firewall_name, AUTH_CONTEXT.project_id, network_name);
-  struct ServerResponse response = gcloud_post(NULL, path, body, NULL);
-  DEBUG_SERVER_RESPONSE("firewall_create_response");
-  const struct Firewall firewall = {firewall_name};
-  const struct OptionalFirewall optionalFirewall = {response.status_code == 200,
-                                                    firewall};
-  return optionalFirewall;
+  {
+    struct ServerResponse response = gcloud_post(NULL, path, body, NULL);
+    DEBUG_SERVER_RESPONSE("firewall_create_response");
+    {
+      const struct Firewall firewall = Firewall_from_name(firewall_name);
+      struct OptionalFirewall optionalFirewall;
+      optionalFirewall.set = response.status_code == 200;
+      optionalFirewall.firewall = firewall;
+      return optionalFirewall;
+    }
+  }
 }
 
 struct OptionalFirewall firewall_get(const char *firewall_name) {
   char *path;
   asprintf(&path, "/v1/projects/%s/global/firewalls", AUTH_CONTEXT.project_id);
 
-  struct ServerResponse response = gcloud_get(NULL, path, NULL);
-  DEBUG_SERVER_RESPONSE("firewall_get");
-  const struct Firewall firewall = {firewall_name};
-  const struct OptionalFirewall optionalFirewall = {response.status_code == 200,
-                                                    firewall};
-  return optionalFirewall;
+  {
+    struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    DEBUG_SERVER_RESPONSE("firewall_get");
+    {
+      const struct Firewall firewall = Firewall_from_name(firewall_name);
+      struct OptionalFirewall optionalFirewall;
+      optionalFirewall.set = response.status_code == 200;
+      optionalFirewall.firewall = firewall;
+      return optionalFirewall;
+    }
+  }
+}
+
+/* Utility functions */
+
+struct Firewall Firewall_from_name(const char *firewall_name) {
+  struct Firewall firewall;
+  firewall.name = firewall_name;
+  return firewall;
 }

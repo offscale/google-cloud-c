@@ -150,6 +150,14 @@ extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalInstance
 instance_incomplete_create_all(const struct InstanceIncomplete *, const char *,
                                const char *, const char *);
 
+/* Utility functions */
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct NetworkInterface
+NetworkInterface_from_json(const JSON_Object *);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct AccessConfigs
+AccessConfigs_from_json(const JSON_Object *);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

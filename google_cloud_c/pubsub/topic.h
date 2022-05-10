@@ -2,7 +2,6 @@
 #define GOOGLE_CLOUD_C_TOPIC_H
 
 #ifdef __cplusplus
-#include <cstdbool>
 extern "C" {
 #elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>

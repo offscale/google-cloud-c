@@ -1,5 +1,3 @@
-#include <json_common.h>
-
 #include <google_cloud_c/compute/network.h>
 
 const struct RoutingConfig routingConfigNull = {""};
@@ -19,9 +17,11 @@ bool network_exists(const char *network) {
     char *path;
     asprintf(&path, "/v1/projects/%s/global/networks/%s",
              AUTH_CONTEXT.project_id, network);
-    struct ServerResponse response = gcloud_get(NULL, path, NULL);
-    DEBUG_SERVER_RESPONSE("network_exists");
-    network_exists = response.status_code == 200;
+    {
+      struct ServerResponse response = gcloud_get(NULL, path, NULL);
+      DEBUG_SERVER_RESPONSE("network_exists");
+      network_exists = response.status_code == 200;
+    }
   }
   return network_exists;
 }
@@ -43,61 +43,86 @@ struct OptionalNetwork network_create(const char *network_name) {
            "}",
            network_name);
   asprintf(&path, "/v1/projects/%s/global/networks", AUTH_CONTEXT.project_id);
-  struct ServerResponse response = gcloud_post(NULL, path, body, NULL);
-  DEBUG_SERVER_RESPONSE("network_create");
-  if (response.status_code == 200 && strlen(response.body) > 0) {
-    const JSON_Value *created_json_value =
-        if_error_exit(json_parse_string(response.body), false);
-    const JSON_Object *created_json_object =
-        json_value_get_object(created_json_value);
+  {
+    struct ServerResponse response = gcloud_post(NULL, path, body, NULL);
+    DEBUG_SERVER_RESPONSE("network_create");
+    if (response.body != NULL && response.body[0] != '\0') {
+      const JSON_Value *res_json_value = json_parse_string(response.body);
+      const JSON_Object *res_json_object =
+          json_value_get_object(res_json_value);
 
-    if (!json_object_has_value(created_json_object, "operationType")) {
-      const struct Network network = {
-          json_object_get_string(created_json_object, "id"),
-          json_object_get_string(created_json_object, "creationTimestamp"),
-          json_object_get_string(created_json_object, "name"),
-          json_object_get_string(created_json_object, "selfLink"),
-          (bool)json_object_get_boolean(created_json_object,
-                                        "autoCreateSubnetworks"),
-          NULL /*json_object_get_string(created_json_object, "subnetworks")*/,
-          NULL /*json_object_get_string(created_json_object, "routingMode")*/,
-          json_object_get_string(created_json_object, "kind")};
-      const struct OptionalNetwork optional_network = {false, network};
+      if (json_object_has_value(res_json_object, "error")) {
+        struct OptionalNetwork optional_network;
+        optional_network.set = false;
+        optional_network.network = EMPTY_NETWORK;
+        fputs(json_object_get_string(res_json_object, "error"), stderr);
+        return optional_network;
+      } else if (!json_object_has_value(res_json_object,
+                                        "autoCreateSubnetworks")) {
+        struct OptionalNetwork optional_network;
+        optional_network.set = false;
+        optional_network.network = EMPTY_NETWORK;
+        fputs(response.body, stderr);
+        return optional_network;
+      } else {
+        const struct OptionalNetwork optional_network = {
+            true, network_from_json(res_json_object)};
+        return optional_network;
+      }
+    } else {
+      struct OptionalNetwork optional_network;
+      optional_network.set = false;
+      optional_network.network = EMPTY_NETWORK;
+      fputs("Empty response.body", stderr);
       return optional_network;
     }
   }
-  const struct OptionalNetwork optional_network = {false, EMPTY_NETWORK};
-  return optional_network;
 }
 
 struct OptionalNetwork network_get(const char *network_name) {
   char *path;
   asprintf(&path, "/v1/projects/%s/global/networks/%s", AUTH_CONTEXT.project_id,
            network_name);
-  struct ServerResponse response = gcloud_get(NULL, path, NULL);
-  DEBUG_SERVER_RESPONSE("network_get");
-  if (response.status_code == 200 && strlen(response.body) > 0) {
-    /* const char *_body = strstr(response.c_str, "\r\n\r\n"); */
-    const JSON_Value *created_json_value =
-        if_error_exit(json_parse_string(response.body), false);
-    const JSON_Object *created_json_object =
-        json_value_get_object(created_json_value);
+  {
+    struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    struct OptionalNetwork optional_network;
+    DEBUG_SERVER_RESPONSE("network_get");
+    optional_network.set = false;
+    optional_network.network = EMPTY_NETWORK;
+    if (response.body != NULL && response.body[0] != '\0') {
+      /* const char *_body = strstr(response.c_str, "\r\n\r\n"); */
+      const JSON_Value *res_json_value = json_parse_string(response.body);
+      const JSON_Object *res_json_object =
+          json_value_get_object(res_json_value);
 
-    if (!json_object_has_value(created_json_object, "operationType")) {
-      const struct Network network = {
-          json_object_get_string(created_json_object, "id"),
-          json_object_get_string(created_json_object, "creationTimestamp"),
-          json_object_get_string(created_json_object, "name"),
-          json_object_get_string(created_json_object, "selfLink"),
-          (bool)json_object_get_boolean(created_json_object,
-                                        "autoCreateSubnetworks"),
-          NULL /*json_object_get_string(created_json_object, "subnetworks")*/,
-          NULL /*json_object_get_string(created_json_object, "routingMode")*/,
-          json_object_get_string(created_json_object, "kind")};
-      const struct OptionalNetwork optional_network = {true, network};
-      return optional_network;
-    }
+      if (json_object_has_value(res_json_object, "error"))
+        fputs(json_object_get_string(res_json_object, "error"), stderr);
+      else if (!json_object_has_value(res_json_object, "autoCreateSubnetworks"))
+        fputs(response.body, stderr);
+      else
+        optional_network.set = true,
+        optional_network.network = network_from_json(res_json_object);
+    } else
+      fputs("Empty response.body", stderr);
+    return optional_network;
   }
-  const struct OptionalNetwork optional_network = {false, EMPTY_NETWORK};
-  return optional_network;
+}
+
+/* utility functions */
+
+struct Network network_from_json(const JSON_Object *jsonObject) {
+  struct Network network;
+  network.id = json_object_get_string(jsonObject, "id");
+  network.creationTimestamp =
+      json_object_get_string(jsonObject, "creationTimestamp");
+  network.name = json_object_get_string(jsonObject, "name");
+  network.selfLink = json_object_get_string(jsonObject, "selfLink");
+  network.autoCreateSubnetworks =
+      (bool)json_object_get_boolean(jsonObject, "autoCreateSubnetworks");
+  network.subnetworks =
+      NULL /*json_object_get_string(res_json_object, "subnetworks")*/;
+  network.routingConfig =
+      NULL /*json_object_get_string(res_json_object, "routingMode")*/;
+  network.kind = json_object_get_string(jsonObject, "kind");
+  return network;
 }

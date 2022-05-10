@@ -1,5 +1,4 @@
 #ifdef __cplusplus
-#include <cstdbool>
 extern "C" {
 #elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>

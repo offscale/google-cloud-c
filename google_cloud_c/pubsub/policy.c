@@ -2,7 +2,6 @@
 
 #include <google_cloud_c/client/cloud_auth.h>
 #include <google_cloud_c/pubsub/policy.h>
-#include <json_common.h>
 
 /* Routes */
 
@@ -23,9 +22,9 @@ struct Policy getIamPolicy(const char *resource,
     {
       struct ServerResponse response = gcloud_pubsub_get(urlp, path, NULL);
       DEBUG_SERVER_RESPONSE("getIamPolicy");
-      assert(response.status_code == 200 && strlen(response.body) > 0);
-      const JSON_Value *json_item =
-          if_error_exit(json_parse_string(response.body), false);
+      assert(response.status_code == 200 && response.body != NULL &&
+             response.body[0] != '\0');
+      const JSON_Value *json_item = json_parse_string(response.body);
       const JSON_Object *json_object = json_value_get_object(json_item);
       return policy_from_json(json_object);
     }
@@ -39,12 +38,12 @@ struct Policy setIamPolicy(const char *resource, struct Policy *policy) {
   char *path;
   asprintf(&path, "/v1/%s:setIamPolicy", resource);
   {
-    struct ServerResponse response =
-        gcloud_pubsub_post(NULL, path, policy_to_json(policy), NULL);
+    struct ServerResponse response = gcloud_pubsub_post(
+        NULL, path, policy == NULL ? NULL : policy_to_json(policy), NULL);
     DEBUG_SERVER_RESPONSE("setIamPolicy");
-    assert(response.status_code == 200 && strlen(response.body) > 0);
-    const JSON_Value *json_item =
-        if_error_exit(json_parse_string(response.body), false);
+    assert(response.status_code == 200 && response.body != NULL &&
+           response.body[0] != '\0');
+    const JSON_Value *json_item = json_parse_string(response.body);
     const JSON_Object *json_object = json_value_get_object(json_item);
     return policy_from_json(json_object);
   }

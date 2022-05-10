@@ -1,7 +1,5 @@
 #include <parson.h>
 
-#include <json_common.h>
-
 #include <google_cloud_c/client/cloud_auth.h>
 #include <google_cloud_c/pubsub/subscription.h>
 
@@ -19,17 +17,17 @@ get_pubsub_subscription(const char *subscription_id) {
 
   {
     struct ServerResponse response = gcloud_pubsub_get(NULL, path, NULL);
+    struct OptionalSubscription optionalSubscription;
     DEBUG_SERVER_RESPONSE("get_pubsub_subscription_response");
-    if (response.status_code == 200 && strlen(response.body) > 0) {
-      struct OptionalSubscription optionalSubscription = {
-          true, subscription_from_json(json_value_get_object(
-                    if_error_exit(json_parse_string(response.body), false)))};
-      return optionalSubscription;
-    } else {
-      const struct OptionalSubscription optionalSubscription = {
-          false, EMPTY_SUBSCRIPTION};
-      return optionalSubscription;
-    }
+    if (response.status_code == 200 && response.body != NULL &&
+        response.body[0] != '\0')
+      optionalSubscription.set = true,
+      optionalSubscription.subscription = subscription_from_json(
+          json_value_get_object(json_parse_string(response.body)));
+    else
+      optionalSubscription.set = false,
+      optionalSubscription.subscription = EMPTY_SUBSCRIPTION;
+    return optionalSubscription;
   }
 }
 
@@ -46,17 +44,17 @@ create_pubsub_subscription(const char *subscription_id,
   {
     struct ServerResponse response =
         gcloud_pubsub_put(NULL, path, subscription_to_json(subscription), NULL);
+    struct OptionalSubscription optionalSubscription;
     DEBUG_SERVER_RESPONSE("create_pubsub_subscription_response");
-    if (response.status_code == 200 && strlen(response.body) > 0) {
-      struct OptionalSubscription optionalSubscription = {
-          true, subscription_from_json(json_value_get_object(
-                    if_error_exit(json_parse_string(response.body), false)))};
-      return optionalSubscription;
-    } else {
-      const struct OptionalSubscription optionalSubscription = {
-          false, EMPTY_SUBSCRIPTION};
-      return optionalSubscription;
-    }
+    if (response.status_code == 200 && response.body != NULL &&
+        response.body[0] != '\0')
+      optionalSubscription.set = true,
+      optionalSubscription.subscription = subscription_from_json(
+          json_value_get_object(json_parse_string(response.body)));
+    else
+      optionalSubscription.set = false,
+      optionalSubscription.subscription = EMPTY_SUBSCRIPTION;
+    return optionalSubscription;
   }
 }
 
@@ -71,8 +69,8 @@ struct ReceivedMessages pull_pubsub_subscription(const char *subscription_id) {
   {
     struct ServerResponse response = gcloud_pubsub_post(NULL, path, NULL, NULL);
     DEBUG_SERVER_RESPONSE("pull_pubsub_subscription_response");
-    return receivedMessages_from_json(json_value_get_object(
-        if_error_exit(json_parse_string(response.body), false)));
+    return receivedMessages_from_json(
+        json_value_get_object(json_parse_string(response.body)));
   }
 }
 

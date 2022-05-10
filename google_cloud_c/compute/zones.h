@@ -2,7 +2,6 @@
 #define GOOGLE_CLOUD_C_ZONES_H
 
 #ifdef __cplusplus
-#include <cstdbool>
 extern "C" {
 #elif __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
@@ -41,6 +40,11 @@ struct Zones {
 /* Retrieves the list of Zone resources available to the specified project.
  * https://cloud.google.com/compute/docs/reference/rest/v1/zones/list */
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Zones zone_list();
+
+/* Utility functions */
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Zone
+zone_from_json(const JSON_Object *);
 
 #ifdef __cplusplus
 }
