@@ -14,12 +14,11 @@ struct Policy getIamPolicy(const char *resource,
   char *path;
   asprintf(&path, "/v1/%s:getIamPolicy", resource);
   {
-    CURLUcode rc;
     CURLU *urlp = curl_url();
 
     if (getPolicyOptions != NULL)
-      rc = curl_url_set(urlp, CURLUPART_QUERY,
-                        GetPolicyOptions_to_json(getPolicyOptions), 0);
+      IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_QUERY,
+                                GetPolicyOptions_to_json(getPolicyOptions), 0));
 
     {
       struct ServerResponse response = gcloud_pubsub_get(urlp, path, NULL);

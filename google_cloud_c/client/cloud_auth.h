@@ -12,6 +12,8 @@ extern "C" {
 #include <curl/curl.h>
 #include <curl_simple_https.h>
 
+#define IS_CURLUE_OK(rc) assert((rc) == CURLUE_OK)
+
 #if defined(_GNU_SOURCE) || defined(HAVE_ASPRINTF)
 #include <stdio.h>
 #else

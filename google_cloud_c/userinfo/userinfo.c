@@ -13,14 +13,14 @@ struct Oauth2UserInfo oauth2_user_info_parse(const JSON_Object *);
 /* undocumented by Google? */
 struct Oauth2UserInfo userinfo_get(const char *google_access_token) {
   CURLU *urlp = curl_url();
-  CURLUcode rc = curl_url_set(
-      urlp, CURLUPART_URL, "https://www.googleapis.com/oauth2/v3/userinfo", 0);
+  IS_CURLUE_OK(curl_url_set(
+      urlp, CURLUPART_URL, "https://www.googleapis.com/oauth2/v3/userinfo", 0));
   {
     char *access_token;
     asprintf(&access_token, "access_token=%s",
              google_access_token == NULL ? AUTH_CONTEXT.google_access_token
                                          : google_access_token);
-    rc = curl_url_set(urlp, CURLUPART_QUERY, access_token, 0);
+    IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_QUERY, access_token, 0));
   }
   {
     struct ServerResponse response = https_json_post(urlp, NULL, NULL);
