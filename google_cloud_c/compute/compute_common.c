@@ -2,12 +2,12 @@
 
 #include <google_cloud_c/compute/compute_common.h>
 
-const struct GoogleCloudOperation EMPTY_GOOGLE_CLOUD_OPERATION = {
+const struct GoogleCloudOperation googleCloudOperationNull = {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL, NULL, NULL};
 
 struct OptionalGoogleCloudOperation
-google_cloud_operation_from_json(const JSON_Object *jsonObject) {
+google_cloud_operation_from_json(const JSON_Object *const jsonObject) {
   struct OptionalGoogleCloudOperation optionalGoogleCloudOperation;
   if (!json_object_has_value(jsonObject, "kind") ||
       !json_object_has_value(jsonObject, "targetId") ||
@@ -15,7 +15,7 @@ google_cloud_operation_from_json(const JSON_Object *jsonObject) {
       !json_object_has_value(jsonObject, "id")) {
     optionalGoogleCloudOperation.set = false,
     optionalGoogleCloudOperation.googleCloudOperation =
-        EMPTY_GOOGLE_CLOUD_OPERATION;
+        googleCloudOperationNull;
     return optionalGoogleCloudOperation;
   } else {
     struct GoogleCloudOperation googleCloudOperation;

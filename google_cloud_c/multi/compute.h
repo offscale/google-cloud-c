@@ -11,7 +11,7 @@ extern "C" {
 
 /*
 struct CInstance {
-    const char *id,
+    const char *const id,
                *creationTimestamp,
                *name,
                *description,

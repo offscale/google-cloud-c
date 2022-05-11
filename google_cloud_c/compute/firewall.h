@@ -18,7 +18,7 @@ struct Firewall {
   const char *name;
 };
 
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Firewall EMPTY_FIREWALL;
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Firewall firewallNull;
 
 struct OptionalFirewall {
   bool set;

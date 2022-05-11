@@ -10,7 +10,8 @@
 const struct Oauth2UserInfo oauth2UserInfoNull = {NULL, NULL, NULL, false};
 
 /* undocumented by Google? */
-struct OptionalOauth2UserInfo userinfo_get(const char *google_access_token) {
+struct OptionalOauth2UserInfo
+userinfo_get(const char *const google_access_token) {
   CURLU *urlp = curl_url();
   IS_CURLUE_OK(curl_url_set(
       urlp, CURLUPART_URL, "https://www.googleapis.com/oauth2/v3/userinfo", 0));
@@ -38,7 +39,7 @@ struct OptionalOauth2UserInfo userinfo_get(const char *google_access_token) {
 /* Utility functions */
 
 struct Oauth2UserInfo
-oauth2_user_info_from_json(const JSON_Object *jsonObject) {
+oauth2_user_info_from_json(const JSON_Object *const jsonObject) {
   struct Oauth2UserInfo oauth2_user_info;
   oauth2_user_info.sub = json_object_get_string(jsonObject, "sub");
   oauth2_user_info.picture = json_object_get_string(jsonObject, "picture");

@@ -10,7 +10,7 @@ const struct ProjectServiceAccount projectServiceAccountNull = {NULL, NULL};
  * https://cloud.google.com/storage/docs/json_api/v1/projects/serviceAccount/get
  */
 struct OptionalProjectServiceAccount
-get_service_account(const char *projectIdentifier) {
+get_service_account(const char *const projectIdentifier) {
   char *path;
   asprintf(&path, "/storage/v1/projects/%s/serviceAccount", projectIdentifier);
   {
@@ -33,7 +33,7 @@ get_service_account(const char *projectIdentifier) {
 /* utility functions */
 
 struct ProjectServiceAccount
-project_service_account_from_json(const JSON_Object *jsonObject) {
+project_service_account_from_json(const JSON_Object *const jsonObject) {
   struct ProjectServiceAccount project_service_account;
   project_service_account.email_address =
       json_object_get_string(jsonObject, "email_address");

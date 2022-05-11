@@ -59,11 +59,11 @@ struct Item {
 
 struct Metadata {
   struct Item *items;
-  const char *kind;
+  const char *const kind;
 };
 
 struct Scheduling {
-  const char *onHostMaintenance;
+  const char *const onHostMaintenance;
   bool automaticRestart, preemptible;
 };
 
@@ -91,7 +91,7 @@ struct Instance {
   const char *fingerprint, *lastStartTimestamp, *kind;
 };
 
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Instance EMPTY_INSTANCE;
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Instance instanceNull;
 
 struct OptionalInstance {
   bool set;
@@ -103,7 +103,7 @@ struct Instances {
   size_t size;
 };
 
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Instances EMPTY_INSTANCES;
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Instances instancesNull;
 
 /* =============
  * | INSTANCES |
@@ -143,7 +143,7 @@ instance_get(const char *instance_name);
 /* Utility functions */
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalInstance
-optional_instance_from_json(const JSON_Object *jsonObject);
+optional_instance_from_json(const JSON_Object *);
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Instance
 instance_from_json(const JSON_Object *);

@@ -24,7 +24,7 @@ struct OptionalGoogleCloudOperation {
 };
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct GoogleCloudOperation
-    EMPTY_GOOGLE_CLOUD_OPERATION;
+    googleCloudOperationNull;
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalGoogleCloudOperation
 google_cloud_operation_from_json(const JSON_Object *);

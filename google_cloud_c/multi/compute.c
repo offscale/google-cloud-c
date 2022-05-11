@@ -12,7 +12,7 @@
 struct StatusAndCstrAndCStr
 create_fw_net_instance(const struct configuration *const config,
                        const struct InstanceIncomplete *const instance,
-                       const char *shell_script) {
+                       const char *const shell_script) {
   puts("create_fw_net_instance");
   set_auth_context(config->google_project_id, config->google_access_token);
   INSTANCE_CONTEXT.zone = config->google_zone;
@@ -35,7 +35,9 @@ create_fw_net_instance(const struct configuration *const config,
              "  \"create_fw_net_instance\": true\n"
              "}",
              _instance.name,
-             _instance.networkInterfaces[0].accessConfigs[0].natIP);
+             strlen(_instance.networkInterfaces[0].accessConfigs[0].natIP) > 0
+                 ? _instance.networkInterfaces[0].accessConfigs[0].natIP
+                 : "(null)");
 
       if (_instance.name != NULL && _instance.name[0] != '\0') {
         instance_name_ip.status = EXIT_SUCCESS;
@@ -52,7 +54,7 @@ create_fw_net_instance(const struct configuration *const config,
 }
 
 struct StatusAndCstr get_instance_ip(const struct configuration *const config,
-                                     const char *instance_name) {
+                                     const char *const instance_name) {
   AUTH_CONTEXT.project_id = config->google_project_id,
   AUTH_CONTEXT.google_access_token = config->google_access_token;
   INSTANCE_CONTEXT.zone = config->google_zone;
@@ -77,7 +79,9 @@ struct StatusAndCstr get_instance_ip(const struct configuration *const config,
              "  \"get_instance_ip\": true\n"
              "}\n",
              _instance.name,
-             _instance.networkInterfaces[0].accessConfigs[0].natIP);
+             strlen(_instance.networkInterfaces[0].accessConfigs[0].natIP) > 0
+                 ? _instance.networkInterfaces[0].accessConfigs[0].natIP
+                 : "(null)");
 
       {
         struct StatusAndCstr instance_ip = {
@@ -96,7 +100,7 @@ struct StatusAndCstr get_instance_ip(const struct configuration *const config,
 }
 
 struct StatusAndArrayCStrArray compute(const struct configuration *const config,
-                                       const char *kind, bool list_only) {
+                                       const char *const kind, bool list_only) {
   struct StatusAndArrayCStrArray zoneNames = StatusAndArrayCStrArrayNull;
 
   AUTH_CONTEXT.project_id = config->google_project_id,

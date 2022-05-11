@@ -15,12 +15,12 @@ extern "C" {
 #include <google_cloud_c/compute/google_cloud_c_compute_export.h>
 
 struct Operation {
-  const char *id, *name, *operationType, *targetLink, *targetId, *status, *user,
-      *progress, *insertTime, *startTime, *selfLink, *kind;
+  const char *const id, *name, *operationType, *targetLink, *targetId, *status,
+      *user, *progress, *insertTime, *startTime, *selfLink, *kind;
 };
 
 struct RoutingConfig {
-  const char *routingMode;
+  const char *const routingMode;
 };
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct RoutingConfig
@@ -34,7 +34,7 @@ struct Network {
   const char *kind;
 };
 
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Network EMPTY_NETWORK;
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Network networkNull;
 
 struct OptionalNetwork {
   bool set;

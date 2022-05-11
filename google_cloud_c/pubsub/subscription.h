@@ -58,8 +58,7 @@ struct OptionalSubscription {
   struct Subscription subscription;
 };
 
-extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const struct Subscription
-    EMPTY_SUBSCRIPTION;
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const struct Subscription subscriptionNull;
 
 /* https://cloud.google.com/pubsub/docs/reference/rest/v1/PubsubMessage */
 struct PubsubMessage {
@@ -71,7 +70,7 @@ struct PubsubMessage {
 };
 
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const struct PubsubMessage
-    EMPTY_PUBSUB_MESSAGE;
+    pubsubMessageNull;
 
 /* https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/pull#ReceivedMessage
  */
@@ -86,10 +85,11 @@ struct ReceivedMessages {
 };
 
 struct AckIds {
-  const char **ackIds;
+  const char *const *ackIds;
 };
 
-const char *AckIds_to_json_str(struct AckIds);
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
+AckIds_to_json_str(const struct AckIds *);
 
 /* Gets the configuration details of a subscription.
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/get
@@ -101,7 +101,7 @@ get_pubsub_subscription(const char *);
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/create
  */
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct OptionalSubscription
-create_pubsub_subscription(const char *, struct Subscription);
+create_pubsub_subscription(const char *, const struct Subscription *);
 
 /* Pulls messages from the server.
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/pull
@@ -116,7 +116,7 @@ pull_pubsub_subscription(const char *subscription_id);
  * */
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT bool
 acknowledge_pubsub_subscription(const char *subscription_id,
-                                struct AckIds ack_ids);
+                                const struct AckIds *ack_ids);
 
 /* Deletes an existing subscription. All messages retained in the subscription
  * are immediately dropped.
@@ -131,7 +131,7 @@ extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Subscription
 subscription_from_json(const JSON_Object *);
 
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
-    subscription_to_json(struct Subscription);
+subscription_to_json(const struct Subscription *);
 
 struct ReceivedMessages receivedMessages_from_json(const JSON_Object *);
 

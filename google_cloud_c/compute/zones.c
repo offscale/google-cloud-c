@@ -12,7 +12,8 @@ struct Zones zone_list() {
     DEBUG_SERVER_RESPONSE("zone_list");
     if (response.status_code == 200 && response.body != NULL &&
         response.body[0] != '\0') {
-      const JSON_Value *zones_json_item = json_parse_string(response.body);
+      const JSON_Value *const zones_json_item =
+          json_parse_string(response.body);
       const JSON_Array *zone_json_items = json_object_get_array(
           json_value_get_object(zones_json_item), "items");
       const size_t zone_json_items_n = json_array_get_count(zone_json_items);
@@ -33,7 +34,7 @@ struct Zones zone_list() {
 
 /* utility functions */
 
-struct Zone zone_from_json(const JSON_Object *jsonObject) {
+struct Zone zone_from_json(const JSON_Object *const jsonObject) {
   struct Zone zone;
 
   zone.id = json_object_get_string(jsonObject, "id");

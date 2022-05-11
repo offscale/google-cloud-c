@@ -10,8 +10,9 @@ const struct Policy policyNull = {NULL, NULL, NULL};
 /* GET https://pubsub.googleapis.com/v1/{resource}:getIamPolicy
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/getIamPolicy
  * */
-struct OptionalPolicy getIamPolicy(const char *resource,
-                                   struct GetPolicyOptions *getPolicyOptions) {
+struct OptionalPolicy
+getIamPolicy(const char *const resource,
+             const struct GetPolicyOptions *getPolicyOptions) {
   char *path;
   asprintf(&path, "/v1/%s:getIamPolicy", resource);
   {
@@ -41,8 +42,8 @@ struct OptionalPolicy getIamPolicy(const char *resource,
 /* POST https://pubsub.googleapis.com/v1/{resource}:setIamPolicy
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/setIamPolicy
  */
-struct OptionalPolicy setIamPolicy(const char *resource,
-                                   struct Policy *policy) {
+struct OptionalPolicy setIamPolicy(const char *const resource,
+                                   const struct Policy *policy) {
   char *path;
   asprintf(&path, "/v1/%s:setIamPolicy", resource);
   {
@@ -63,7 +64,7 @@ struct OptionalPolicy setIamPolicy(const char *resource,
 
 /* utility functions */
 
-struct Expr expr_from_json(const JSON_Object *jsonObject) {
+struct Expr expr_from_json(const JSON_Object *const jsonObject) {
   struct Expr expr;
   expr.expression = json_object_get_string(jsonObject, "expression");
   expr.title = json_object_get_string(jsonObject, "title");
@@ -88,7 +89,7 @@ const char *expr_to_json(const struct Expr *expr) {
   return s;
 }
 
-struct Binding bindings_from_json(const JSON_Object *jsonObject) {
+struct Binding bindings_from_json(const JSON_Object *const jsonObject) {
   struct Binding bindings;
 
   bindings.role = json_object_get_string(jsonObject, "role");
@@ -102,8 +103,8 @@ struct Binding bindings_from_json(const JSON_Object *jsonObject) {
     size_t i;
 
     if (members_json_items_n > 0) {
-      bindings.members =
-          (const char **)malloc(members_json_items_n * sizeof(const char *));
+      bindings.members = (const char **)malloc(members_json_items_n *
+                                               sizeof(const char *const));
       for (i = 0; i < members_json_items_n; i++)
         bindings.members[i] = json_array_get_string(members_json_items, i);
     }
@@ -162,7 +163,7 @@ const char *bindings_to_json(const struct Binding *binding) {
   return s;
 }
 
-struct Policy policy_from_json(const JSON_Object *jsonObject) {
+struct Policy policy_from_json(const JSON_Object *const jsonObject) {
   struct Policy policy;
 
   policy.version = json_object_get_string(jsonObject, "version");
@@ -214,7 +215,7 @@ const char *policy_to_json(const struct Policy *policy) {
 }
 
 const char *
-GetPolicyOptions_to_json(struct GetPolicyOptions *getPolicyOptions) {
+GetPolicyOptions_to_json(const struct GetPolicyOptions *getPolicyOptions) {
   enum { n = 29 };
   static char requestedPolicyVersion[n] = "{\"requestedPolicyVersion\": \0}";
   requestedPolicyVersion[n - 2] =

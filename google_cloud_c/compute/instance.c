@@ -3,31 +3,31 @@
 
 struct InstanceContext INSTANCE_CONTEXT = {NULL, NULL, NULL};
 
-const struct Instance EMPTY_INSTANCE = {NULL,
-                                        NULL,
-                                        NULL,
-                                        NULL,
-                                        NULL,
-                                        NULL,
+const struct Instance instanceNull = {NULL,
+                                      NULL,
+                                      NULL,
+                                      NULL,
+                                      NULL,
+                                      NULL,
 
-                                        /*NetworkInterface*/ NULL,
-                                        /*struct Disk*/ NULL,
-                                        /*Metadata*/ NULL,
-                                        /* selfLink*/ NULL,
-                                        NULL,
-                                        NULL,
-                                        NULL,
-                                        false,
-                                        false,
-                                        NULL,
-                                        NULL,
-                                        NULL,
-                                        NULL,
-                                        NULL};
+                                      /*NetworkInterface*/ NULL,
+                                      /*struct Disk*/ NULL,
+                                      /*Metadata*/ NULL,
+                                      /* selfLink*/ NULL,
+                                      NULL,
+                                      NULL,
+                                      NULL,
+                                      false,
+                                      false,
+                                      NULL,
+                                      NULL,
+                                      NULL,
+                                      NULL,
+                                      NULL};
 
-const struct Instances EMPTY_INSTANCES = {NULL, 0};
+const struct Instances instancesNull = {NULL, 0};
 
-bool instance_exists(const char *instance_name) {
+bool instance_exists(const char *const instance_name) {
   /* CHECK IF INSTANCE EXISTS */
   /* https://cloud.google.com/compute/docs/reference/rest/v1/instances/get
    * GET
@@ -58,11 +58,11 @@ struct Instances instances_list() {
            INSTANCE_CONTEXT.zone);
   {
     const struct ServerResponse response = gcloud_get(NULL, path, NULL);
-    struct Instances _instances = EMPTY_INSTANCES;
+    struct Instances _instances = instancesNull;
     DEBUG_SERVER_RESPONSE("instances_list");
     if (response.status_code == 200 && response.body != NULL &&
         response.body[0] != '\0') {
-      const JSON_Value *json_item = json_parse_string(response.body);
+      const JSON_Value *const json_item = json_parse_string(response.body);
       const JSON_Array *json_items =
           json_object_get_array(json_value_get_object(json_item), "items");
       const size_t json_items_n = json_array_get_count(json_items);
@@ -72,7 +72,8 @@ struct Instances instances_list() {
             (struct Instance *)malloc(json_items_n * sizeof(struct Instance));
         size_t i;
         for (i = 0; i < json_items_n; i++) {
-          const JSON_Object *json_obj = json_array_get_object(json_items, i);
+          const JSON_Object *const json_obj =
+              json_array_get_object(json_items, i);
           const struct OptionalInstance optionalInstance =
               optional_instance_from_json(json_obj);
           assert(optionalInstance.set == true);
@@ -85,7 +86,7 @@ struct Instances instances_list() {
   }
 }
 
-struct OptionalInstance instance_get(const char *instance_name) {
+struct OptionalInstance instance_get(const char *const instance_name) {
   /* https://cloud.google.com/compute/docs/reference/rest/v1/instances/get
    * GET
    * https://compute.googleapis.com/compute/v1/projects/{project}/zones/{zone}/instances/{resourceId}*/
@@ -97,7 +98,7 @@ struct OptionalInstance instance_get(const char *instance_name) {
     const struct ServerResponse response = gcloud_get(NULL, path, NULL);
     struct OptionalInstance optionalInstance;
     DEBUG_SERVER_RESPONSE("instance_get");
-    optionalInstance.set = false, optionalInstance.instance = EMPTY_INSTANCE;
+    optionalInstance.set = false, optionalInstance.instance = instanceNull;
     if (response.status_code == 200 && response.body != NULL &&
         response.body[0] != '\0')
       optionalInstance = optional_instance_from_json(
@@ -186,12 +187,12 @@ instance_insert(const struct InstanceIncomplete *instance,
     const struct ServerResponse response = gcloud_post(NULL, path, body, NULL);
     struct OptionalInstance optionalInstance;
     DEBUG_SERVER_RESPONSE("instance_insert");
-    optionalInstance.set = false, optionalInstance.instance = EMPTY_INSTANCE;
+    optionalInstance.set = false, optionalInstance.instance = instanceNull;
 
     if ((response.status_code == 200 || response.status_code == 201) &&
         response.body != NULL && response.body[0] != '\0') {
-      const JSON_Value *json_item = json_parse_string(response.body);
-      const JSON_Object *json_object = json_value_get_object(json_item);
+      const JSON_Value *const json_item = json_parse_string(response.body);
+      const JSON_Object *const json_object = json_value_get_object(json_item);
 
       if (json_object_has_value(json_object, "machineType"))
         optionalInstance = optional_instance_from_json(json_object);
@@ -199,7 +200,7 @@ instance_insert(const struct InstanceIncomplete *instance,
         const JSON_Array *_json_items =
             json_object_get_array(json_object, "items");
         if (json_array_get_count(_json_items) > 0) {
-          const JSON_Object *_json_object =
+          const JSON_Object *const _json_object =
               json_array_get_object(_json_items, 0);
           if (json_object_has_value(_json_object, "machineType"))
             optionalInstance = optional_instance_from_json(_json_object);
@@ -231,7 +232,7 @@ instance_insert(const struct InstanceIncomplete *instance,
 
 struct OptionalInstance instance_incomplete_create_all(
     const struct InstanceIncomplete *instance, const char *network_name,
-    const char *firewall_name, const char *shell_script) {
+    const char *firewall_name, const char *const shell_script) {
   /* Creates network, firewall, and instance */
 
   /* TODO: Proper request/response handling with structs and all for network and
@@ -374,9 +375,9 @@ const char *instance_to_json(const struct InstanceIncomplete *instance) {
 }
 
 struct OptionalInstance
-optional_instance_from_json(const JSON_Object *jsonObject) {
+optional_instance_from_json(const JSON_Object *const jsonObject) {
   struct OptionalInstance optionalInstance;
-  optionalInstance.set = false, optionalInstance.instance = EMPTY_INSTANCE;
+  optionalInstance.set = false, optionalInstance.instance = instanceNull;
   if (json_object_has_value(jsonObject, "operationType") &&
       json_object_has_value(jsonObject, "name")) {
     const JSON_Array *network_json_items =
@@ -390,7 +391,7 @@ optional_instance_from_json(const JSON_Object *jsonObject) {
       networkInterfaces = (struct NetworkInterface *)malloc(
           network_json_items_n * sizeof(struct NetworkInterface));
       for (i = 0; i < network_json_items_n; i++) {
-        const JSON_Object *network_json =
+        const JSON_Object *const network_json =
             json_array_get_object(network_json_items, i);
         struct AccessConfigs *accessConfigs = NULL;
         const JSON_Array *ac_json_items =
@@ -442,7 +443,7 @@ optional_instance_from_json(const JSON_Object *jsonObject) {
 /* Utility functions */
 
 struct NetworkInterface
-NetworkInterface_from_json(const JSON_Object *jsonObject) {
+NetworkInterface_from_json(const JSON_Object *const jsonObject) {
   struct NetworkInterface networkInterface;
   networkInterface.network = json_object_get_string(jsonObject, "network");
   networkInterface.subnetwork =
@@ -452,7 +453,8 @@ NetworkInterface_from_json(const JSON_Object *jsonObject) {
   return networkInterface;
 }
 
-struct AccessConfigs AccessConfigs_from_json(const JSON_Object *jsonObject) {
+struct AccessConfigs
+AccessConfigs_from_json(const JSON_Object *const jsonObject) {
   struct AccessConfigs accessConfigs;
   accessConfigs.type = json_object_get_string(jsonObject, "type");
   accessConfigs.name = json_object_get_string(jsonObject, "name");
@@ -462,7 +464,7 @@ struct AccessConfigs AccessConfigs_from_json(const JSON_Object *jsonObject) {
   return accessConfigs;
 }
 
-struct Instance instance_from_json(const JSON_Object *jsonObject) {
+struct Instance instance_from_json(const JSON_Object *const jsonObject) {
   struct Instance instance;
   instance.id = json_object_get_string(jsonObject, "id");
   instance.creationTimestamp =

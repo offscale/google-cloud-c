@@ -1,8 +1,8 @@
 #include <google_cloud_c/compute/firewall.h>
 
-const struct Firewall EMPTY_FIREWALL = {NULL};
+const struct Firewall firewallNull = {NULL};
 
-bool firewall_exists(const char *firewall) {
+bool firewall_exists(const char *const firewall) {
   /* CHECK IF FIREWALL EXISTS */
   /* https://cloud.google.com/compute/docs/reference/rest/v1/firewalls/get
    * GET
@@ -21,8 +21,8 @@ bool firewall_exists(const char *firewall) {
   return exists;
 }
 
-struct OptionalFirewall firewall_create(const char *network_name,
-                                        const char *firewall_name) {
+struct OptionalFirewall firewall_create(const char *const network_name,
+                                        const char *const firewall_name) {
   /* CREATE THE FIREWALL + RULES */
   /* https://cloud.google.com/compute/docs/reference/rest/v1/firewalls/insert
    * POST
@@ -82,7 +82,7 @@ struct OptionalFirewall firewall_create(const char *network_name,
   }
 }
 
-struct OptionalFirewall firewall_get(const char *firewall_name) {
+struct OptionalFirewall firewall_get(const char *const firewall_name) {
   char *path;
   asprintf(&path, "/v1/projects/%s/global/firewalls", AUTH_CONTEXT.project_id);
 
@@ -101,7 +101,7 @@ struct OptionalFirewall firewall_get(const char *firewall_name) {
 
 /* Utility functions */
 
-struct Firewall Firewall_from_name(const char *firewall_name) {
+struct Firewall Firewall_from_name(const char *const firewall_name) {
   struct Firewall firewall;
   firewall.name = firewall_name;
   return firewall;

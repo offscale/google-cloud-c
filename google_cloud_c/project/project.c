@@ -5,7 +5,7 @@
 const struct Project projectNull = {NULL, NULL, LIFECYCLE_STATE_UNSPECIFIED,
                                     NULL, NULL, NULL};
 
-bool project_exists(const char *project_id) {
+bool project_exists(const char *const project_id) {
   /* CHECK IF PROJECT EXISTS */
   /* https://cloud.google.com/resource-manager/reference/rest/v1/projects/get
    * GET https://cloudresourcemanager.googleapis.com/v1/projects/{projectId} */
@@ -26,7 +26,7 @@ bool project_exists(const char *project_id) {
   return exists;
 }
 
-struct OptionalProject project_get(const char *project_id) {
+struct OptionalProject project_get(const char *const project_id) {
   /* https://cloud.google.com/resource-manager/reference/rest/v1/projects/get
    * GET https://cloudresourcemanager.googleapis.com/v1/projects/{projectId} */
   char *path;
@@ -57,7 +57,7 @@ const struct Project *project_list() {
   DEBUG_SERVER_RESPONSE("project_list");
 
   if (response.status_code == 200) {
-    const JSON_Value *json_value = json_parse_string(response.body);
+    const JSON_Value *const json_value = json_parse_string(response.body);
     const JSON_Array *projects_items_json =
         json_object_get_array(json_value_get_object(json_value), "projects");
     const size_t projects_items_n = json_array_get_count(projects_items_json);
@@ -79,7 +79,7 @@ const struct Project *project_list() {
 
 /* Utility functions */
 
-enum LifecycleState str_to_LifecycleState(const char *state) {
+enum LifecycleState str_to_LifecycleState(const char *const state) {
   if (strcmp(state, "LIFECYCLE_STATE_UNSPECIFIED") == 0)
     return LIFECYCLE_STATE_UNSPECIFIED;
   else if (strcmp(state, "ACTIVE") == 0)
@@ -89,10 +89,10 @@ enum LifecycleState str_to_LifecycleState(const char *state) {
   return DELETE_IN_PROGRESS /* unused */;
 }
 
-struct Project project_from_json(const JSON_Object *jsonObject) {
+struct Project project_from_json(const JSON_Object *const jsonObject) {
   struct Project project;
   if (json_object_has_value(jsonObject, "parent")) {
-    const JSON_Object *parent_obj =
+    const JSON_Object *const parent_obj =
         json_object_get_object(jsonObject, "parent");
     struct ResourceId parent;
     parent.type = json_object_get_string(parent_obj, "type");

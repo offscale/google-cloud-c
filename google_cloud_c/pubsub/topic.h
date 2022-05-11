@@ -55,7 +55,7 @@ struct OptionalTopic {
   struct Topic topic;
 };
 
-extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const struct Topic EMPTY_TOPIC;
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const struct Topic topicEmptyNull;
 
 /* Gets the configuration of a topic.
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/get
@@ -67,7 +67,7 @@ get_topic(const char *);
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/create
  */
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct OptionalTopic
-create_topic(const char *, struct Topic);
+create_topic(const char *, const struct Topic *);
 
 /* Deletes the topic with the given name.
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/delete
@@ -79,7 +79,8 @@ extern GOOGLE_CLOUD_C_PUBSUB_EXPORT bool delete_topic(const char *topic_id);
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Topic
 topic_from_json(const JSON_Object *);
 
-extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *topic_to_json(struct Topic);
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
+topic_to_json(const struct Topic *);
 
 #ifdef __cplusplus
 }

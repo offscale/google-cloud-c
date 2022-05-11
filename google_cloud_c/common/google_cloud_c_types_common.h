@@ -63,7 +63,7 @@ struct CStrArray {
 };
 
 struct InstanceIncomplete {
-  const char *id, *creationTimestamp, *name, *description, *machineType,
+  const char *const id, *creationTimestamp, *name, *description, *machineType,
       *statusMessage, *zone, *cpuPlatform, *hostname, *lastStartTimestamp,
       *lastStopTimestamp, *lastSuspendedTimestamp, *kind;
   // std::map<std::string, std::string> metadata;

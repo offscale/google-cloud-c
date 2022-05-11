@@ -69,14 +69,14 @@ extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const struct Policy policyNull;
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/getIamPolicy
  * */
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct OptionalPolicy
-getIamPolicy(const char *, struct GetPolicyOptions *);
+getIamPolicy(const char *, const struct GetPolicyOptions *);
 
 /* Sets the access control policy on the specified resource. Replaces any
  * existing policy.
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/setIamPolicy
  * */
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct OptionalPolicy
-setIamPolicy(const char *, struct Policy *);
+setIamPolicy(const char *, const struct Policy *);
 
 /* utility functions */
 
@@ -99,7 +99,7 @@ extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
 policy_to_json(const struct Policy *);
 
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
-GetPolicyOptions_to_json(struct GetPolicyOptions *);
+GetPolicyOptions_to_json(const struct GetPolicyOptions *);
 
 #ifdef __cplusplus
 }

@@ -2,10 +2,10 @@
 
 const struct RoutingConfig routingConfigNull = {""};
 
-const struct Network EMPTY_NETWORK = {NULL, NULL, NULL, NULL,
-                                      true, NULL, NULL, NULL};
+const struct Network networkNull = {NULL, NULL, NULL, NULL,
+                                    true, NULL, NULL, NULL};
 
-bool network_exists(const char *network) {
+bool network_exists(const char *const network) {
   /* CHECK IF NETWORK EXISTS */
   /* https://cloud.google.com/compute/docs/reference/rest/v1/networks/get
    * GET
@@ -26,7 +26,7 @@ bool network_exists(const char *network) {
   return exists;
 }
 
-struct OptionalNetwork network_create(const char *network_name) {
+struct OptionalNetwork network_create(const char *const network_name) {
   /* CREATE THE NETWORK */
   /* https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert
    * POST
@@ -46,11 +46,11 @@ struct OptionalNetwork network_create(const char *network_name) {
   {
     const struct ServerResponse response = gcloud_post(NULL, path, body, NULL);
     struct OptionalNetwork optional_network;
-    optional_network.set = false, optional_network.network = EMPTY_NETWORK;
+    optional_network.set = false, optional_network.network = networkNull;
     DEBUG_SERVER_RESPONSE("network_create");
     if (response.body != NULL && response.body[0] != '\0') {
-      const JSON_Value *res_json_value = json_parse_string(response.body);
-      const JSON_Object *res_json_object =
+      const JSON_Value *const res_json_value = json_parse_string(response.body);
+      const JSON_Object *const res_json_object =
           json_value_get_object(res_json_value);
 
       if (json_object_has_value(res_json_object, "error"))
@@ -66,7 +66,7 @@ struct OptionalNetwork network_create(const char *network_name) {
   }
 }
 
-struct OptionalNetwork network_get(const char *network_name) {
+struct OptionalNetwork network_get(const char *const network_name) {
   char *path;
   asprintf(&path, "/v1/projects/%s/global/networks/%s", AUTH_CONTEXT.project_id,
            network_name);
@@ -74,11 +74,11 @@ struct OptionalNetwork network_get(const char *network_name) {
     const struct ServerResponse response = gcloud_get(NULL, path, NULL);
     struct OptionalNetwork optional_network;
     DEBUG_SERVER_RESPONSE("network_get");
-    optional_network.set = false, optional_network.network = EMPTY_NETWORK;
+    optional_network.set = false, optional_network.network = networkNull;
     if (response.body != NULL && response.body[0] != '\0') {
-      /* const char *_body = strstr(response.c_str, "\r\n\r\n"); */
-      const JSON_Value *res_json_value = json_parse_string(response.body);
-      const JSON_Object *res_json_object =
+      /* const char *const _body = strstr(response.c_str, "\r\n\r\n"); */
+      const JSON_Value *const res_json_value = json_parse_string(response.body);
+      const JSON_Object *const res_json_object =
           json_value_get_object(res_json_value);
 
       if (json_object_has_value(res_json_object, "error"))
@@ -96,7 +96,7 @@ struct OptionalNetwork network_get(const char *network_name) {
 
 /* utility functions */
 
-struct Network network_from_json(const JSON_Object *jsonObject) {
+struct Network network_from_json(const JSON_Object *const jsonObject) {
   struct Network network;
   network.id = json_object_get_string(jsonObject, "id");
   network.creationTimestamp =

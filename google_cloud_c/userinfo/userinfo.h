@@ -16,41 +16,41 @@ extern "C" {
 #include <google_cloud_c/userinfo/google_cloud_c_userinfo_export.h>
 
 struct UserInfo {
-  const char *localId;
-  const char *email;
-  const char *displayName;
-  const char *language;
-  const char *photoUrl;
-  const char *timeZone;
-  const char *dateOfBirth;
-  const char *passwordHash;
-  const char *salt;
+  const char *const localId;
+  const char *const email;
+  const char *const displayName;
+  const char *const language;
+  const char *const photoUrl;
+  const char *const timeZone;
+  const char *const dateOfBirth;
+  const char *const passwordHash;
+  const char *const salt;
   int version;
   bool emailVerified;
   int passwordUpdatedAt;
-  /*const char *providerUserInfo": [
+  /*const char *const providerUserInfo": [
   {
     object (ProviderUserInfo)
   }
   ],*/
-  const char *validSince;
+  const char *const validSince;
   bool disabled;
-  const char *lastLoginAt;
-  const char *createdAt;
-  const char *screenName;
+  const char *const lastLoginAt;
+  const char *const createdAt;
+  const char *const screenName;
   bool customAuth;
-  const char *rawPassword;
-  const char *phoneNumber;
-  const char *customAttributes;
+  const char *const rawPassword;
+  const char *const phoneNumber;
+  const char *const customAttributes;
   bool emailLinkSignin;
-  const char *tenantId;
-  /*const char *mfaInfo": [
+  const char *const tenantId;
+  /*const char *const mfaInfo": [
   {
     object (MfaEnrollment)
   }
   ],*/
-  const char *initialEmail;
-  const char *lastRefreshAt;
+  const char *const initialEmail;
+  const char *const lastRefreshAt;
 };
 
 struct Oauth2UserInfo {

@@ -32,8 +32,7 @@ struct OptionalNotification {
   struct Notification notification;
 };
 
-extern GOOGLE_CLOUD_C_STORAGE_EXPORT const struct Notification
-    EMPTY_NOTIFICATION;
+extern GOOGLE_CLOUD_C_STORAGE_EXPORT const struct Notification notificationNull;
 
 /* View a Pub/Sub notification configuration on a given bucket
  * https://cloud.google.com/storage/docs/json_api/v1/notifications/get */
