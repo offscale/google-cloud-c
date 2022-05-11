@@ -20,7 +20,7 @@ struct Zone {
   const char *name;
   const char *description;
   /*enum*/ const char *status;
-  // Deprecated deprecated;
+  /* Deprecated deprecated; */
   const char *region;
   const char *selfLink;
   const char **availableCpuPlatforms;

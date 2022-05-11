@@ -26,8 +26,13 @@ COPY . /google-cloud-c
 
 WORKDIR /google-cloud-c/build
 
+ENV G_PROJECT_ID ""
+ENV G_REFRESH_TOKEN ""
+
 RUN cmake \
     -DCMAKE_BUILD_TYPE="Debug" \
     -DCMAKE_TOOLCHAIN_FILE="/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+    -DG_PROJECT_ID="$G_PROJECT_ID" \
+    -DG_REFRESH_TOKEN="$G_REFRESH_TOKEN" \
     .. && \
     cmake --build .

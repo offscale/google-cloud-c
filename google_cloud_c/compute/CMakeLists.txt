@@ -43,7 +43,6 @@ target_link_libraries(
 target_link_libraries(
         "${LIBRARY_NAME}"
         PUBLIC
-        "${PROJECT_NAME}_multi"
         "${PROJECT_NAME}_common"
 )
 

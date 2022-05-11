@@ -66,7 +66,7 @@ struct InstanceIncomplete {
   const char *const id, *creationTimestamp, *name, *description, *machineType,
       *statusMessage, *zone, *cpuPlatform, *hostname, *lastStartTimestamp,
       *lastStopTimestamp, *lastSuspendedTimestamp, *kind;
-  // std::map<std::string, std::string> metadata;
+  /* std::map<std::string, std::string> metadata; */
   bool supportsPzs;
 };
 
