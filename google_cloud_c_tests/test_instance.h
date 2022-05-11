@@ -47,31 +47,37 @@ TEST x_create_fw_net_instance_should_be(void) {
                                           /*lastSuspendedTimestamp*/ NULL,
                                           /*kind*/ NULL,
                                           /*supportsPzs*/ true};
-  const struct configuration config = {
-      /* google_access_token */ ACCESS_TOKEN,
-      /* google_access_token_expiry */ (time_t)ACCESS_TOKEN_EXPIRY,
-      /* google_refresh_token */ REFRESH_TOKEN,
-      /* google_project_id */ AUTH_CONTEXT.project_id,
-      /* google_bucket_name */ NULL,
-      /* google_region */ NULL,
-      /* google_zone */ NULL,
-      /* google_instance_name */ NULL,
-      /* google_instance_public_ip */ NULL,
-      /* folder_path */ NULL};
-  struct StatusAndCstrAndCStr createComputeResp =
-      create_fw_net_instance(&config, &c_instance,
-                             /* shell_script */ NULL);
-  int status = createComputeResp.status;
-  if (status != EXIT_SUCCESS) {
-    fprintf(stderr, "createComputeResp.status: %d\n", status);
-    status = EXIT_FAILURE;
+  struct configuration config;
+  config.google_access_token = ACCESS_TOKEN;
+  config.google_access_token_expiry = (time_t)ACCESS_TOKEN_EXPIRY;
+  config.google_project_id = AUTH_CONTEXT.project_id;
+  config.google_region = NULL;
+  config.google_zone = NULL;
+  config.google_instance_name = NULL;
+  config.google_instance_public_ip = NULL;
+  config.folder_path = NULL;
+  int status;
+  {
+    struct StatusAndCstrAndCStr createComputeResp =
+        create_fw_net_instance(&config, &c_instance,
+                               /* shell_script */ NULL);
+    status = createComputeResp.status;
+    if (status != EXIT_SUCCESS) {
+      fprintf(stderr, "createComputeResp.status: %d\n", status);
+      status = EXIT_FAILURE;
+      cleanup_struct_cstr_cstr(&createComputeResp);
+    }
     cleanup_struct_cstr_cstr(&createComputeResp);
   }
-  cleanup_struct_cstr_cstr(&createComputeResp);
 
-  struct Instances instances = instances_list();
-  ASSERT_GT(instances.size, 0);
-  PASS();
+  {
+    struct Instances instances = instances_list();
+    ASSERT_GT(instances.size, 0);
+  }
+  if (status == EXIT_SUCCESS)
+    PASS();
+  else
+    FAIL();
 }
 
 /* Suites can group multiple tests with common setup. */

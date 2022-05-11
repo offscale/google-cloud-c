@@ -143,6 +143,9 @@ instance_get(const char *instance_name);
 /* Utility functions */
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalInstance
+optional_instance_from_json(const JSON_Object *jsonObject);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Instance
 instance_from_json(const JSON_Object *);
 
 /* Creates network, firewall, and instance */

@@ -9,16 +9,16 @@ bool firewall_exists(const char *firewall) {
    * https://compute.googleapis.com/compute/v1/projects/{project}/global/firewalls/{resourceId}
    */
 
-  bool firewall_exists = false;
+  bool exists = false;
   {
     char *path;
     asprintf(&path, "/v1/projects/%s/global/firewalls/%s",
              AUTH_CONTEXT.project_id, firewall);
-    struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    const struct ServerResponse response = gcloud_get(NULL, path, NULL);
     DEBUG_SERVER_RESPONSE("firewall_get_response");
-    firewall_exists = response.status_code == 200;
+    exists = response.status_code == 200;
   }
-  return firewall_exists;
+  return exists;
 }
 
 struct OptionalFirewall firewall_create(const char *network_name,
@@ -70,7 +70,7 @@ struct OptionalFirewall firewall_create(const char *network_name,
            "}",
            firewall_name, AUTH_CONTEXT.project_id, network_name);
   {
-    struct ServerResponse response = gcloud_post(NULL, path, body, NULL);
+    const struct ServerResponse response = gcloud_post(NULL, path, body, NULL);
     DEBUG_SERVER_RESPONSE("firewall_create_response");
     {
       const struct Firewall firewall = Firewall_from_name(firewall_name);
@@ -87,7 +87,7 @@ struct OptionalFirewall firewall_get(const char *firewall_name) {
   asprintf(&path, "/v1/projects/%s/global/firewalls", AUTH_CONTEXT.project_id);
 
   {
-    struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    const struct ServerResponse response = gcloud_get(NULL, path, NULL);
     DEBUG_SERVER_RESPONSE("firewall_get");
     {
       const struct Firewall firewall = Firewall_from_name(firewall_name);

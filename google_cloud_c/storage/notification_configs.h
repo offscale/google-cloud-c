@@ -50,6 +50,11 @@ get_bucket_notification(const char *, const char *);
 extern GOOGLE_CLOUD_C_STORAGE_EXPORT struct OptionalNotification
 insert_bucket_notification(const char *, const char *);
 
+/* Utility functions */
+
+extern GOOGLE_CLOUD_C_STORAGE_EXPORT struct Notification
+notification_from_json(const JSON_Object *);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

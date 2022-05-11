@@ -15,7 +15,7 @@ struct OptionalTopic get_topic(const char *topic_id) {
   asprintf(&path, "/v1/%s", topic_id);
 
   {
-    struct ServerResponse response = gcloud_pubsub_get(NULL, path, NULL);
+    const struct ServerResponse response = gcloud_pubsub_get(NULL, path, NULL);
     struct OptionalTopic optionalTopic;
     DEBUG_SERVER_RESPONSE("get_topic_response");
     if (response.status_code == 200 && response.body != NULL &&
@@ -38,7 +38,7 @@ struct OptionalTopic create_topic(const char *topic_id, struct Topic topic) {
   asprintf(&path, "/v1/%s", topic_id);
 
   {
-    struct ServerResponse response =
+    const struct ServerResponse response =
         gcloud_pubsub_put(NULL, path, topic_to_json(topic), NULL);
     struct OptionalTopic optionalTopic;
     DEBUG_SERVER_RESPONSE("create_topic_response");
@@ -62,7 +62,7 @@ bool delete_topic(const char *topic_id) {
   asprintf(&path, "/v1/%s", topic_id);
 
   {
-    struct ServerResponse response =
+    const struct ServerResponse response =
         gcloud_pubsub_delete(NULL, path, NULL, NULL);
     DEBUG_SERVER_RESPONSE("delete_topic_response");
     /* free(path) */
@@ -96,8 +96,7 @@ const char *Encoding_to_str(enum Encoding encoding) {
 struct Topic topic_from_json(const JSON_Object *jsonObject) {
   struct Topic topic;
 
-  if (json_object_has_value(jsonObject, "name"))
-    topic.name = json_object_get_string(jsonObject, "name");
+  topic.name = json_object_get_string(jsonObject, "name");
   if (json_object_has_value(jsonObject, "messageStoragePolicy")) {
     const JSON_Object *jsonMessageStoragePolicy =
         json_object_get_object(jsonObject, "messageStoragePolicy");
@@ -106,27 +105,35 @@ struct Topic topic_from_json(const JSON_Object *jsonObject) {
         (const char **)json_object_get_array(jsonMessageStoragePolicy,
                                              "allowedPersistenceRegions");
     topic.messageStoragePolicy = messageStoragePolicy;
+  } else {
+    struct MessageStoragePolicy messageStoragePolicy;
+    messageStoragePolicy.allowedPersistenceRegions = NULL;
+    topic.messageStoragePolicy = messageStoragePolicy;
   }
-  if (json_object_has_value(jsonObject, "kmsKeyName"))
-    topic.kmsKeyName = json_object_get_string(jsonObject, "kmsKeyName");
+  topic.kmsKeyName = json_object_get_string(jsonObject, "kmsKeyName");
   if (json_object_has_value(jsonObject, "SchemaSettings")) {
     const JSON_Object *jsonSchemaSettings =
         json_object_get_object(jsonObject, "SchemaSettings");
     struct SchemaSettings schemaSettings;
-    if (json_object_has_value(jsonSchemaSettings, "schema"))
-      schemaSettings.schema =
-          json_object_get_string(jsonSchemaSettings, "schema");
+    schemaSettings.schema =
+        json_object_get_string(jsonSchemaSettings, "schema");
     if (json_object_has_value(jsonSchemaSettings, "encoding"))
       schemaSettings.encoding = str_to_Encoding(
           json_object_get_string(jsonSchemaSettings, "encoding"));
+    else
+      schemaSettings.encoding = ENCODING_UNSPECIFIED;
+    topic.schemaSettings = schemaSettings;
+  } else {
+    struct SchemaSettings schemaSettings = {NULL, ENCODING_UNSPECIFIED};
     topic.schemaSettings = schemaSettings;
   }
-  if (json_object_has_value(jsonObject, "satisfiesPzs"))
+  if (json_object_has_value_of_type(jsonObject, "satisfiesPzs", JSONBoolean))
     topic.satisfiesPzs =
         (bool)json_object_get_boolean(jsonObject, "kmsKeyName");
-  if (json_object_has_value(jsonObject, "messageRetentionDuration"))
-    topic.messageRetentionDuration =
-        json_object_get_string(jsonObject, "messageRetentionDuration");
+  else
+    topic.satisfiesPzs = false;
+  topic.messageRetentionDuration =
+      json_object_get_string(jsonObject, "messageRetentionDuration");
 
   return topic;
 }

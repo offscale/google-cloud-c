@@ -57,7 +57,7 @@ CURLU *set_compute_url_path(CURLU *urlp, const char *path) {
   /*IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_PORT, "443", 0);*/
   assert(path != NULL && path_n > 0);
   {
-    unsigned short j = path[0] == '/' ? 1 : 0;
+    const unsigned short j = path[0] == '/' ? 1 : 0;
     if (path[j] == 'c' && path[1 + j] == 'o' && path[2 + j] == 'm' &&
         path[3 + j] == 'p' && path[4 + j] == 'u' && path[5 + j] == 't' &&
         path[6 + j] == 'e' && (path[7 + j] == '/' || path[7 + j] == '\0')) {
@@ -81,7 +81,7 @@ CURLU *set_cloud_resource_url_path(CURLU *urlp, const char *path) {
   IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_SCHEME, "https", 0));
   assert(path_n > 0);
   if (path != NULL) {
-    unsigned short j = path[0] == '/' ? 1 : 0;
+    const unsigned short j = path[0] == '/' ? 1 : 0;
     if (path[j] == 'v' && /* path[1 + j] == '1' && */ path[2 + j] == '/') {
       IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_PATH, path, 0));
     } else {

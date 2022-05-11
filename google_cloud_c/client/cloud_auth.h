@@ -19,6 +19,10 @@ extern "C" {
   if ((rc) != CURLUE_OK)                                                       \
   fprintf(stderr, "curl_url_set failed: %s\n", curl_url_strerror(rc))
 
+#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
+#define C89STRINGUTILS_IMPLEMENTATION
+#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
+
 #include <c89stringutils_string_extras.h>
 
 #include <google_cloud_c/client/google_cloud_c_client_export.h>

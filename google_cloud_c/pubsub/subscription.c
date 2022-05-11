@@ -6,6 +6,8 @@
 const struct Subscription EMPTY_SUBSCRIPTION = {
     NULL, NULL, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, STATE_UNSPECIFIED};
 
+const struct PubsubMessage EMPTY_PUBSUB_MESSAGE = {NULL, NULL, NULL, NULL};
+
 /* Gets the configuration details of a subscription.
  * GET https://pubsub.googleapis.com/v1/{subscription}
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/get
@@ -16,7 +18,7 @@ get_pubsub_subscription(const char *subscription_id) {
   asprintf(&path, "/v1/%s", subscription_id);
 
   {
-    struct ServerResponse response = gcloud_pubsub_get(NULL, path, NULL);
+    const struct ServerResponse response = gcloud_pubsub_get(NULL, path, NULL);
     struct OptionalSubscription optionalSubscription;
     DEBUG_SERVER_RESPONSE("get_pubsub_subscription_response");
     if (response.status_code == 200 && response.body != NULL &&
@@ -42,7 +44,7 @@ create_pubsub_subscription(const char *subscription_id,
   asprintf(&path, "/v1/%s", subscription_id);
 
   {
-    struct ServerResponse response =
+    const struct ServerResponse response =
         gcloud_pubsub_put(NULL, path, subscription_to_json(subscription), NULL);
     struct OptionalSubscription optionalSubscription;
     DEBUG_SERVER_RESPONSE("create_pubsub_subscription_response");
@@ -67,7 +69,8 @@ struct ReceivedMessages pull_pubsub_subscription(const char *subscription_id) {
   asprintf(&path, "/v1/%s:pull", subscription_id);
 
   {
-    struct ServerResponse response = gcloud_pubsub_post(NULL, path, NULL, NULL);
+    const struct ServerResponse response =
+        gcloud_pubsub_post(NULL, path, NULL, NULL);
     DEBUG_SERVER_RESPONSE("pull_pubsub_subscription_response");
     return receivedMessages_from_json(
         json_value_get_object(json_parse_string(response.body)));
@@ -86,7 +89,7 @@ bool acknowledge_pubsub_subscription(const char *subscription_id,
   asprintf(&path, "/v1/%s", subscription_id);
 
   {
-    struct ServerResponse response =
+    const struct ServerResponse response =
         gcloud_pubsub_post(NULL, path, AckIds_to_json_str(ack_ids), NULL);
     DEBUG_SERVER_RESPONSE("acknowledge_pubsub_subscription_response");
     /* free(path) */
@@ -104,7 +107,7 @@ bool delete_pubsub_subscription(const char *subscription_id) {
   asprintf(&path, "/v1/%s", subscription_id);
 
   {
-    struct ServerResponse response =
+    const struct ServerResponse response =
         gcloud_pubsub_delete(NULL, path, NULL, NULL);
     DEBUG_SERVER_RESPONSE("delete_pubsub_subscription_response");
     /* free(path) */
@@ -138,45 +141,59 @@ const char *PubSubState_to_str(enum PubSubState state) {
 struct Subscription subscription_from_json(const JSON_Object *jsonObject) {
   struct Subscription subscription;
 
-  if (json_object_has_value(jsonObject, "name"))
-    subscription.name = json_object_get_string(jsonObject, "name");
-  if (json_object_has_value(jsonObject, "topic"))
-    subscription.topic = json_object_get_string(jsonObject, "topic");
-  if (json_object_has_value(jsonObject, "ackDeadlineSeconds"))
+  subscription.name = json_object_get_string(jsonObject, "name");
+  subscription.topic = json_object_get_string(jsonObject, "topic");
+  if (json_object_has_value_of_type(jsonObject, "ackDeadlineSeconds",
+                                    JSONNumber))
     subscription.ackDeadlineSeconds =
         (int)json_object_get_number(jsonObject, "ackDeadlineSeconds");
-  if (json_object_has_value(jsonObject, "retainAckedMessages"))
+  else
+    subscription.ackDeadlineSeconds = 0;
+  if (json_object_has_value_of_type(jsonObject, "retainAckedMessages",
+                                    JSONBoolean))
     subscription.retainAckedMessages =
         (bool)json_object_get_boolean(jsonObject, "retainAckedMessages");
-  if (json_object_has_value(jsonObject, "messageRetentionDuration"))
-    subscription.messageRetentionDuration =
-        json_object_get_string(jsonObject, "messageRetentionDuration");
-  if (json_object_has_value(jsonObject, "labels"))
+  else
+    subscription.retainAckedMessages = false;
+  subscription.messageRetentionDuration =
+      json_object_get_string(jsonObject, "messageRetentionDuration");
+  if (json_object_has_value_of_type(jsonObject, "labels", JSONArray))
     subscription.labels =
         (const char **)json_object_get_array(jsonObject, "labels");
-  if (json_object_has_value(jsonObject, "enableMessageOrdering"))
+  else
+    subscription.labels = NULL;
+  if (json_object_has_value_of_type(jsonObject, "enableMessageOrdering",
+                                    JSONBoolean))
     subscription.enableMessageOrdering =
         (bool)json_object_get_boolean(jsonObject, "enableMessageOrdering");
-  if (json_object_has_value(jsonObject, "filter"))
-    subscription.filter = json_object_get_string(jsonObject, "filter");
-  if (json_object_has_value(jsonObject, "detached"))
+  else
+    subscription.enableMessageOrdering = false;
+  subscription.filter = json_object_get_string(jsonObject, "filter");
+  if (json_object_has_value_of_type(jsonObject, "detached", JSONBoolean))
     subscription.detached =
         (bool)json_object_get_boolean(jsonObject, "detached");
-  if (json_object_has_value(jsonObject, "enableExactlyOnceDelivery"))
+  else
+    subscription.detached = false;
+  if (json_object_has_value_of_type(jsonObject, "enableExactlyOnceDelivery",
+                                    JSONBoolean))
     subscription.enableExactlyOnceDelivery =
         (bool)json_object_get_boolean(jsonObject, "enableExactlyOnceDelivery");
-  if (json_object_has_value(jsonObject, "topicMessageRetentionDuration"))
-    subscription.topicMessageRetentionDuration =
-        json_object_get_string(jsonObject, "topicMessageRetentionDuration");
+  else
+    subscription.enableExactlyOnceDelivery = false;
+  subscription.topicMessageRetentionDuration =
+      json_object_get_string(jsonObject, "topicMessageRetentionDuration");
   if (json_object_has_value(jsonObject, "state"))
     subscription.state =
         str_to_PubSubState(json_object_get_string(jsonObject, "state"));
+  else
+    subscription.state = STATE_UNSPECIFIED;
 
   return subscription;
 }
 
 const char *subscription_to_json(struct Subscription subscription) {
   char *s = NULL;
+
   jasprintf(&s, "{");
   if (subscription.name != NULL && strlen(subscription.name) > 0)
     jasprintf(&s, "  \"name\": \"%s\",", subscription.name);
@@ -206,47 +223,67 @@ const char *subscription_to_json(struct Subscription subscription) {
     jasprintf(&s, "  \"topicMessageRetentionDuration\": \"%s\",",
               subscription.topicMessageRetentionDuration);
   jasprintf(&s, "  \"state\": \"%s\"}", PubSubState_to_str(subscription.state));
+
   return s;
 }
 
 struct ReceivedMessages
 receivedMessages_from_json(const JSON_Object *jsonObject) {
-  struct ReceivedMessages receivedMessages;
+  struct ReceivedMessages receivedMessages = {NULL};
   const JSON_Array *json_items =
       json_object_get_array(jsonObject, "receivedMessages");
   const size_t json_items_n = json_array_get_count(json_items);
   size_t i;
-  receivedMessages.receivedMessages = (struct ReceivedMessage *)malloc(
-      json_items_n * sizeof(struct ReceivedMessage));
-  for (i = 0; i < json_items_n; i++) {
-    const JSON_Object *json_obj = json_array_get_object(json_items, i);
-    struct ReceivedMessage receivedMessage;
-    struct PubsubMessage pubsubMessage;
-    JSON_Object *messageObject = json_object_get_object(json_obj, "message");
+  if (json_items_n > 0) {
+    receivedMessages.receivedMessages = (struct ReceivedMessage *)malloc(
+        json_items_n * sizeof(struct ReceivedMessage));
+    for (i = 0; i < json_items_n; i++) {
+      const JSON_Object *json_obj = json_array_get_object(json_items, i);
+      struct ReceivedMessage receivedMessage;
+      struct PubsubMessage pubsubMessage = EMPTY_PUBSUB_MESSAGE;
+      const JSON_Object *messageObject =
+          json_object_get_object(json_obj, "message");
 
-    pubsubMessage.data = json_object_get_string(messageObject, "data");
-    pubsubMessage.messageId =
-        json_object_get_string(messageObject, "messageId");
-    pubsubMessage.orderingKey =
-        json_object_get_string(messageObject, "orderingKey");
-    pubsubMessage.publishTime =
-        json_object_get_string(messageObject, "publishTime");
-    receivedMessage.message = pubsubMessage;
+      const bool pubsubMessage_contents =
+          json_object_has_value(messageObject, "data") ||
+          json_object_has_value(messageObject, "messageId") ||
+          json_object_has_value(messageObject, "orderingKey") ||
+          json_object_has_value(messageObject, "publishTime");
+      if (pubsubMessage_contents) {
+        pubsubMessage.data = json_object_get_string(messageObject, "data");
+        pubsubMessage.messageId =
+            json_object_get_string(messageObject, "messageId");
+        pubsubMessage.orderingKey =
+            json_object_get_string(messageObject, "orderingKey");
+        pubsubMessage.publishTime =
+            json_object_get_string(messageObject, "publishTime");
+      }
+      receivedMessage.message = pubsubMessage;
 
-    receivedMessage.ackId = json_object_get_string(json_obj, "ackId");
-    receivedMessage.deliveryAttempt =
-        (int)json_object_get_number(json_obj, "deliveryAttempt");
+      receivedMessage.ackId = json_object_get_string(json_obj, "ackId");
+      if (json_object_has_value_of_type(json_obj, "deliveryAttempt",
+                                        JSONNumber))
+        receivedMessage.deliveryAttempt =
+            (int)json_object_get_number(json_obj, "deliveryAttempt");
+      else
+        receivedMessage.deliveryAttempt = 0;
 
-    receivedMessages.receivedMessages[i] = receivedMessage;
+      receivedMessages.receivedMessages[i] = receivedMessage;
+    }
   }
   return receivedMessages;
 }
 
 const char *AckIds_to_json_str(struct AckIds ack_ids) {
-  /* char *json_str;
-  char *cur=(char *)ack_ids.ackIds[0];
-  jsprintf(&json_str, "%s", cur++);
-   // TODO: Loop over all ackIds
-   */
-  return ack_ids.ackIds[0];
+  char *s = NULL, *w;
+  size_t n;
+  jasprintf(&s, "{\"ackIds\": [");
+
+  for (w = (char *)ack_ids.ackIds; w != NULL; w++)
+    jasprintf(&s, "\"%s\",", w);
+  jasprintf(&s, "\0\0");
+  n = strlen(s);
+  s[n - 2] = ']';
+  s[n - 1] = '}';
+  return s;
 }

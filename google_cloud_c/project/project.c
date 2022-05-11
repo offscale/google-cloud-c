@@ -10,20 +10,20 @@ bool project_exists(const char *project_id) {
   /* https://cloud.google.com/resource-manager/reference/rest/v1/projects/get
    * GET https://cloudresourcemanager.googleapis.com/v1/projects/{projectId} */
 
-  bool project_exists = false;
+  bool exists = false;
   {
     char *path;
     {
       asprintf(&path, "/v1/projects/%s", project_id);
       {
-        struct ServerResponse response =
+        const struct ServerResponse response =
             gcloud_cloud_resource_get(NULL, path, NULL);
         DEBUG_SERVER_RESPONSE("projects_get_response");
-        project_exists = response.status_code == 200;
+        exists = response.status_code == 200;
       }
     }
   }
-  return project_exists;
+  return exists;
 }
 
 struct OptionalProject project_get(const char *project_id) {
@@ -32,7 +32,7 @@ struct OptionalProject project_get(const char *project_id) {
   char *path;
   asprintf(&path, "/v1/projects/%s", project_id);
   {
-    struct ServerResponse response =
+    const struct ServerResponse response =
         gcloud_cloud_resource_get(NULL, path, NULL);
     struct OptionalProject optionalProject;
     DEBUG_SERVER_RESPONSE("projects_get_response");
@@ -51,7 +51,7 @@ const struct Project *project_list() {
   /* https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
    * GET https://cloudresourcemanager.googleapis.com/v1/projects
    * */
-  struct ServerResponse response =
+  const struct ServerResponse response =
       gcloud_cloud_resource_get(NULL, "/v1/projects", NULL);
 
   DEBUG_SERVER_RESPONSE("project_list");
@@ -62,15 +62,17 @@ const struct Project *project_list() {
         json_object_get_array(json_value_get_object(json_value), "projects");
     const size_t projects_items_n = json_array_get_count(projects_items_json);
     /* if (projects_items_n == 0) return NULL; */
-    struct Project *projects =
-        (struct Project *)malloc(projects_items_n * sizeof(struct Project));
-    size_t i;
-    for (i = 0; i < projects_items_n; i++) {
-      const struct Project project =
-          project_from_json(json_array_get_object(projects_items_json, i));
-      projects[i] = project;
+    if (projects_items_n > 0) {
+      struct Project *projects =
+          (struct Project *)malloc(projects_items_n * sizeof(struct Project));
+      size_t i;
+      for (i = 0; i < projects_items_n; i++) {
+        const struct Project project =
+            project_from_json(json_array_get_object(projects_items_json, i));
+        projects[i] = project;
+      }
+      return projects;
     }
-    return projects;
   }
   return NULL;
 }
@@ -90,17 +92,22 @@ enum LifecycleState str_to_LifecycleState(const char *state) {
 struct Project project_from_json(const JSON_Object *jsonObject) {
   struct Project project;
   if (json_object_has_value(jsonObject, "parent")) {
-    JSON_Object *parent_obj = json_object_get_object(jsonObject, "parent");
+    const JSON_Object *parent_obj =
+        json_object_get_object(jsonObject, "parent");
     struct ResourceId parent;
     parent.type = json_object_get_string(parent_obj, "type");
     parent.id = json_object_get_string(parent_obj, "id");
     project.parent = &parent;
-  }
+  } else
+    project.parent = NULL;
 
   project.projectNumber = json_object_get_string(jsonObject, "projectNumber");
   project.projectId = json_object_get_string(jsonObject, "projectId");
-  project.lifecycleState = str_to_LifecycleState(
-      json_object_get_string(jsonObject, "lifecycleState"));
+  if (json_object_has_value(jsonObject, "lifecycleState"))
+    project.lifecycleState = str_to_LifecycleState(
+        json_object_get_string(jsonObject, "lifecycleState"));
+  else
+    project.lifecycleState = LIFECYCLE_STATE_UNSPECIFIED;
   project.name = json_object_get_string(jsonObject, "name");
   project.createTime = json_object_get_string(jsonObject, "createTime");
 

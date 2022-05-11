@@ -1,7 +1,7 @@
 #include <parson.h>
 
-#include <google_cloud_c/storage/service_account.h>
 #include <google_cloud_c/client/cloud_auth.h>
+#include <google_cloud_c/storage/service_account.h>
 
 const struct ProjectServiceAccount projectServiceAccountNull = {NULL, NULL};
 
@@ -14,7 +14,7 @@ get_service_account(const char *projectIdentifier) {
   char *path;
   asprintf(&path, "/storage/v1/projects/%s/serviceAccount", projectIdentifier);
   {
-    struct ServerResponse response = gcloud_storage_get(NULL, path, NULL);
+    const struct ServerResponse response = gcloud_storage_get(NULL, path, NULL);
     struct OptionalProjectServiceAccount optionalProjectServiceAccount;
     DEBUG_SERVER_RESPONSE("get_service_account");
     if (response.status_code == 200)

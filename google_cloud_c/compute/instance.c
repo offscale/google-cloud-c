@@ -40,7 +40,7 @@ bool instance_exists(const char *instance_name) {
     asprintf(&path, "/v1/projects/%s/zones/%s/instances/%s",
              AUTH_CONTEXT.project_id, INSTANCE_CONTEXT.zone, instance_name);
     {
-      struct ServerResponse response = gcloud_get(NULL, path, NULL);
+      const struct ServerResponse response = gcloud_get(NULL, path, NULL);
       DEBUG_SERVER_RESPONSE("instance_exists");
       instance_exists = response.status_code == 200;
     }
@@ -57,35 +57,31 @@ struct Instances instances_list() {
   asprintf(&path, "/v1/projects/%s/zones/%s/instances", AUTH_CONTEXT.project_id,
            INSTANCE_CONTEXT.zone);
   {
-    struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    const struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    struct Instances _instances = EMPTY_INSTANCES;
     DEBUG_SERVER_RESPONSE("instances_list");
-    if (response.status_code != 200)
-      return EMPTY_INSTANCES;
-    else if (response.status_code == 200 && response.body != NULL &&
-             response.body[0] != '\0') {
+    if (response.status_code == 200 && response.body != NULL &&
+        response.body[0] != '\0') {
       const JSON_Value *json_item = json_parse_string(response.body);
       const JSON_Array *json_items =
           json_object_get_array(json_value_get_object(json_item), "items");
       const size_t json_items_n = json_array_get_count(json_items);
 
-      struct Instance *instances =
-          (struct Instance *)malloc(json_items_n * sizeof(struct Instance));
-      size_t i;
-      for (i = 0; i < json_items_n; i++) {
-        const JSON_Object *json_obj = json_array_get_object(json_items, i);
-        const struct OptionalInstance optionalInstance =
-            instance_from_json(json_obj);
-        assert(optionalInstance.set == true);
-        instances[i] = optionalInstance.instance;
+      if (json_items_n > 0) {
+        struct Instance *instances =
+            (struct Instance *)malloc(json_items_n * sizeof(struct Instance));
+        size_t i;
+        for (i = 0; i < json_items_n; i++) {
+          const JSON_Object *json_obj = json_array_get_object(json_items, i);
+          const struct OptionalInstance optionalInstance =
+              optional_instance_from_json(json_obj);
+          assert(optionalInstance.set == true);
+          instances[i] = optionalInstance.instance;
+        }
+        _instances.arr = instances, _instances.size = json_items_n;
       }
-      {
-        const struct Instances _instances = {instances, json_items_n};
-        return _instances;
-      }
-    } else {
-      fputs(response.body, stderr);
-      return EMPTY_INSTANCES;
     }
+    return _instances;
   }
 }
 
@@ -98,20 +94,17 @@ struct OptionalInstance instance_get(const char *instance_name) {
   asprintf(&path, "/v1/projects/%s/zones/%s/instances/%s",
            AUTH_CONTEXT.project_id, INSTANCE_CONTEXT.zone, instance_name);
   {
-    struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    const struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    struct OptionalInstance optionalInstance;
     DEBUG_SERVER_RESPONSE("instance_get");
+    optionalInstance.set = false, optionalInstance.instance = EMPTY_INSTANCE;
     if (response.status_code == 200 && response.body != NULL &&
-        response.body[0] != '\0') {
-      const JSON_Value *json_item = json_parse_string(response.body);
-      const JSON_Object *json_object = json_value_get_object(json_item);
-
-      return instance_from_json(json_object);
-    } else {
-      const struct OptionalInstance optionalInstance = {false, EMPTY_INSTANCE};
-      if (response.status_code != 404)
-        fputs(response.body, stderr);
-      return optionalInstance;
-    }
+        response.body[0] != '\0')
+      optionalInstance = optional_instance_from_json(
+          json_value_get_object(json_parse_string(response.body)));
+    else if (response.status_code != 404)
+      fputs(response.body, stderr);
+    return optionalInstance;
   }
 }
 
@@ -190,26 +183,27 @@ instance_insert(const struct InstanceIncomplete *instance,
            shell_script);
 
   {
-    struct ServerResponse response = gcloud_post(NULL, path, body, NULL);
+    const struct ServerResponse response = gcloud_post(NULL, path, body, NULL);
+    struct OptionalInstance optionalInstance;
     DEBUG_SERVER_RESPONSE("instance_insert");
+    optionalInstance.set = false, optionalInstance.instance = EMPTY_INSTANCE;
 
-    if (response.status_code != 200 && response.status_code != 201) {
-      const struct OptionalInstance optionalInstance = {false, EMPTY_INSTANCE};
-      if (response.status_code != 404)
-        fputs(response.body, stderr);
-      return optionalInstance;
-    } else {
+    if ((response.status_code == 200 || response.status_code == 201) &&
+        response.body != NULL && response.body[0] != '\0') {
       const JSON_Value *json_item = json_parse_string(response.body);
       const JSON_Object *json_object = json_value_get_object(json_item);
 
       if (json_object_has_value(json_object, "machineType"))
-        return instance_from_json(json_object);
+        optionalInstance = optional_instance_from_json(json_object);
       else if (json_object_has_value(json_object, "items")) {
         const JSON_Array *_json_items =
             json_object_get_array(json_object, "items");
-        const JSON_Object *_json_object = json_array_get_object(_json_items, 0);
-        if (json_object_has_value(_json_object, "machineType"))
-          return instance_from_json(_json_object);
+        if (json_array_get_count(_json_items) > 0) {
+          const JSON_Object *_json_object =
+              json_array_get_object(_json_items, 0);
+          if (json_object_has_value(_json_object, "machineType"))
+            optionalInstance = optional_instance_from_json(_json_object);
+        }
       } else if (json_object_has_value(json_object, "kind") &&
                  strcmp(json_object_get_string(json_object, "kind"),
                         "compute#operation") == 0) {
@@ -219,32 +213,19 @@ instance_insert(const struct InstanceIncomplete *instance,
           const struct GoogleCloudOperation googleCloudOperation =
               optionalGoogleCloudOperation.googleCloudOperation;
           if (strcmp(googleCloudOperation.status, "RUNNING") == 0)
-            return instance_get(instance->name);
-          else {
-            const struct OptionalInstance optionalInstance = {false,
-                                                              EMPTY_INSTANCE};
+            optionalInstance = instance_get(instance->name);
+          else
             fprintf(stderr, "instance_insert operation not RUNNING. Got:\n%s\n",
                     json_serialize_to_string_pretty(json_item));
-            return optionalInstance;
-          }
-        } else {
-          const struct OptionalInstance optionalInstance = {false,
-                                                            EMPTY_INSTANCE};
+        } else
           fprintf(stderr,
                   "instance_insert JSON object missing required attributes. "
                   "Got:\n%s\n",
                   json_serialize_to_string_pretty(json_item));
-          return optionalInstance;
-        }
       }
-      {
-        const struct OptionalInstance optionalInstance = {false,
-                                                          EMPTY_INSTANCE};
-        fprintf(stderr, "instance_insert final else block on %s\n",
-                json_serialize_to_string_pretty(json_item));
-        return optionalInstance;
-      }
-    }
+    } else if (response.status_code != 404)
+      fputs(response.body, stderr);
+    return optionalInstance;
   }
 }
 
@@ -392,41 +373,44 @@ const char *instance_to_json(const struct InstanceIncomplete *instance) {
   return instance_json_str;
 }
 
-struct OptionalInstance instance_from_json(const JSON_Object *jsonObject) {
+struct OptionalInstance
+optional_instance_from_json(const JSON_Object *jsonObject) {
   struct OptionalInstance optionalInstance;
-  if (!json_object_has_value(jsonObject, "operationType") ||
-      !json_object_has_value(jsonObject, "name")) {
-    optionalInstance.set = false, optionalInstance.instance = EMPTY_INSTANCE;
-  } else {
+  optionalInstance.set = false, optionalInstance.instance = EMPTY_INSTANCE;
+  if (json_object_has_value(jsonObject, "operationType") &&
+      json_object_has_value(jsonObject, "name")) {
     const JSON_Array *network_json_items =
         json_object_get_array(jsonObject, "networkInterfaces");
     const size_t network_json_items_n =
         json_array_get_count(network_json_items);
-    struct NetworkInterface *networkInterfaces =
-        (struct NetworkInterface *)malloc(network_json_items_n *
-                                          sizeof(struct NetworkInterface));
-    size_t i;
-    for (i = 0; i < network_json_items_n; i++) {
-      const JSON_Object *network_json =
-          json_array_get_object(network_json_items, i);
-      struct AccessConfigs *accessConfigs;
-      {
+
+    struct NetworkInterface *networkInterfaces = NULL;
+    if (network_json_items_n > 0) {
+      size_t i;
+      networkInterfaces = (struct NetworkInterface *)malloc(
+          network_json_items_n * sizeof(struct NetworkInterface));
+      for (i = 0; i < network_json_items_n; i++) {
+        const JSON_Object *network_json =
+            json_array_get_object(network_json_items, i);
+        struct AccessConfigs *accessConfigs = NULL;
         const JSON_Array *ac_json_items =
             json_object_get_array(network_json, "accessConfigs");
         const size_t ac_json_items_n = json_array_get_count(ac_json_items);
-        size_t j;
-        accessConfigs = (struct AccessConfigs *)malloc(
-            ac_json_items_n * sizeof(struct AccessConfigs));
-        for (j = 0; j < ac_json_items_n; j++)
-          accessConfigs[j] =
-              AccessConfigs_from_json(json_array_get_object(ac_json_items, i));
-      }
+        if (ac_json_items_n > 0) {
+          size_t j;
+          accessConfigs = (struct AccessConfigs *)malloc(
+              ac_json_items_n * sizeof(struct AccessConfigs));
+          for (j = 0; j < ac_json_items_n; j++)
+            accessConfigs[j] = AccessConfigs_from_json(
+                json_array_get_object(ac_json_items, i));
+        }
 
-      {
-        struct NetworkInterface networkInterface =
-            NetworkInterface_from_json(network_json);
-        networkInterface.accessConfigs = accessConfigs;
-        networkInterfaces[i] = networkInterface;
+        {
+          struct NetworkInterface networkInterface =
+              NetworkInterface_from_json(network_json);
+          networkInterface.accessConfigs = accessConfigs;
+          networkInterfaces[i] = networkInterface;
+        }
       }
     }
 
@@ -441,36 +425,15 @@ struct OptionalInstance instance_from_json(const JSON_Object *jsonObject) {
       struct ShieldedInstanceIntegrityPolicy shieldedInstanceIntegrityPolicy = {
           true};
 
-      struct Instance instance;
-      instance.id = json_object_get_string(jsonObject, "id");
-      instance.creationTimestamp =
-          json_object_get_string(jsonObject, "creationTimestamp");
-      instance.name = json_object_get_string(jsonObject, "name");
-      instance.machineType = json_object_get_string(jsonObject, "machineType");
-      instance.status = json_object_get_string(jsonObject, "status");
-      instance.zone = json_object_get_string(jsonObject, "zone");
+      struct Instance instance = instance_from_json(jsonObject);
       instance.networkInterfaces = networkInterfaces;
-      instance.disks = NULL /*std::vector<struct Disk>()*/;
       instance.metadata = &metadata;
-      instance.selfLink = json_object_get_string(jsonObject, "selfLink");
       instance.scheduling = &scheduling;
-      instance.cpuPlatform = json_object_get_string(jsonObject, "cpuPlatform");
-      instance.labelFingerprint =
-          json_object_get_string(jsonObject, "labelFingerprint");
-      instance.startRestricted =
-          (bool)json_object_get_boolean(jsonObject, "startRestricted");
-      instance.deletionProtection =
-          (bool)json_object_get_boolean(jsonObject, "deletionProtection");
       instance.shieldedInstanceConfig = &shieldedInstanceConfig;
       instance.shieldedInstanceIntegrityPolicy =
           &shieldedInstanceIntegrityPolicy;
-      instance.fingerprint = json_object_get_string(jsonObject, "fingerprint");
-      instance.lastStartTimestamp =
-          json_object_get_string(jsonObject, "lastStartTimestamp");
-      instance.kind = json_object_get_string(jsonObject, "kind");
 
-      optionalInstance.set = true;
-      optionalInstance.instance = instance;
+      optionalInstance.set = true, optionalInstance.instance = instance;
     }
   }
   return optionalInstance;
@@ -497,4 +460,36 @@ struct AccessConfigs AccessConfigs_from_json(const JSON_Object *jsonObject) {
   accessConfigs.networkTier = json_object_get_string(jsonObject, "networkTier");
   accessConfigs.kind = json_object_get_string(jsonObject, "kind");
   return accessConfigs;
+}
+
+struct Instance instance_from_json(const JSON_Object *jsonObject) {
+  struct Instance instance;
+  instance.id = json_object_get_string(jsonObject, "id");
+  instance.creationTimestamp =
+      json_object_get_string(jsonObject, "creationTimestamp");
+  instance.name = json_object_get_string(jsonObject, "name");
+  instance.machineType = json_object_get_string(jsonObject, "machineType");
+  instance.status = json_object_get_string(jsonObject, "status");
+  instance.zone = json_object_get_string(jsonObject, "zone");
+  instance.disks = NULL /*std::vector<struct Disk>()*/;
+  instance.selfLink = json_object_get_string(jsonObject, "selfLink");
+  instance.cpuPlatform = json_object_get_string(jsonObject, "cpuPlatform");
+  instance.labelFingerprint =
+      json_object_get_string(jsonObject, "labelFingerprint");
+  if (json_object_has_value_of_type(jsonObject, "startRestricted", JSONBoolean))
+    instance.startRestricted =
+        (bool)json_object_get_boolean(jsonObject, "startRestricted");
+  else
+    instance.startRestricted = false;
+  if (json_object_has_value_of_type(jsonObject, "deletionProtection",
+                                    JSONBoolean))
+    instance.deletionProtection =
+        (bool)json_object_get_boolean(jsonObject, "deletionProtection");
+  else
+    instance.startRestricted = false;
+  instance.fingerprint = json_object_get_string(jsonObject, "fingerprint");
+  instance.lastStartTimestamp =
+      json_object_get_string(jsonObject, "lastStartTimestamp");
+  instance.kind = json_object_get_string(jsonObject, "kind");
+  return instance;
 }

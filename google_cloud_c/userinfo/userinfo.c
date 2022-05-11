@@ -9,9 +9,6 @@
 
 const struct Oauth2UserInfo oauth2UserInfoNull = {NULL, NULL, NULL, false};
 
-struct Oauth2UserInfo
-oauth2_user_info_from_json(const JSON_Object *oauth2_user_info_obj);
-
 /* undocumented by Google? */
 struct OptionalOauth2UserInfo userinfo_get(const char *google_access_token) {
   CURLU *urlp = curl_url();
@@ -25,7 +22,7 @@ struct OptionalOauth2UserInfo userinfo_get(const char *google_access_token) {
     IS_CURLUE_OK(curl_url_set(urlp, CURLUPART_QUERY, access_token, 0));
   }
   {
-    struct ServerResponse response = https_json_post(urlp, NULL, NULL);
+    const struct ServerResponse response = https_json_post(urlp, NULL, NULL);
     struct OptionalOauth2UserInfo optionalOauth2UserInfo;
     if (response.code == 200)
       optionalOauth2UserInfo.set = true,
@@ -41,14 +38,15 @@ struct OptionalOauth2UserInfo userinfo_get(const char *google_access_token) {
 /* Utility functions */
 
 struct Oauth2UserInfo
-oauth2_user_info_from_json(const JSON_Object *oauth2_user_info_obj) {
+oauth2_user_info_from_json(const JSON_Object *jsonObject) {
   struct Oauth2UserInfo oauth2_user_info;
-  oauth2_user_info.sub = json_object_get_string(oauth2_user_info_obj, "sub");
-  oauth2_user_info.picture =
-      json_object_get_string(oauth2_user_info_obj, "picture");
-  oauth2_user_info.email =
-      json_object_get_string(oauth2_user_info_obj, "email");
-  oauth2_user_info.email_verified =
-      (bool)json_object_get_boolean(oauth2_user_info_obj, "email_verified");
+  oauth2_user_info.sub = json_object_get_string(jsonObject, "sub");
+  oauth2_user_info.picture = json_object_get_string(jsonObject, "picture");
+  oauth2_user_info.email = json_object_get_string(jsonObject, "email");
+  if (json_object_has_value_of_type(jsonObject, "email_verified", JSONBoolean))
+    oauth2_user_info.email_verified =
+        (bool)json_object_get_boolean(jsonObject, "email_verified");
+  else
+    oauth2_user_info.email_verified = false;
   return oauth2_user_info;
 }

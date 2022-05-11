@@ -70,6 +70,9 @@ struct PubsubMessage {
     }, */
 };
 
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const struct PubsubMessage
+    EMPTY_PUBSUB_MESSAGE;
+
 /* https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/pull#ReceivedMessage
  */
 struct ReceivedMessage {

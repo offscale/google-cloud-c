@@ -7,7 +7,8 @@ struct Zones zone_list() {
   asprintf(&path, "/compute/v1/projects/%s/zones", AUTH_CONTEXT.project_id);
 
   {
-    struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    const struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    struct Zones _zones = {NULL, 0};
     DEBUG_SERVER_RESPONSE("zone_list");
     if (response.status_code == 200 && response.body != NULL &&
         response.body[0] != '\0') {
@@ -15,23 +16,18 @@ struct Zones zone_list() {
       const JSON_Array *zone_json_items = json_object_get_array(
           json_value_get_object(zones_json_item), "items");
       const size_t zone_json_items_n = json_array_get_count(zone_json_items);
-      size_t i;
+      if (zone_json_items_n > 0) {
+        size_t i;
 
-      struct Zone *zones =
-          (struct Zone *)malloc(zone_json_items_n * sizeof(struct Zone));
-      for (i = 0; i < zone_json_items_n; i++)
-        zones[i] = zone_from_json(json_array_get_object(zone_json_items, i));
-      {
-        struct Zones _zones;
-        _zones.arr = zones;
-        _zones.size = zone_json_items_n;
-        return _zones;
+        struct Zone *zones =
+            (struct Zone *)malloc(zone_json_items_n * sizeof(struct Zone));
+        for (i = 0; i < zone_json_items_n; i++)
+          zones[i] = zone_from_json(json_array_get_object(zone_json_items, i));
+        _zones.arr = zones, _zones.size = zone_json_items_n;
       }
-    } else {
-      const struct Zones _zones = {NULL, 0};
+    } else
       fputs("Empty response.body", stderr);
-      return _zones;
-    }
+    return _zones;
   }
 }
 
@@ -49,7 +45,10 @@ struct Zone zone_from_json(const JSON_Object *jsonObject) {
   zone.region = json_object_get_string(jsonObject, "region");
   zone.selfLink = json_object_get_string(jsonObject, "selfLink");
   zone.availableCpuPlatforms = NULL;
-  zone.supportsPzs = (bool)json_object_get_boolean(jsonObject, "supportsPzs");
+  if (json_object_has_value_of_type(jsonObject, "supportsPzs", JSONBoolean))
+    zone.supportsPzs = (bool)json_object_get_boolean(jsonObject, "supportsPzs");
+  else
+    zone.supportsPzs = false;
   zone.kind = json_object_get_string(jsonObject, "kind");
 
   return zone;
