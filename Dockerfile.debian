@@ -1,14 +1,33 @@
 FROM debian
 
-ADD 'https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3.22.2-linux-x86_64.sh' '/tmp/cmake.sh'
+ADD 'https://github.com/Kitware/CMake/releases/download/v3.23.1/cmake-3.23.1-linux-x86_64.sh' '/tmp/cmake.sh'
 
 RUN sh /tmp/cmake.sh --prefix='/usr/local' --skip-license && \
     apt-get update -qq && \
-    apt-get install -y gcc make pkg-config libc-dev libcurl4-openssl-dev
+    apt-get install -y \
+                        curl \
+                        gcc \
+                        g++ \
+                        git \
+                        libc-dev \
+                        libc++-dev \
+                        libcurl4-openssl-dev \
+                        make \
+                        pkg-config \
+                        tar \
+                        unzip \
+                        zip
+
+RUN git clone --depth=1 --branch='project0' https://github.com/offscale/vcpkg && \
+    ./vcpkg/bootstrap-vcpkg.sh && \
+    ./vcpkg/vcpkg install c89stringutils cauthflow parson libcurl-simple-https
 
 COPY . /google-cloud-c
 
 WORKDIR /google-cloud-c/build
 
-RUN cmake -DCMAKE_BUILD_TYPE="Debug" .. && \
+RUN cmake \
+    -DCMAKE_BUILD_TYPE="Debug" \
+    -DCMAKE_TOOLCHAIN_FILE="/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+    .. && \
     cmake --build .

@@ -23,6 +23,8 @@ target_link_libraries(
         "${LIBRARY_NAME}"
         PUBLIC
         "${PROJECT_NAME}_client"
+        "${PROJECT_NAME}_compute"
+        "${PROJECT_NAME}_common"
 )
 
 set_target_properties(
