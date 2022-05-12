@@ -54,7 +54,7 @@ project_get(const char *project_id);
 /* Lists `Project`s that the caller has the `resourcemanager.projects.get`
  * permission on.
  * https://cloud.google.com/resource-manager/reference/rest/v1/projects/list */
-extern GOOGLE_CLOUD_C_PROJECT_EXPORT const struct Project *project_list();
+extern GOOGLE_CLOUD_C_PROJECT_EXPORT const struct Project *project_list(void);
 
 extern GOOGLE_CLOUD_C_PROJECT_EXPORT const struct Project projectNull;
 

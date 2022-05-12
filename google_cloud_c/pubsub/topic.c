@@ -139,14 +139,15 @@ struct Topic topic_from_json(const JSON_Object *const jsonObject) {
   return topic;
 }
 
-const char *SchemaSettings_to_json(struct SchemaSettings schemaSettings) {
+const char *
+SchemaSettings_to_json(const struct SchemaSettings *schemaSettings) {
   char *s = NULL;
   jasprintf(&s, "{");
-  if (schemaSettings.schema != NULL && strlen(schemaSettings.schema) > 0)
-    jasprintf(&s, "  \"schema\": \"%s\",", schemaSettings.schema);
-  if (schemaSettings.encoding)
+  if (schemaSettings->schema != NULL && schemaSettings->schema[0] != '\0')
+    jasprintf(&s, "  \"schema\": \"%s\",", schemaSettings->schema);
+  if (schemaSettings->encoding)
     jasprintf(&s, "  \"encoding\": \"%s\"",
-              Encoding_to_str(schemaSettings.encoding));
+              Encoding_to_str(schemaSettings->encoding));
   jasprintf(&s, "\0");
   s[strlen(s) - 1] = '}';
   return s;
@@ -155,21 +156,21 @@ const char *SchemaSettings_to_json(struct SchemaSettings schemaSettings) {
 const char *topic_to_json(const struct Topic *topic) {
   char *s = NULL;
   jasprintf(&s, "{");
-  if (topic->name != NULL && strlen(topic->name) > 0)
+  if (topic->name != NULL && topic->name[0] != '\0')
     jasprintf(&s, "  \"name\": \"%s\",", topic->name);
-  if (topic->kmsKeyName != NULL && strlen(topic->kmsKeyName) > 0)
+  if (topic->kmsKeyName != NULL && topic->kmsKeyName[0] != '\0')
     jasprintf(&s, "  \"kmsKeyName\": \"%s\",", topic->kmsKeyName);
   if (topic->satisfiesPzs)
     jasprintf(&s, "  \"satisfiesPzs\": %ld,", topic->satisfiesPzs);
   if (topic->messageRetentionDuration != NULL &&
-      strlen(topic->messageRetentionDuration) > 0)
+      topic->messageRetentionDuration[0] != '\0')
     jasprintf(&s, "  \"messageRetentionDuration\": \"%s\",",
               topic->messageRetentionDuration);
   /* TODO: MessageStoragePolicy */
   if (topic->schemaSettings.schema != NULL &&
-      strlen(topic->schemaSettings.schema) > 0)
+      topic->schemaSettings.schema[0] != '\0')
     jasprintf(&s, "  \"schemaSettings\": %s",
-              SchemaSettings_to_json(topic->schemaSettings));
+              SchemaSettings_to_json(&topic->schemaSettings));
   jasprintf(&s, "\0");
   s[strlen(s) - 1] = '}';
   return s;

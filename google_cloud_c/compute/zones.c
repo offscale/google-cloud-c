@@ -1,6 +1,6 @@
 #include <google_cloud_c/compute/zones.h>
 
-struct Zones zone_list() {
+struct Zones zone_list(void) {
   /* https://cloud.google.com/compute/docs/reference/rest/v1/zones/list
    * GET https://compute.googleapis.com/compute/v1/projects/{project}/zones */
   char *path;

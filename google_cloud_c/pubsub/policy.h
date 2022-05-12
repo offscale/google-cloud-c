@@ -33,7 +33,7 @@ struct Expr {
 struct Binding {
   const char *role;
   const char **members;
-  struct Expr *condition;
+  struct Expr **condition;
 };
 
 /* https://cloud.google.com/pubsub/docs/reference/rest/v1/Policy
@@ -41,7 +41,7 @@ struct Binding {
  * controls for Google Cloud resources. */
 struct Policy {
   const char *version;
-  struct Binding *bindings;
+  struct Binding **bindings;
   const char *etag;
 };
 

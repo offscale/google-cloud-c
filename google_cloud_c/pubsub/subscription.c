@@ -197,9 +197,9 @@ const char *subscription_to_json(const struct Subscription *subscription) {
   char *s = NULL;
 
   jasprintf(&s, "{");
-  if (subscription->name != NULL && strlen(subscription->name) > 0)
+  if (subscription->name != NULL && subscription->name[0] != '\0')
     jasprintf(&s, "  \"name\": \"%s\",", subscription->name);
-  if (subscription->topic != NULL && strlen(subscription->topic) > 0)
+  if (subscription->topic != NULL && subscription->topic[0] != '\0')
     jasprintf(&s, "  \"topic\": \"%s\",", subscription->topic);
   if (subscription->ackDeadlineSeconds)
     jasprintf(&s, "  \"ackDeadlineSeconds\": %d,",
@@ -208,20 +208,20 @@ const char *subscription_to_json(const struct Subscription *subscription) {
     jasprintf(&s, "  \"retainAckedMessages\": %lu,",
               subscription->retainAckedMessages);
   if (subscription->messageRetentionDuration != NULL &&
-      strlen(subscription->messageRetentionDuration) > 0)
+      subscription->messageRetentionDuration[0] != '\0')
     jasprintf(&s, "  \"messageRetentionDuration\": \"%s\",",
               subscription->messageRetentionDuration);
   /* "  \"labels\": \"%s\"," */
   jasprintf(&s, "  \"enableMessageOrdering\": \"%s\",",
             subscription->enableMessageOrdering);
-  if (subscription->filter != NULL && strlen(subscription->filter) > 0)
+  if (subscription->filter != NULL && subscription->filter[0] != '\0')
     jasprintf(&s, "  \"filter\": \"%s\",", subscription->filter);
   jasprintf(&s,
             "  \"detached\": %lu,"
             "  \"enableExactlyOnceDelivery\": %lu,",
             subscription->detached, subscription->enableExactlyOnceDelivery);
   if (subscription->topicMessageRetentionDuration != NULL &&
-      strlen(subscription->topicMessageRetentionDuration) > 0)
+      subscription->topicMessageRetentionDuration[0] != '\0')
     jasprintf(&s, "  \"topicMessageRetentionDuration\": \"%s\",",
               subscription->topicMessageRetentionDuration);
   jasprintf(&s, "  \"state\": \"%s\"}",

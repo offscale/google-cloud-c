@@ -48,7 +48,7 @@ bool instance_exists(const char *const instance_name) {
   return instance_exists;
 }
 
-struct Instances instances_list() {
+struct Instances instances_list(void) {
   /* https://cloud.google.com/compute/docs/reference/rest/v1/instances/list
    * GET
    * https://compute.googleapis.com/compute/v1/projects/{project}/zones/{zone}/instances
@@ -69,7 +69,7 @@ struct Instances instances_list() {
 
       if (json_items_n > 0) {
         struct Instance *instances =
-            (struct Instance *)malloc(json_items_n * sizeof(struct Instance));
+            (struct Instance *)malloc((json_items_n) * sizeof(struct Instance));
         size_t i;
         for (i = 0; i < json_items_n; i++) {
           const JSON_Object *const json_obj =
@@ -383,14 +383,14 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
     const JSON_Array *network_json_items =
         json_object_get_array(jsonObject, "networkInterfaces");
     const size_t network_json_items_n =
-        json_array_get_count(network_json_items);
+        json_array_get_count(network_json_items) + 1;
 
-    struct NetworkInterface *networkInterfaces = NULL;
-    if (network_json_items_n > 0) {
+    struct NetworkInterface **networkInterfaces = NULL;
+    if (network_json_items_n > 1) {
       size_t i;
-      networkInterfaces = (struct NetworkInterface *)malloc(
-          network_json_items_n * sizeof(struct NetworkInterface));
-      for (i = 0; i < network_json_items_n; i++) {
+      networkInterfaces = (struct NetworkInterface **)malloc(
+          network_json_items_n * sizeof(struct NetworkInterface **));
+      for (i = 0; i < network_json_items_n - 1; i++) {
         const JSON_Object *const network_json =
             json_array_get_object(network_json_items, i);
         struct AccessConfigs *accessConfigs = NULL;
@@ -409,10 +409,11 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
         {
           struct NetworkInterface networkInterface =
               NetworkInterface_from_json(network_json);
-          networkInterface.accessConfigs = accessConfigs;
-          networkInterfaces[i] = networkInterface;
+          networkInterface.accessConfigs = &accessConfigs;
+          networkInterfaces[i] = &networkInterface;
         }
       }
+      networkInterfaces[network_json_items_n] = NULL;
     }
 
     {

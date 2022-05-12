@@ -34,7 +34,7 @@ struct AccessConfigs {
 
 struct NetworkInterface {
   const char *network, *subnetwork, *networkIP, *name;
-  struct AccessConfigs *accessConfigs;
+  struct AccessConfigs **accessConfigs;
 };
 
 struct GuestOsFeatures {
@@ -58,7 +58,7 @@ struct Item {
 };
 
 struct Metadata {
-  struct Item *items;
+  struct Item **items;
   const char *const kind;
 };
 
@@ -78,7 +78,7 @@ struct ShieldedInstanceIntegrityPolicy {
 
 struct Instance {
   const char *id, *creationTimestamp, *name, *machineType, *status, *zone;
-  struct NetworkInterface *networkInterfaces;
+  struct NetworkInterface **networkInterfaces;
   struct Disk *disks;
   struct Metadata *metadata;
   const char *selfLink;
@@ -91,17 +91,17 @@ struct Instance {
   const char *fingerprint, *lastStartTimestamp, *kind;
 };
 
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Instance instanceNull;
+struct Instances {
+  struct Instance *arr;
+  size_t size;
+};
 
 struct OptionalInstance {
   bool set;
   struct Instance instance;
 };
 
-struct Instances {
-  struct Instance *arr;
-  size_t size;
-};
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Instance instanceNull;
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Instances instancesNull;
 
@@ -118,7 +118,7 @@ extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct InstanceContext INSTANCE_CONTEXT;
 /* Retrieves the list of instances contained within the specified zone.
  * https://cloud.google.com/compute/docs/reference/rest/v1/instances/list
  * */
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Instances instances_list();
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Instances instances_list(void);
 
 /* struct Instance instance_create_all(const struct InstanceIncomplete *);
 

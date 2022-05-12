@@ -27,7 +27,8 @@ create_fw_net_instance(const struct configuration *const config,
     if (optionalInstance.set) {
       const struct Instance _instance = optionalInstance.instance;
 
-      assert(strlen(_instance.networkInterfaces[0].accessConfigs[0].natIP) > 0);
+      assert(_instance.networkInterfaces[0]->accessConfigs[0]->natIP[0] !=
+             '\0');
 
       printf("{\n"
              "  \"instance_name\": \"%s\",\n"
@@ -35,8 +36,8 @@ create_fw_net_instance(const struct configuration *const config,
              "  \"create_fw_net_instance\": true\n"
              "}",
              _instance.name,
-             strlen(_instance.networkInterfaces[0].accessConfigs[0].natIP) > 0
-                 ? _instance.networkInterfaces[0].accessConfigs[0].natIP
+             _instance.networkInterfaces[0]->accessConfigs[0]->natIP[0] != '\0'
+                 ? _instance.networkInterfaces[0]->accessConfigs[0]->natIP
                  : "(null)");
 
       if (_instance.name != NULL && _instance.name[0] != '\0') {
@@ -44,9 +45,9 @@ create_fw_net_instance(const struct configuration *const config,
         instance_name_ip.c_str0 = _instance.name;
         instance_name_ip.size0 = (ssize_t)strlen(_instance.name);
         instance_name_ip.c_str1 =
-            _instance.networkInterfaces[0].accessConfigs[0].natIP;
+            _instance.networkInterfaces[0]->accessConfigs[0]->natIP;
         instance_name_ip.size1 = (ssize_t)strlen(
-            _instance.networkInterfaces[0].accessConfigs[0].natIP);
+            _instance.networkInterfaces[0]->accessConfigs[0]->natIP);
       }
     }
     return instance_name_ip;
@@ -69,18 +70,19 @@ struct StatusAndCstr get_instance_ip(const struct configuration *const config,
     {
       const struct Instance _instance = optionalInstance.instance;
 
-      if (strlen(_instance.name) == 0)
+      if (_instance.name == NULL || _instance.name[0] == '\0')
         return StatusAndCstrNull;
 
-      assert(strlen(_instance.networkInterfaces[0].accessConfigs[0].natIP) > 0);
+      assert(_instance.networkInterfaces[0]->accessConfigs[0]->natIP[0] !=
+             '\0');
       printf("{\n"
              "  \"instance_name\": \"%s\",\n"
              "  \"natIP\": \"%s\",\n"
              "  \"get_instance_ip\": true\n"
              "}\n",
              _instance.name,
-             strlen(_instance.networkInterfaces[0].accessConfigs[0].natIP) > 0
-                 ? _instance.networkInterfaces[0].accessConfigs[0].natIP
+             _instance.networkInterfaces[0]->accessConfigs[0]->natIP[0] != '\0'
+                 ? _instance.networkInterfaces[0]->accessConfigs[0]->natIP
                  : "(null)");
 
       {
@@ -90,9 +92,9 @@ struct StatusAndCstr get_instance_ip(const struct configuration *const config,
             0,
         };
         instance_ip.c_str =
-            _instance.networkInterfaces[0].accessConfigs[0].natIP;
+            _instance.networkInterfaces[0]->accessConfigs[0]->natIP;
         instance_ip.size = (ssize_t)strlen(
-            _instance.networkInterfaces[0].accessConfigs[0].natIP);
+            _instance.networkInterfaces[0]->accessConfigs[0]->natIP);
         return instance_ip;
       }
     }
@@ -135,7 +137,8 @@ struct StatusAndArrayCStrArray compute(const struct configuration *const config,
         zoneNames.status = EXIT_SUCCESS;
         zoneNames.c_str_arr = _zoneNames;
         zoneNames.size = _zones.size;
-      }
+      } else
+        fputs("No Zones found", stderr);
     }
   } else {
     fputs("TODO: Implement", stderr);

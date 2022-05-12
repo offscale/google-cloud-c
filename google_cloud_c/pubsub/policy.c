@@ -76,13 +76,13 @@ struct Expr expr_from_json(const JSON_Object *const jsonObject) {
 const char *expr_to_json(const struct Expr *expr) {
   char *s = NULL;
   jasprintf(&s, "{");
-  if (expr->expression != NULL && strlen(expr->expression) > 0)
+  if (expr->expression != NULL && expr->expression[0] != '\0')
     jasprintf(&s, "  \"expression\": \"%s\",", expr->expression);
-  if (expr->title != NULL && strlen(expr->title) > 0)
+  if (expr->title != NULL && expr->title[0] != '\0')
     jasprintf(&s, "  \"title\": \"%s\",", expr->title);
-  if (expr->description != NULL && strlen(expr->description) > 0)
+  if (expr->description != NULL && expr->description[0] != '\0')
     jasprintf(&s, "  \"description\": \"%s\",", expr->description);
-  if (expr->location != NULL && strlen(expr->location) > 0)
+  if (expr->location != NULL && expr->location[0] != '\0')
     jasprintf(&s, "  \"location\": \"%s\",", expr->location);
   jasprintf(&s, "\0");
   s[strlen(s) - 1] = '}';
@@ -99,14 +99,15 @@ struct Binding bindings_from_json(const JSON_Object *const jsonObject) {
     const JSON_Array *members_json_items =
         json_object_get_array(jsonObject, "members");
     const size_t members_json_items_n =
-        json_array_get_count(members_json_items);
+        json_array_get_count(members_json_items) + 1;
     size_t i;
 
-    if (members_json_items_n > 0) {
+    if (members_json_items_n > 1) {
       bindings.members = (const char **)malloc(members_json_items_n *
                                                sizeof(const char *const));
-      for (i = 0; i < members_json_items_n; i++)
+      for (i = 0; i < members_json_items_n - 1; i++)
         bindings.members[i] = json_array_get_string(members_json_items, i);
+      bindings.members[members_json_items_n] = NULL;
     }
   }
 
@@ -114,15 +115,18 @@ struct Binding bindings_from_json(const JSON_Object *const jsonObject) {
   if (json_object_has_value_of_type(jsonObject, "condition", JSONArray)) {
     const JSON_Array *expr_json_items =
         json_object_get_array(jsonObject, "condition");
-    const size_t expr_json_items_n = json_array_get_count(expr_json_items);
+    const size_t expr_json_items_n = json_array_get_count(expr_json_items) + 1;
     size_t i;
 
-    if (expr_json_items_n > 0) {
+    if (expr_json_items_n > 1) {
       bindings.condition =
-          (struct Expr *)malloc(expr_json_items_n * sizeof(struct Expr));
-      for (i = 0; i < expr_json_items_n; i++)
-        bindings.condition[i] =
+          (struct Expr **)malloc(expr_json_items_n * sizeof(struct Expr *));
+      for (i = 0; i < expr_json_items_n - 1; i++) {
+        struct Expr expr =
             expr_from_json(json_array_get_object(expr_json_items, i));
+        bindings.condition[i] = &expr;
+      }
+      bindings.condition[expr_json_items_n] = NULL;
     }
   }
 
@@ -133,7 +137,7 @@ const char *bindings_to_json(const struct Binding *binding) {
   char *s = NULL;
   size_t n;
   jasprintf(&s, "{");
-  if (binding->role != NULL && strlen(binding->role) > 0)
+  if (binding->role != NULL && binding->role[0] != '\0')
     jasprintf(&s, "  \"role\": \"%s\",", binding->role);
   if (binding->members != NULL) {
     char *member;
@@ -147,11 +151,11 @@ const char *bindings_to_json(const struct Binding *binding) {
     else
       jasprintf(&s, "]");
   }
-  if (binding->condition) {
-    struct Expr *expr;
+  if (binding->condition != NULL) {
+    struct Expr **expr;
     jasprintf(&s, "  \"condition\": [");
     for (expr = binding->condition; expr != NULL; expr++)
-      jasprintf(&s, "%s,", expr_to_json(expr));
+      jasprintf(&s, "%s,", expr_to_json(*expr));
     n = strlen(s);
     if (s[n - 1] == ',') /* `if` to handle empty array */
       s[n - 1] = ']';
@@ -173,15 +177,18 @@ struct Policy policy_from_json(const JSON_Object *const jsonObject) {
     const JSON_Array *bindings_json_items =
         json_object_get_array(jsonObject, "bindings");
     const size_t bindings_json_items_n =
-        json_array_get_count(bindings_json_items);
+        json_array_get_count(bindings_json_items) + 1;
     size_t i;
 
-    if (bindings_json_items_n > 0) {
-      policy.bindings = (struct Binding *)malloc(bindings_json_items_n *
-                                                 sizeof(struct Policy));
-      for (i = 0; i < bindings_json_items_n; i++)
-        policy.bindings[i] =
+    if (bindings_json_items_n > 1) {
+      policy.bindings = (struct Binding **)malloc(bindings_json_items_n *
+                                                  sizeof(struct Policy *));
+      for (i = 0; i < bindings_json_items_n - 1; i++) {
+        struct Binding binding =
             bindings_from_json(json_array_get_object(bindings_json_items, i));
+        policy.bindings[i] = &binding;
+      }
+      policy.bindings[bindings_json_items_n] = NULL;
     }
   }
 
@@ -194,20 +201,20 @@ const char *policy_to_json(const struct Policy *policy) {
   char *s = NULL;
   size_t n;
   jasprintf(&s, "{");
-  if (policy->version != NULL && strlen(policy->version) > 0)
+  if (policy->version != NULL && policy->version[0] != '\0')
     jasprintf(&s, "  \"version\": \"%s\",", policy->version);
   if (policy->bindings != NULL) {
-    struct Binding *binding;
+    struct Binding **binding;
     jasprintf(&s, "  \"bindings\": [");
     for (binding = policy->bindings; binding != NULL; binding++)
-      jasprintf(&s, "%s,", bindings_to_json(binding));
+      jasprintf(&s, "%s,", bindings_to_json(*binding));
     n = strlen(s);
     if (s[n - 1] == ',') /* `if` to handle empty array */
       s[n - 1] = ']';
     else
       jasprintf(&s, "]");
   }
-  if (policy->etag != NULL && strlen(policy->etag) > 0)
+  if (policy->etag != NULL && policy->etag[0] != '\0')
     jasprintf(&s, "  \"etag\": \"%s\",", policy->etag);
   jasprintf(&s, "\0");
   s[strlen(s) - 1] = '}';

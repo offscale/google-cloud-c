@@ -47,7 +47,7 @@ struct OptionalProject project_get(const char *const project_id) {
   }
 }
 
-const struct Project *project_list() {
+const struct Project *project_list(void) {
   /* https://cloud.google.com/resource-manager/reference/rest/v1/projects/list
    * GET https://cloudresourcemanager.googleapis.com/v1/projects
    * */
