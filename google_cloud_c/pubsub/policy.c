@@ -144,7 +144,6 @@ const char *bindings_to_json(const struct Binding *binding) {
     jasprintf(&s, "  \"members\": [");
     for (member = (char *)binding->members; member != NULL; member++)
       jasprintf(&s, "\"%s\",", member);
-    jasprintf(&s, "  \"members\": [");
     n = strlen(s);
     if (s[n - 1] == ',') /* `if` to handle empty array */
       s[n - 1] = ']';
