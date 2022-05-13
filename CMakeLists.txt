@@ -37,8 +37,15 @@ configure_file(
 add_subdirectory("${PROJECT_NAME}")
 
 include(CTest)
+option(BUILD_PARSE_EMIT_TESTS "Build parse/emit tests" ON)
+option(BUILD_REAL_API_TESTING "Build tests which call actual Google Cloud Compute API" ON)
 if (BUILD_TESTING)
-    add_subdirectory("google_cloud_c_tests")
+    if (BUILD_REAL_API_TESTING)
+        add_subdirectory("${PROJECT_NAME}_tests")
+    endif (BUILD_REAL_API_TESTING)
+    if (BUILD_PARSE_EMIT_TESTS)
+        add_subdirectory("${PROJECT_NAME}_parse_emit_tests")
+    endif (BUILD_PARSE_EMIT_TESTS)
 endif (BUILD_TESTING)
 
 include(InstallRequiredSystemLibraries)

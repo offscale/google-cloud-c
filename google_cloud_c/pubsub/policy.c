@@ -141,6 +141,7 @@ const char *bindings_to_json(const struct Binding *binding) {
     jasprintf(&s, "  \"role\": \"%s\",", binding->role);
   if (binding->members != NULL) {
     char *member;
+    assert(binding->members != NULL);
     jasprintf(&s, "  \"members\": [");
     for (member = (char *)binding->members; member != NULL; member++)
       jasprintf(&s, "\"%s\",", member);
@@ -222,9 +223,20 @@ const char *policy_to_json(const struct Policy *policy) {
 
 const char *
 GetPolicyOptions_to_json(const struct GetPolicyOptions *getPolicyOptions) {
-  enum { n = 29 };
-  static char requestedPolicyVersion[n] = "{\"requestedPolicyVersion\": \0}";
-  requestedPolicyVersion[n - 2] =
-      (char)getPolicyOptions->requestedPolicyVersion;
+  enum { n = 30 };
+  char *requestedPolicyVersion = malloc(sizeof(char)*n);
+  memcpy(requestedPolicyVersion, "{\"requestedPolicyVersion\": \0}", n);
+  requestedPolicyVersion[n-1] = '\0';
+  switch (getPolicyOptions->requestedPolicyVersion) {
+  case POLICY_VERSION_0:
+    requestedPolicyVersion[n - 3] = '0';
+    break;
+  case POLICY_VERSION_1:
+    requestedPolicyVersion[n - 3] = '1';
+    break;
+  case POLICY_VERSION_3:
+  default:
+    requestedPolicyVersion[n - 3] = '3';
+  }
   return requestedPolicyVersion;
 }

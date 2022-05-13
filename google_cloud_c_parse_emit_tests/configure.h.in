@@ -1,0 +1,9 @@
+#ifndef GOOGLE_CLOUD_C_PARSE_EMIT_CONFIG_H
+#define GOOGLE_CLOUD_C_PARSE_EMIT_CONFIG_H
+
+#define _@TARGET_ARCH@_
+
+#define CLIENT_ID                          "@CLIENT_ID@"
+#define CLIENT_SECRET                      "@CLIENT_SECRET@"
+
+#endif /* !GOOGLE_CLOUD_C_PARSE_EMIT_CONFIG_H */

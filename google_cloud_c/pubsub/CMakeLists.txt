@@ -10,7 +10,6 @@ source_group("Source Files" FILES "${Source_Files}")
 add_library("${LIBRARY_NAME}" "${LIBRARY_TYPE_FLAG}" "${Header_Files}" "${Source_Files}")
 
 include(GNUInstallDirs)
-get_filename_component(PROJECT_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}" DIRECTORY)
 get_filename_component(PROJECT_ROOT_DIR "${PROJECT_ROOT_DIR}" DIRECTORY)
 target_include_directories(
         "${LIBRARY_NAME}"
