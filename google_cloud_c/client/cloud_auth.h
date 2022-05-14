@@ -19,8 +19,6 @@ extern "C" {
   if ((rc) != CURLUE_OK)                                                       \
   fprintf(stderr, "curl_url_set failed: %s\n", curl_url_strerror(rc))
 
-#include <c89stringutils_string_extras.h>
-
 #include <google_cloud_c/client/google_cloud_c_client_export.h>
 
 #define DEBUG_SERVER_RESPONSE(name)                                            \

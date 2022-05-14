@@ -1,3 +1,5 @@
+#include <c89stringutils_string_extras.h>
+
 #include <google_cloud_c/compute/firewall.h>
 
 const struct Firewall firewallNull = {NULL};

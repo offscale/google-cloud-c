@@ -1,3 +1,5 @@
+#include <c89stringutils_string_extras.h>
+
 #include <google_cloud_c/compute/network.h>
 
 const struct RoutingConfig routingConfigNull = {""};

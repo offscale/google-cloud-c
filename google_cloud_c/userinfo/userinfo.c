@@ -2,6 +2,8 @@
 #include <curl/urlapi.h>
 #include <parson.h>
 
+#include <c89stringutils_string_extras.h>
+
 #include <curl_simple_https.h>
 
 #include <google_cloud_c/client/cloud_auth.h>

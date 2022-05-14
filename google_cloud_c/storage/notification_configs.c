@@ -1,5 +1,7 @@
 #include <parson.h>
 
+#include <c89stringutils_string_extras.h>
+
 #include <google_cloud_c/client/cloud_auth.h>
 #include <google_cloud_c/storage/notification_configs.h>
 

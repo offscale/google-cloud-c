@@ -1,5 +1,7 @@
 #include <parson.h>
 
+#include <c89stringutils_string_extras.h>
+
 #include <google_cloud_c/project/project.h>
 
 const struct Project projectNull = {NULL, NULL, LIFECYCLE_STATE_UNSPECIFIED,
