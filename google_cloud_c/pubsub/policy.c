@@ -205,7 +205,7 @@ const char *policy_to_json(const struct Policy *policy) {
   if (policy->bindings != NULL) {
     struct Binding **binding;
     jasprintf(&s, "  \"bindings\": [");
-    for (binding = policy->bindings; binding != NULL; binding++)
+    for (binding = policy->bindings; *binding; binding++)
       jasprintf(&s, "%s,", bindings_to_json(*binding));
     n = strlen(s);
     if (s[n - 1] == ',') /* `if` to handle empty array */
@@ -213,8 +213,12 @@ const char *policy_to_json(const struct Policy *policy) {
     else
       jasprintf(&s, "]");
   }
-  if (policy->etag != NULL && policy->etag[0] != '\0')
+  if (policy->etag != NULL && policy->etag[0] != '\0') {
+    n = strlen(s);
+    if (n > 1)
+      jasprintf(&s, ",");
     jasprintf(&s, "  \"etag\": \"%s\",", policy->etag);
+  }
   jasprintf(&s, "\0");
   s[strlen(s) - 1] = '}';
   return s;

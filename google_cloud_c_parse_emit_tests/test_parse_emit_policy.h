@@ -86,10 +86,72 @@ TEST x_bindings_to_json(void) {
   PASS();
 }
 
+TEST x_policy_to_json(void) {
+  struct Policy *policy = (struct Policy *)malloc(sizeof(struct Policy) * 1);
+  struct Binding *binding =
+      (struct Binding *)malloc(sizeof(struct Binding) * 1);
+
+  binding->role = "role";
+
+  binding->members = malloc(sizeof(char *) * 3);
+  binding->members[0] = "member0", binding->members[1] = "member1",
+  binding->members[2] = NULL;
+
+  binding->condition = (struct Expr **)malloc(sizeof(struct Expr) * 3);
+
+  binding->condition[0] = malloc(sizeof(struct Expr) * 1);
+  binding->condition[0]->description = "description0",
+  binding->condition[0]->expression = "expression0",
+  binding->condition[0]->location = "location0",
+  binding->condition[0]->title = "title0";
+
+  binding->condition[1] = malloc(sizeof(struct Expr) * 1);
+  binding->condition[1]->description = "description1",
+  binding->condition[1]->expression = "expression1",
+  binding->condition[1]->location = "location1",
+  binding->condition[1]->title = "title1";
+
+  binding->condition[2] = NULL;
+
+  ASSERT_STR_EQ(
+      bindings_to_json(binding),
+      "{  \"role\": \"role\",  \"members\": [\"member0\",\"member1\"],  "
+      "\"condition\": [{  \"expression\": \"expression0\",  \"title\": "
+      "\"title0\",  \"description\": \"description0\",  \"location\": "
+      "\"location0\"},{  \"expression\": \"expression1\",  \"title\": "
+      "\"title1\",  \"description\": \"description1\",  \"location\": "
+      "\"location1\"}]}");
+
+  policy->etag = "etag", policy->version = "version";
+
+  policy->bindings = malloc(sizeof(struct Binding *) * 2);
+  policy->bindings[0] = binding;
+  policy->bindings[1] = NULL;
+
+  ASSERT_STR_EQ(
+      policy_to_json(policy),
+      "{  \"version\": \"version\",  \"bindings\": [{  \"role\": \"role\",  "
+      "\"members\": [\"member0\",\"member1\"],  \"condition\": [{  "
+      "\"expression\": \"expression0\",  \"title\": \"title0\",  "
+      "\"description\": \"description0\",  \"location\": \"location0\"},{  "
+      "\"expression\": \"expression1\",  \"title\": \"title1\",  "
+      "\"description\": \"description1\",  \"location\": \"location1\"}]}],  "
+      "\"etag\": \"etag\"}");
+
+  free(policy->bindings[0]->members);
+  free(policy->bindings[0]->condition[0]);
+  free(policy->bindings[0]->condition[1]);
+  free(policy->bindings[0]->condition);
+  free(policy->bindings[0]);
+  free(policy);
+  PASS();
+}
+
 SUITE(parse_emit_policy_suite) {
   RUN_TEST(x_expr_to_json);
   RUN_TEST(x_GetPolicyOptions_to_json);
   RUN_TEST(x_bindings_to_json);
+  RUN_TEST(x_policy_to_json);
 }
 
 #ifdef __cplusplus
