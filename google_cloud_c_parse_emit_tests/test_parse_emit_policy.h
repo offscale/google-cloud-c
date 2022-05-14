@@ -16,10 +16,8 @@ extern "C" {
 
 TEST x_expr_to_json(void) {
   struct Expr *expr = (struct Expr *)malloc(sizeof(struct Expr) * 1);
-  expr->description = "description";
-  expr->expression = "expression";
-  expr->location = "location";
-  expr->title = "title";
+  expr->description = "description", expr->expression = "expression",
+  expr->location = "location", expr->title = "title";
   ASSERT_STR_EQ(
       expr_to_json(expr),
       "{"
@@ -31,26 +29,59 @@ TEST x_expr_to_json(void) {
 }
 
 TEST x_GetPolicyOptions_to_json(void) {
-  struct GetPolicyOptions *getPolicyOptions = (struct GetPolicyOptions *)malloc(sizeof(struct GetPolicyOptions) * 1);
+  struct GetPolicyOptions *getPolicyOptions =
+      (struct GetPolicyOptions *)malloc(sizeof(struct GetPolicyOptions) * 1);
   getPolicyOptions->requestedPolicyVersion = POLICY_VERSION_1;
-  ASSERT_STR_EQ(
-      GetPolicyOptions_to_json(getPolicyOptions),
-      "{\"requestedPolicyVersion\": 1}"
-      );
+  ASSERT_STR_EQ(GetPolicyOptions_to_json(getPolicyOptions),
+                "{\"requestedPolicyVersion\": 1}");
   free(getPolicyOptions);
   PASS();
 }
 
 TEST x_bindings_to_json(void) {
-  struct Binding *binding = (struct Binding *)malloc(sizeof(struct Binding) * 1);
-  binding->role = "role";
-      ASSERT_STR_EQ(
+  struct Binding *binding =
+      (struct Binding *)malloc(sizeof(struct Binding) * 1);
+  binding->role = "role", binding->members = NULL, binding->condition = NULL;
+
+  ASSERT_STR_EQ(bindings_to_json(binding), "{  \"role\": \"role\"}");
+
+  binding->members = malloc(sizeof(char *) * 3);
+  binding->members[0] = "member0", binding->members[1] = "member1",
+  binding->members[2] = NULL;
+
+  ASSERT_STR_EQ(
       bindings_to_json(binding),
-      "{\"requestedPolicyVersion\": 1}"
-  );
-  binding->members = NULL;
-  binding->condition = NULL;
-  printf("bindings_to_json() = \"%s\"\n", bindings_to_json(binding));
+      "{  \"role\": \"role\",  \"members\": [\"member0\",\"member1\"]}");
+
+  binding->condition = (struct Expr **)malloc(sizeof(struct Expr) * 3);
+
+  binding->condition[0] = malloc(sizeof(struct Expr) * 1);
+  binding->condition[0]->description = "description0",
+  binding->condition[0]->expression = "expression0",
+  binding->condition[0]->location = "location0",
+  binding->condition[0]->title = "title0";
+
+  binding->condition[1] = malloc(sizeof(struct Expr) * 1);
+  binding->condition[1]->description = "description1",
+  binding->condition[1]->expression = "expression1",
+  binding->condition[1]->location = "location1",
+  binding->condition[1]->title = "title1";
+
+  binding->condition[2] = NULL;
+
+  ASSERT_STR_EQ(
+      bindings_to_json(binding),
+      "{  \"role\": \"role\",  \"members\": [\"member0\",\"member1\"],  "
+      "\"condition\": [{  \"expression\": \"expression0\",  \"title\": "
+      "\"title0\",  \"description\": \"description0\",  \"location\": "
+      "\"location0\"},{  \"expression\": \"expression1\",  \"title\": "
+      "\"title1\",  \"description\": \"description1\",  \"location\": "
+      "\"location1\"}]}");
+
+  free(binding->members);
+  free(binding->condition[0]);
+  free(binding->condition[1]);
+  free(binding->condition);
   free(binding);
   PASS();
 }

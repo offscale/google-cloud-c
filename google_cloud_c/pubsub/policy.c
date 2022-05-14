@@ -140,27 +140,26 @@ const char *bindings_to_json(const struct Binding *binding) {
   if (binding->role != NULL && binding->role[0] != '\0')
     jasprintf(&s, "  \"role\": \"%s\",", binding->role);
   if (binding->members != NULL) {
-    char *member;
-    assert(binding->members != NULL);
+    const char **member;
     jasprintf(&s, "  \"members\": [");
-    for (member = (char *)binding->members; member != NULL; member++)
-      jasprintf(&s, "\"%s\",", member);
+    for (member = binding->members; *member; member++)
+      jasprintf(&s, "\"%s\",", *member);
+
     n = strlen(s);
-    if (s[n - 1] == ',') /* `if` to handle empty array */
-      s[n - 1] = ']';
-    else
-      jasprintf(&s, "]");
+    s[n - 1] = ']';
+    jasprintf(&s, "}");
   }
   if (binding->condition != NULL) {
     struct Expr **expr;
+    n = strlen(s);
+    if (s[n - 1] == '}')
+      s[n - 1] = ',';
     jasprintf(&s, "  \"condition\": [");
-    for (expr = binding->condition; expr != NULL; expr++)
+    for (expr = binding->condition; *expr; expr++)
       jasprintf(&s, "%s,", expr_to_json(*expr));
     n = strlen(s);
-    if (s[n - 1] == ',') /* `if` to handle empty array */
-      s[n - 1] = ']';
-    else
-      jasprintf(&s, "]");
+    s[n - 1] = ']';
+    jasprintf(&s, "}");
   }
   jasprintf(&s, "\0");
   s[strlen(s) - 1] = '}';
@@ -224,9 +223,9 @@ const char *policy_to_json(const struct Policy *policy) {
 const char *
 GetPolicyOptions_to_json(const struct GetPolicyOptions *getPolicyOptions) {
   enum { n = 30 };
-  char *requestedPolicyVersion = malloc(sizeof(char)*n);
+  char *requestedPolicyVersion = malloc(sizeof(char) * n);
   memcpy(requestedPolicyVersion, "{\"requestedPolicyVersion\": \0}", n);
-  requestedPolicyVersion[n-1] = '\0';
+  requestedPolicyVersion[n - 1] = '\0';
   switch (getPolicyOptions->requestedPolicyVersion) {
   case POLICY_VERSION_0:
     requestedPolicyVersion[n - 3] = '0';
