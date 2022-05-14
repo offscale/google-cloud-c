@@ -4,7 +4,7 @@
 
 #include <greatest.h>
 
-#include "test_parse_emit_policy.h"
+#include "test_policy_to_json.h"
 
 /* Add definitions that need to be in the test runner's main file. */
 GREATEST_MAIN_DEFS();

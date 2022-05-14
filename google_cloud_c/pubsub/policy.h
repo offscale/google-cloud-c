@@ -80,11 +80,16 @@ setIamPolicy(const char *, const struct Policy *);
 
 /* utility functions */
 
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
+GetPolicyOptions_to_json(const struct GetPolicyOptions *);
+
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Expr
 expr_from_json(const JSON_Object *);
 
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
 expr_to_json(const struct Expr *);
+
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT void expr_cleanup(struct Expr *);
 
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Binding
 bindings_from_json(const JSON_Object *);
@@ -92,14 +97,15 @@ bindings_from_json(const JSON_Object *);
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
 bindings_to_json(const struct Binding *);
 
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT void bindings_cleanup(struct Binding *);
+
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Policy
 policy_from_json(const JSON_Object *);
 
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
 policy_to_json(const struct Policy *);
 
-extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
-GetPolicyOptions_to_json(const struct GetPolicyOptions *);
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT void policy_cleanup(struct Policy *);
 
 #ifdef __cplusplus
 }

@@ -64,6 +64,26 @@ struct OptionalPolicy setIamPolicy(const char *const resource,
 
 /* utility functions */
 
+const char *
+GetPolicyOptions_to_json(const struct GetPolicyOptions *getPolicyOptions) {
+  enum { n = 30 };
+  char *requestedPolicyVersion = malloc(sizeof(char) * n);
+  memcpy(requestedPolicyVersion, "{\"requestedPolicyVersion\": \0}", n);
+  requestedPolicyVersion[n - 1] = '\0';
+  switch (getPolicyOptions->requestedPolicyVersion) {
+  case POLICY_VERSION_0:
+    requestedPolicyVersion[n - 3] = '0';
+    break;
+  case POLICY_VERSION_1:
+    requestedPolicyVersion[n - 3] = '1';
+    break;
+  case POLICY_VERSION_3:
+  default:
+    requestedPolicyVersion[n - 3] = '3';
+  }
+  return requestedPolicyVersion;
+}
+
 struct Expr expr_from_json(const JSON_Object *const jsonObject) {
   struct Expr expr;
   expr.expression = json_object_get_string(jsonObject, "expression");
@@ -87,6 +107,17 @@ const char *expr_to_json(const struct Expr *expr) {
   jasprintf(&s, "\0");
   s[strlen(s) - 1] = '}';
   return s;
+}
+
+void expr_cleanup(struct Expr *expr) {
+  free((void *)expr->title);
+  expr->title = NULL;
+  free((void *)expr->expression);
+  expr->expression = NULL;
+  free((void *)expr->description);
+  expr->description = NULL;
+  free((void *)expr->location);
+  expr->location = NULL;
 }
 
 struct Binding bindings_from_json(const JSON_Object *const jsonObject) {
@@ -166,6 +197,25 @@ const char *bindings_to_json(const struct Binding *binding) {
   return s;
 }
 
+void bindings_cleanup(struct Binding *binding) {
+  free((void *)binding->role);
+  binding->role = NULL;
+
+  {
+    const char **member;
+    for (member = binding->members; *member; member++)
+      free((void *)*member);
+    binding->members = NULL;
+  }
+
+  {
+    struct Expr **expr;
+    for (expr = binding->condition; *expr; expr++)
+      expr_cleanup(*expr);
+    binding->condition = NULL;
+  }
+}
+
 struct Policy policy_from_json(const JSON_Object *const jsonObject) {
   struct Policy policy;
 
@@ -224,22 +274,15 @@ const char *policy_to_json(const struct Policy *policy) {
   return s;
 }
 
-const char *
-GetPolicyOptions_to_json(const struct GetPolicyOptions *getPolicyOptions) {
-  enum { n = 30 };
-  char *requestedPolicyVersion = malloc(sizeof(char) * n);
-  memcpy(requestedPolicyVersion, "{\"requestedPolicyVersion\": \0}", n);
-  requestedPolicyVersion[n - 1] = '\0';
-  switch (getPolicyOptions->requestedPolicyVersion) {
-  case POLICY_VERSION_0:
-    requestedPolicyVersion[n - 3] = '0';
-    break;
-  case POLICY_VERSION_1:
-    requestedPolicyVersion[n - 3] = '1';
-    break;
-  case POLICY_VERSION_3:
-  default:
-    requestedPolicyVersion[n - 3] = '3';
-  }
-  return requestedPolicyVersion;
+void policy_cleanup(struct Policy *policy) {
+  struct Binding **binding;
+  for (binding = policy->bindings; *binding; binding++)
+    bindings_cleanup(*binding);
+  policy->bindings = NULL;
+
+  free((void *)policy->version);
+  policy->version = NULL;
+
+  free((void *)policy->etag);
+  policy->etag = NULL;
 }

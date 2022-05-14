@@ -16,15 +16,16 @@ extern "C" {
 
 TEST x_expr_to_json(void) {
   struct Expr *expr = (struct Expr *)malloc(sizeof(struct Expr) * 1);
-  expr->description = "description", expr->expression = "expression",
-  expr->location = "location", expr->title = "title";
+  expr->description = strdup("description"),
+  expr->expression = strdup("expression"), expr->location = strdup("location"),
+  expr->title = strdup("title");
   ASSERT_STR_EQ(
       expr_to_json(expr),
       "{"
       "  \"expression\": \"expression\",  \"title\": \"title\","
       "  \"description\": \"description\",  \"location\": \"location\""
       "}");
-  free(expr);
+  expr_cleanup(expr);
   PASS();
 }
 
@@ -41,13 +42,14 @@ TEST x_GetPolicyOptions_to_json(void) {
 TEST x_bindings_to_json(void) {
   struct Binding *binding =
       (struct Binding *)malloc(sizeof(struct Binding) * 1);
-  binding->role = "role", binding->members = NULL, binding->condition = NULL;
+  binding->role = strdup("role"), binding->members = NULL,
+  binding->condition = NULL;
 
   ASSERT_STR_EQ(bindings_to_json(binding), "{  \"role\": \"role\"}");
 
   binding->members = malloc(sizeof(char *) * 3);
-  binding->members[0] = "member0", binding->members[1] = "member1",
-  binding->members[2] = NULL;
+  binding->members[0] = strdup("member0"),
+  binding->members[1] = strdup("member1"), binding->members[2] = NULL;
 
   ASSERT_STR_EQ(
       bindings_to_json(binding),
@@ -56,16 +58,16 @@ TEST x_bindings_to_json(void) {
   binding->condition = (struct Expr **)malloc(sizeof(struct Expr) * 3);
 
   binding->condition[0] = malloc(sizeof(struct Expr) * 1);
-  binding->condition[0]->description = "description0",
-  binding->condition[0]->expression = "expression0",
-  binding->condition[0]->location = "location0",
-  binding->condition[0]->title = "title0";
+  binding->condition[0]->description = strdup("description0"),
+  binding->condition[0]->expression = strdup("expression0"),
+  binding->condition[0]->location = strdup("location0"),
+  binding->condition[0]->title = strdup("title0");
 
   binding->condition[1] = malloc(sizeof(struct Expr) * 1);
-  binding->condition[1]->description = "description1",
-  binding->condition[1]->expression = "expression1",
-  binding->condition[1]->location = "location1",
-  binding->condition[1]->title = "title1";
+  binding->condition[1]->description = strdup("description1"),
+  binding->condition[1]->expression = strdup("expression1"),
+  binding->condition[1]->location = strdup("location1"),
+  binding->condition[1]->title = strdup("title1");
 
   binding->condition[2] = NULL;
 
@@ -78,11 +80,7 @@ TEST x_bindings_to_json(void) {
       "\"title1\",  \"description\": \"description1\",  \"location\": "
       "\"location1\"}]}");
 
-  free(binding->members);
-  free(binding->condition[0]);
-  free(binding->condition[1]);
-  free(binding->condition);
-  free(binding);
+  bindings_cleanup(binding);
   PASS();
 }
 
@@ -91,25 +89,25 @@ TEST x_policy_to_json(void) {
   struct Binding *binding =
       (struct Binding *)malloc(sizeof(struct Binding) * 1);
 
-  binding->role = "role";
+  binding->role = strdup("role");
 
   binding->members = malloc(sizeof(char *) * 3);
-  binding->members[0] = "member0", binding->members[1] = "member1",
-  binding->members[2] = NULL;
+  binding->members[0] = strdup("member0"),
+  binding->members[1] = strdup("member1"), binding->members[2] = NULL;
 
   binding->condition = (struct Expr **)malloc(sizeof(struct Expr) * 3);
 
   binding->condition[0] = malloc(sizeof(struct Expr) * 1);
-  binding->condition[0]->description = "description0",
-  binding->condition[0]->expression = "expression0",
-  binding->condition[0]->location = "location0",
-  binding->condition[0]->title = "title0";
+  binding->condition[0]->description = strdup("description0"),
+  binding->condition[0]->expression = strdup("expression0"),
+  binding->condition[0]->location = strdup("location0"),
+  binding->condition[0]->title = strdup("title0");
 
   binding->condition[1] = malloc(sizeof(struct Expr) * 1);
-  binding->condition[1]->description = "description1",
-  binding->condition[1]->expression = "expression1",
-  binding->condition[1]->location = "location1",
-  binding->condition[1]->title = "title1";
+  binding->condition[1]->description = strdup("description1"),
+  binding->condition[1]->expression = strdup("expression1"),
+  binding->condition[1]->location = strdup("location1"),
+  binding->condition[1]->title = strdup("title1");
 
   binding->condition[2] = NULL;
 
@@ -122,7 +120,7 @@ TEST x_policy_to_json(void) {
       "\"title1\",  \"description\": \"description1\",  \"location\": "
       "\"location1\"}]}");
 
-  policy->etag = "etag", policy->version = "version";
+  policy->etag = strdup("etag"), policy->version = strdup("version");
 
   policy->bindings = malloc(sizeof(struct Binding *) * 2);
   policy->bindings[0] = binding;
@@ -138,12 +136,7 @@ TEST x_policy_to_json(void) {
       "\"description\": \"description1\",  \"location\": \"location1\"}]}],  "
       "\"etag\": \"etag\"}");
 
-  free(policy->bindings[0]->members);
-  free(policy->bindings[0]->condition[0]);
-  free(policy->bindings[0]->condition[1]);
-  free(policy->bindings[0]->condition);
-  free(policy->bindings[0]);
-  free(policy);
+  policy_cleanup(policy);
   PASS();
 }
 

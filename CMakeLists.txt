@@ -44,7 +44,7 @@ if (BUILD_TESTING)
         add_subdirectory("${PROJECT_NAME}_tests")
     endif (BUILD_REAL_API_TESTING)
     if (BUILD_PARSE_EMIT_TESTS)
-        add_subdirectory("${PROJECT_NAME}_parse_emit_tests")
+        add_subdirectory("${PROJECT_NAME}_emit_tests")
     endif (BUILD_PARSE_EMIT_TESTS)
 endif (BUILD_TESTING)
 
