@@ -53,9 +53,14 @@ struct OptionalNetwork network_create(const char *const network_name) {
       const JSON_Object *const res_json_object =
           json_value_get_object(res_json_value);
 
-      if (json_object_has_value(res_json_object, "error"))
-        fputs(json_object_get_string(res_json_object, "error"), stderr);
-      else if (!json_object_has_value(res_json_object, "autoCreateSubnetworks"))
+      if (json_object_has_value(res_json_object, "error")) {
+        const JSON_Object *err =
+            json_object_get_object(res_json_object, "error");
+        fprintf(stderr, "[code=%u] %s",
+                (unsigned)json_object_get_number(err, "code"),
+                json_object_get_string(err, "message"));
+      } else if (!json_object_has_value(res_json_object,
+                                        "autoCreateSubnetworks"))
         fputs(response.body, stderr);
       else
         optional_network.set = true,
@@ -81,9 +86,14 @@ struct OptionalNetwork network_get(const char *const network_name) {
       const JSON_Object *const res_json_object =
           json_value_get_object(res_json_value);
 
-      if (json_object_has_value(res_json_object, "error"))
-        fputs(json_object_get_string(res_json_object, "error"), stderr);
-      else if (!json_object_has_value(res_json_object, "autoCreateSubnetworks"))
+      if (json_object_has_value(res_json_object, "error")) {
+        const JSON_Object *err =
+            json_object_get_object(res_json_object, "error");
+        fprintf(stderr, "[code=%u] %s",
+                (unsigned)json_object_get_number(err, "code"),
+                json_object_get_string(err, "message"));
+      } else if (!json_object_has_value(res_json_object,
+                                        "autoCreateSubnetworks"))
         fputs(response.body, stderr);
       else
         optional_network.set = true,
