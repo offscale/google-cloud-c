@@ -1,5 +1,16 @@
 #include <stdio.h>
+#include <stdlib.h>
+
+#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
+#include <io.h>
+#define access _access
+#define strdup _strdup
+#define F_OK EXIT_SUCCESS
+#define NUM_FORMAT "lld"
+#else
 #include <unistd.h>
+#define NUM_FORMAT "ld"
+#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
 
 #include <cauthflow_server.h>
 #include <google_auth.h>
@@ -34,7 +45,12 @@ void auth() {
     } else {
       struct GoogleCloudProject google_cloud_project = get_google_auth(
           CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN, redirect_dance);
-      FILE *fh = fopen(ACCESS_FILEPATH, "wt");
+      FILE *fh;
+#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
+      fopen_s(&fh, ACCESS_FILEPATH, "wt");
+#else
+      fh = fopen(ACCESS_FILEPATH, "wt");
+#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
       fputs(google_cloud_project.google_access_token, fh);
       fclose(fh);
     }
@@ -43,22 +59,41 @@ void auth() {
         get_google_auth(CLIENT_ID, CLIENT_SECRET,
                         /*refresh_token*/ REFRESH_TOKEN, redirect_dance);
 
-    FILE *fh = fopen(REFRESH_FILEPATH, "wt");
+    FILE *fh;
+#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
+    fopen_s(&fh, REFRESH_FILEPATH, "wt");
+#else
+    fh = fopen(REFRESH_FILEPATH, "wt");
+#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
+
     fputs(google_cloud_project.google_refresh_token, fh);
     fclose(fh);
     REFRESH_TOKEN = google_cloud_project.google_refresh_token;
 
+#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
+    fopen_s(&fh, ACCESS_FILEPATH, "wt");
+#else
     fh = fopen(ACCESS_FILEPATH, "wt");
+#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
     fputs(google_cloud_project.google_access_token, fh);
     fclose(fh);
     ACCESS_TOKEN = google_cloud_project.google_access_token;
 
+#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
+    fopen_s(&fh, ACCESS_TOKEN_EXPIRY_FILEPATH, "wt");
+#else
     fh = fopen(ACCESS_TOKEN_EXPIRY_FILEPATH, "wt");
-    fprintf(fh, "%ld", google_cloud_project.google_access_token_expiry);
+#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
+    fprintf(fh, "%" NUM_FORMAT,
+            google_cloud_project.google_access_token_expiry);
     fclose(fh);
     ACCESS_TOKEN_EXPIRY = google_cloud_project.google_access_token_expiry;
 
+#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
+    fopen_s(&fh, PROJECT_ID_FILEPATH, "wt");
+#else
     fh = fopen(PROJECT_ID_FILEPATH, "wt");
+#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
     fputs(google_cloud_project.projectId, fh);
     fclose(fh);
     PROJECT_ID = google_cloud_project.projectId;
@@ -71,7 +106,12 @@ void auth() {
 
 const char *get_file_contents(const char *filepath) {
 #define TOKEN_LEN 512
-  FILE *fh = fopen(filepath, "rt");
+  FILE *fh;
+#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
+  fopen_s(&fh, filepath, "rt");
+#else
+  fh = fopen(filepath, "rt");
+#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
   char token[TOKEN_LEN];
   char *tok = fgets(token, TOKEN_LEN, fh);
   fclose(fh);

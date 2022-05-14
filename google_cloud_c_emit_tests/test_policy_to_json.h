@@ -6,6 +6,10 @@ extern "C" {
 #include <google_cloud_c/common/google_cloud_c_stdbool.h>
 #endif /* __cplusplus */
 
+#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
+#define strdup _strdup
+#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
+
 #include <greatest.h>
 
 #include <c89stringutils_string_extras.h>

@@ -61,7 +61,9 @@ target_link_libraries(
         #"${PROJECT_NAME}_compiler_flags"
         "${PROJECT_NAME}_pubsub"
 )
-target_compile_definitions("${EXEC_NAME}" PRIVATE C89STRINGUTILS_IMPLEMENTATION)
+if (NOT WIN32)
+    target_compile_definitions("${EXEC_NAME}" PRIVATE C89STRINGUTILS_IMPLEMENTATION)
+endif (NOT WIN32)
 
 add_test(NAME "${EXEC_NAME}"
          COMMAND "${EXEC_NAME}"

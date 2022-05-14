@@ -1,3 +1,7 @@
+#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
+#define C89STRINGUTILS_IMPLEMENTATION
+#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
+
 #include <google_cloud_c/client/cloud_auth.h>
 
 extern CURLU *set_compute_url_path(CURLU *, const char *);
