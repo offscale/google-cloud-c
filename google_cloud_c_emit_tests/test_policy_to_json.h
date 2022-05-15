@@ -130,15 +130,24 @@ TEST x_policy_to_json(void) {
   policy->bindings[0] = binding;
   policy->bindings[1] = NULL;
 
-  ASSERT_STR_EQ(
-      policy_to_json(policy),
-      "{  \"version\": \"version\",  \"bindings\": [{  \"role\": \"role\",  "
-      "\"members\": [\"member0\",\"member1\"],  \"condition\": [{  "
-      "\"expression\": \"expression0\",  \"title\": \"title0\",  "
-      "\"description\": \"description0\",  \"location\": \"location0\"},{  "
-      "\"expression\": \"expression1\",  \"title\": \"title1\",  "
-      "\"description\": \"description1\",  \"location\": \"location1\"}]}],  "
-      "\"etag\": \"etag\"}");
+  ASSERT_STR_EQ(policy_to_json(policy),
+                "{\"policy\": {"
+                "  \"version\": \"version\","
+                "  \"bindings\": [{"
+                "  \"role\": \"role\","
+                "  \"members\": [\"member0\",\"member1\"],"
+                "  \"condition\": ["
+                "{"
+                "  \"expression\": \"expression0\","
+                "  \"title\": \"title0\","
+                "  \"description\": \"description0\","
+                "  \"location\": \"location0\"},"
+                "{"
+                "  \"expression\": \"expression1\","
+                "  \"title\": \"title1\","
+                "  \"description\": \"description1\","
+                "  \"location\": \"location1\"}]}],"
+                "  \"etag\": \"etag\"}}");
 
   policy_cleanup(policy);
   PASS();

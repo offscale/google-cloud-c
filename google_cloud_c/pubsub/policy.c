@@ -251,7 +251,7 @@ struct Policy policy_from_json(const JSON_Object *const jsonObject) {
 const char *policy_to_json(const struct Policy *policy) {
   char *s = NULL;
   size_t n;
-  jasprintf(&s, "{");
+  jasprintf(&s, "{\"policy\": {");
   if (policy->version != NULL && policy->version[0] != '\0')
     jasprintf(&s, "  \"version\": \"%s\",", policy->version);
   if (policy->bindings != NULL) {
@@ -271,8 +271,8 @@ const char *policy_to_json(const struct Policy *policy) {
       jasprintf(&s, ",");
     jasprintf(&s, "  \"etag\": \"%s\",", policy->etag);
   }
-  jasprintf(&s, "\0");
-  s[strlen(s) - 1] = '}';
+  jasprintf(&s, "}\0");
+  s[strlen(s) - 2] = '}';
   return s;
 }
 
