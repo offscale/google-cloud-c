@@ -39,14 +39,14 @@ jobs:
       - name: configure (with vcpkg on Windows)
         working-directory: ./build
         run: |
-          cmake -DCMAKE_TOOLCHAIN_FILE="vcpkg\scripts\buildsystems\vcpkg.cmake" ..
+          cmake -DCMAKE_TOOLCHAIN_FILE="vcpkg\scripts\buildsystems\vcpkg.cmake" -DBUILD_REAL_API_TESTING=OFF ..
         shell: cmd
         if: matrix.os == 'windows-latest'
 
       - name: configure (with vcpkg on non-Windows)
         working-directory: ./build
         run: |
-          cmake -DCMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" ..
+          cmake -DCMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" -DBUILD_REAL_API_TESTING=OFF ..
         if: matrix.os != 'windows-latest'
 
       - name: build
