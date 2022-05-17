@@ -210,12 +210,14 @@ void bindings_cleanup(struct Binding *binding) {
 struct Policy *policy_from_json(const JSON_Object *const jsonObject) {
   struct Policy *policy = malloc(sizeof(struct Policy));
 
-  policy->version = json_object_get_string(jsonObject, "version");
+  const JSON_Object *policy_obj = json_object_get_object(jsonObject, "policy");
+
+  policy->version = json_object_get_string(policy_obj, "version");
 
   policy->bindings = NULL;
-  if (json_object_has_value_of_type(jsonObject, "bindings", JSONArray)) {
+  if (json_object_has_value_of_type(policy_obj, "bindings", JSONArray)) {
     const JSON_Array *bindings_json_items =
-        json_object_get_array(jsonObject, "bindings");
+        json_object_get_array(policy_obj, "bindings");
     const size_t bindings_json_items_n =
         json_array_get_count(bindings_json_items) + 1;
     size_t i;
@@ -232,7 +234,7 @@ struct Policy *policy_from_json(const JSON_Object *const jsonObject) {
     }
   }
 
-  policy->etag = json_object_get_string(jsonObject, "etag");
+  policy->etag = json_object_get_string(policy_obj, "etag");
 
   return policy;
 }
