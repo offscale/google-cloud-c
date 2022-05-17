@@ -63,7 +63,7 @@ struct Metadata {
 };
 
 struct Scheduling {
-  const char *const onHostMaintenance;
+  const char *onHostMaintenance;
   bool automaticRestart, preemptible;
 };
 
@@ -92,16 +92,9 @@ struct Instance {
 };
 
 struct Instances {
-  struct Instance *arr;
+  struct Instance **arr;
   size_t size;
 };
-
-struct OptionalInstance {
-  bool set;
-  struct Instance instance;
-};
-
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Instance instanceNull;
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Instances instancesNull;
 
@@ -132,33 +125,33 @@ instance_exists(const char *instance_name);
 /* Creates an instance resource in the specified project using the data included
  * in the request.
  * https://cloud.google.com/compute/docs/reference/rest/v1/instances/insert */
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalInstance
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Instance *
 instance_insert(const struct InstanceIncomplete *, const char *, const char *);
 
 /* Returns the specified Instance resource.
  * https://cloud.google.com/compute/docs/reference/rest/v1/instances/get */
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalInstance
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Instance *
 instance_get(const char *instance_name);
 
 /* Utility functions */
 
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalInstance
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Instance *
 optional_instance_from_json(const JSON_Object *);
 
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Instance
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Instance *
 instance_from_json(const JSON_Object *);
 
 /* Creates network, firewall, and instance */
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalInstance
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Instance *
 instance_incomplete_create_all(const struct InstanceIncomplete *, const char *,
                                const char *, const char *);
 
 /* Utility functions */
 
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct NetworkInterface
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct NetworkInterface *
 NetworkInterface_from_json(const JSON_Object *);
 
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct AccessConfigs
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct AccessConfigs *
 AccessConfigs_from_json(const JSON_Object *);
 
 #ifdef __cplusplus

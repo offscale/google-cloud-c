@@ -27,31 +27,24 @@ struct Notification {
   const char *kind /* "storage#notification" */;
 };
 
-struct OptionalNotification {
-  bool set;
-  struct Notification notification;
-};
-
-extern GOOGLE_CLOUD_C_STORAGE_EXPORT const struct Notification notificationNull;
-
 /* View a Pub/Sub notification configuration on a given bucket
  * https://cloud.google.com/storage/docs/json_api/v1/notifications/get */
-extern GOOGLE_CLOUD_C_STORAGE_EXPORT struct OptionalNotification
+extern GOOGLE_CLOUD_C_STORAGE_EXPORT struct Notification *
 get_notification_configuration(const struct configuration *, const char *);
 
 /* View a Pub/Sub notification configuration on a given bucket.
  * https://cloud.google.com/storage/docs/json_api/v1/notifications/get */
-extern GOOGLE_CLOUD_C_STORAGE_EXPORT struct OptionalNotification
+extern GOOGLE_CLOUD_C_STORAGE_EXPORT struct Notification *
 get_bucket_notification(const char *, const char *);
 
 /* Creates a Pub/Sub notification configuration for a given bucket.
  * https://cloud.google.com/storage/docs/json_api/v1/notifications/insert */
-extern GOOGLE_CLOUD_C_STORAGE_EXPORT struct OptionalNotification
+extern GOOGLE_CLOUD_C_STORAGE_EXPORT struct Notification *
 insert_bucket_notification(const char *, const char *);
 
 /* Utility functions */
 
-extern GOOGLE_CLOUD_C_STORAGE_EXPORT struct Notification
+extern GOOGLE_CLOUD_C_STORAGE_EXPORT struct Notification *
 notification_from_json(const JSON_Object *);
 
 #ifdef __cplusplus

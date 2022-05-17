@@ -43,30 +43,22 @@ struct Topic {
     string: string,
       ...
   },*/
-  struct MessageStoragePolicy messageStoragePolicy;
+  struct MessageStoragePolicy *messageStoragePolicy;
   const char *kmsKeyName;
-  struct SchemaSettings schemaSettings;
+  struct SchemaSettings *schemaSettings;
   bool satisfiesPzs;
   const char *messageRetentionDuration;
 };
 
-struct OptionalTopic {
-  bool set;
-  struct Topic topic;
-};
-
-extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const struct Topic topicEmptyNull;
-
 /* Gets the configuration of a topic.
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/get
  */
-extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct OptionalTopic
-get_topic(const char *);
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Topic *get_topic(const char *);
 
 /* Creates the given topic with the given name.
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/create
  */
-extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct OptionalTopic
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Topic *
 create_topic(const char *, const struct Topic *);
 
 /* Deletes the topic with the given name.
@@ -76,7 +68,7 @@ extern GOOGLE_CLOUD_C_PUBSUB_EXPORT bool delete_topic(const char *topic_id);
 
 /* utility functions */
 
-extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Topic
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Topic *
 topic_from_json(const JSON_Object *);
 
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *

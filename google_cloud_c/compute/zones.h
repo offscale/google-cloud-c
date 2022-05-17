@@ -29,7 +29,7 @@ struct Zone {
 };
 
 struct Zones {
-  struct Zone *arr;
+  struct Zone **arr;
   size_t size;
 };
 
@@ -43,7 +43,7 @@ extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Zones zone_list(void);
 
 /* Utility functions */
 
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Zone
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Zone *
 zone_from_json(const JSON_Object *);
 
 #ifdef __cplusplus

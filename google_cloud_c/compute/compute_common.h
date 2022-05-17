@@ -18,15 +18,7 @@ struct GoogleCloudOperation {
       *user, *progress, *insertTime, *startTime, *selfLink, *kind;
 };
 
-struct OptionalGoogleCloudOperation {
-  bool set;
-  struct GoogleCloudOperation googleCloudOperation;
-};
-
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct GoogleCloudOperation
-    googleCloudOperationNull;
-
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalGoogleCloudOperation
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct GoogleCloudOperation *
 google_cloud_operation_from_json(const JSON_Object *);
 
 /*

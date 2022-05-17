@@ -60,20 +60,12 @@ struct Oauth2UserInfo {
   bool email_verified;
 };
 
-struct OptionalOauth2UserInfo {
-  bool set;
-  struct Oauth2UserInfo oauth2UserInfo;
-};
-
-extern GOOGLE_CLOUD_C_USERINFO_EXPORT struct OptionalOauth2UserInfo
+extern GOOGLE_CLOUD_C_USERINFO_EXPORT struct Oauth2UserInfo *
 userinfo_get(const char *);
-
-extern GOOGLE_CLOUD_C_USERINFO_EXPORT const struct Oauth2UserInfo
-    oauth2UserInfoNull;
 
 /* Utility functions */
 
-extern GOOGLE_CLOUD_C_USERINFO_EXPORT struct Oauth2UserInfo
+extern GOOGLE_CLOUD_C_USERINFO_EXPORT struct Oauth2UserInfo *
 oauth2_user_info_from_json(const JSON_Object *);
 
 #ifdef __cplusplus

@@ -17,24 +17,16 @@ struct ProjectServiceAccount {
   const char *email_address, *kind;
 };
 
-struct OptionalProjectServiceAccount {
-  bool set;
-  struct ProjectServiceAccount project_service_account;
-};
-
-extern GOOGLE_CLOUD_C_STORAGE_EXPORT const struct ProjectServiceAccount
-    projectServiceAccountNull;
-
 /* Get the email address of this project's Cloud Storage service account, also
  * known as the service agent.
  * https://cloud.google.com/storage/docs/json_api/v1/projects/serviceAccount/get
  */
-extern GOOGLE_CLOUD_C_STORAGE_EXPORT struct OptionalProjectServiceAccount
+extern GOOGLE_CLOUD_C_STORAGE_EXPORT struct ProjectServiceAccount *
 get_service_account(const char *);
 
 /* utility functions */
 
-extern GOOGLE_CLOUD_C_STORAGE_EXPORT struct ProjectServiceAccount
+extern GOOGLE_CLOUD_C_STORAGE_EXPORT struct ProjectServiceAccount *
 project_service_account_from_json(const JSON_Object *);
 
 #ifdef __cplusplus

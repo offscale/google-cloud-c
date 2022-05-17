@@ -36,11 +36,6 @@ struct Project {
   struct ResourceId *parent;
 };
 
-struct OptionalProject {
-  bool set;
-  struct Project project;
-};
-
 /* Check if project exists.
  * https://cloud.google.com/resource-manager/reference/rest/v1/projects/get */
 extern GOOGLE_CLOUD_C_PROJECT_EXPORT bool
@@ -48,22 +43,20 @@ project_exists(const char *project_id);
 
 /* Retrieves the Project identified by the specified `projectId`
  * https://cloud.google.com/resource-manager/reference/rest/v1/projects/get */
-extern GOOGLE_CLOUD_C_PROJECT_EXPORT struct OptionalProject
+extern GOOGLE_CLOUD_C_PROJECT_EXPORT struct Project *
 project_get(const char *project_id);
 
 /* Lists `Project`s that the caller has the `resourcemanager.projects.get`
  * permission on.
  * https://cloud.google.com/resource-manager/reference/rest/v1/projects/list */
-extern GOOGLE_CLOUD_C_PROJECT_EXPORT const struct Project *project_list(void);
-
-extern GOOGLE_CLOUD_C_PROJECT_EXPORT const struct Project projectNull;
+extern GOOGLE_CLOUD_C_PROJECT_EXPORT struct Project **project_list(void);
 
 /* Utility functions */
 
 extern GOOGLE_CLOUD_C_PROJECT_EXPORT enum LifecycleState
 str_to_LifecycleState(const char *);
 
-extern GOOGLE_CLOUD_C_PROJECT_EXPORT struct Project
+extern GOOGLE_CLOUD_C_PROJECT_EXPORT struct Project *
 project_from_json(const JSON_Object *);
 
 #ifdef __cplusplus

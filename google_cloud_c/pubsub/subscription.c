@@ -5,33 +5,23 @@
 #include <google_cloud_c/client/cloud_auth.h>
 #include <google_cloud_c/pubsub/subscription.h>
 
-const struct Subscription subscriptionNull = {
-    NULL, NULL, 0, 0, NULL, NULL, 0, NULL, 0, 0, NULL, STATE_UNSPECIFIED};
-
-const struct PubsubMessage pubsubMessageNull = {NULL, NULL, NULL, NULL};
-
 /* Gets the configuration details of a subscription.
  * GET https://pubsub.googleapis.com/v1/{subscription}
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/get
  * */
-struct OptionalSubscription
+struct Subscription *
 get_pubsub_subscription(const char *const subscription_id) {
   char *path;
   asprintf(&path, "/v1/%s", subscription_id);
 
   {
     const struct ServerResponse response = gcloud_pubsub_get(NULL, path, NULL);
-    struct OptionalSubscription optionalSubscription;
     DEBUG_SERVER_RESPONSE("get_pubsub_subscription_response");
-    if (response.status_code == 200 && response.body != NULL &&
-        response.body[0] != '\0')
-      optionalSubscription.set = true,
-      optionalSubscription.subscription = subscription_from_json(
-          json_value_get_object(json_parse_string(response.body)));
-    else
-      optionalSubscription.set = false,
-      optionalSubscription.subscription = subscriptionNull;
-    return optionalSubscription;
+    return response.status_code == 200 && response.body != NULL &&
+                   response.body[0] != '\0'
+               ? subscription_from_json(
+                     json_value_get_object(json_parse_string(response.body)))
+               : NULL;
   }
 }
 
@@ -39,7 +29,7 @@ get_pubsub_subscription(const char *const subscription_id) {
  * PUT https://pubsub.googleapis.com/v1/{name}
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/create
  * */
-struct OptionalSubscription
+struct Subscription *
 create_pubsub_subscription(const char *const subscription_id,
                            const struct Subscription *subscription) {
   char *path;
@@ -48,17 +38,12 @@ create_pubsub_subscription(const char *const subscription_id,
   {
     const struct ServerResponse response =
         gcloud_pubsub_put(NULL, path, subscription_to_json(subscription), NULL);
-    struct OptionalSubscription optionalSubscription;
     DEBUG_SERVER_RESPONSE("create_pubsub_subscription_response");
-    if (response.status_code == 200 && response.body != NULL &&
-        response.body[0] != '\0')
-      optionalSubscription.set = true,
-      optionalSubscription.subscription = subscription_from_json(
-          json_value_get_object(json_parse_string(response.body)));
-    else
-      optionalSubscription.set = false,
-      optionalSubscription.subscription = subscriptionNull;
-    return optionalSubscription;
+    return response.status_code == 200 && response.body != NULL &&
+                   response.body[0] != '\0'
+               ? subscription_from_json(
+                     json_value_get_object(json_parse_string(response.body)))
+               : NULL;
   }
 }
 
@@ -66,7 +51,7 @@ create_pubsub_subscription(const char *const subscription_id,
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/pull
  * POST https://pubsub.googleapis.com/v1/{subscription}:pull
  * */
-struct ReceivedMessages
+struct ReceivedMessages *
 pull_pubsub_subscription(const char *const subscription_id) {
   char *path;
   asprintf(&path, "/v1/%s:pull", subscription_id);
@@ -141,56 +126,56 @@ const char *PubSubState_to_str(enum PubSubState state) {
   }
 }
 
-struct Subscription
+struct Subscription *
 subscription_from_json(const JSON_Object *const jsonObject) {
-  struct Subscription subscription;
+  struct Subscription *subscription = malloc(sizeof(struct Subscription));
 
-  subscription.name = json_object_get_string(jsonObject, "name");
-  subscription.topic = json_object_get_string(jsonObject, "topic");
+  subscription->name = json_object_get_string(jsonObject, "name");
+  subscription->topic = json_object_get_string(jsonObject, "topic");
   if (json_object_has_value_of_type(jsonObject, "ackDeadlineSeconds",
                                     JSONNumber))
-    subscription.ackDeadlineSeconds =
+    subscription->ackDeadlineSeconds =
         (int)json_object_get_number(jsonObject, "ackDeadlineSeconds");
   else
-    subscription.ackDeadlineSeconds = 0;
+    subscription->ackDeadlineSeconds = 0;
   if (json_object_has_value_of_type(jsonObject, "retainAckedMessages",
                                     JSONBoolean))
-    subscription.retainAckedMessages =
+    subscription->retainAckedMessages =
         (bool)json_object_get_boolean(jsonObject, "retainAckedMessages");
   else
-    subscription.retainAckedMessages = false;
-  subscription.messageRetentionDuration =
+    subscription->retainAckedMessages = false;
+  subscription->messageRetentionDuration =
       json_object_get_string(jsonObject, "messageRetentionDuration");
   if (json_object_has_value_of_type(jsonObject, "labels", JSONArray))
-    subscription.labels =
+    subscription->labels =
         (const char **)json_object_get_array(jsonObject, "labels");
   else
-    subscription.labels = NULL;
+    subscription->labels = NULL;
   if (json_object_has_value_of_type(jsonObject, "enableMessageOrdering",
                                     JSONBoolean))
-    subscription.enableMessageOrdering =
+    subscription->enableMessageOrdering =
         (bool)json_object_get_boolean(jsonObject, "enableMessageOrdering");
   else
-    subscription.enableMessageOrdering = false;
-  subscription.filter = json_object_get_string(jsonObject, "filter");
+    subscription->enableMessageOrdering = false;
+  subscription->filter = json_object_get_string(jsonObject, "filter");
   if (json_object_has_value_of_type(jsonObject, "detached", JSONBoolean))
-    subscription.detached =
+    subscription->detached =
         (bool)json_object_get_boolean(jsonObject, "detached");
   else
-    subscription.detached = false;
+    subscription->detached = false;
   if (json_object_has_value_of_type(jsonObject, "enableExactlyOnceDelivery",
                                     JSONBoolean))
-    subscription.enableExactlyOnceDelivery =
+    subscription->enableExactlyOnceDelivery =
         (bool)json_object_get_boolean(jsonObject, "enableExactlyOnceDelivery");
   else
-    subscription.enableExactlyOnceDelivery = false;
-  subscription.topicMessageRetentionDuration =
+    subscription->enableExactlyOnceDelivery = false;
+  subscription->topicMessageRetentionDuration =
       json_object_get_string(jsonObject, "topicMessageRetentionDuration");
   if (json_object_has_value(jsonObject, "state"))
-    subscription.state =
+    subscription->state =
         str_to_PubSubState(json_object_get_string(jsonObject, "state"));
   else
-    subscription.state = STATE_UNSPECIFIED;
+    subscription->state = STATE_UNSPECIFIED;
 
   return subscription;
 }
@@ -232,20 +217,21 @@ const char *subscription_to_json(const struct Subscription *subscription) {
   return s;
 }
 
-struct ReceivedMessages
+struct ReceivedMessages *
 receivedMessages_from_json(const JSON_Object *const jsonObject) {
-  struct ReceivedMessages receivedMessages = {NULL};
+  struct ReceivedMessages *receivedMessages =
+      malloc(sizeof(struct ReceivedMessages));
   const JSON_Array *json_items =
       json_object_get_array(jsonObject, "receivedMessages");
   const size_t json_items_n = json_array_get_count(json_items);
   size_t i;
   if (json_items_n > 0) {
-    receivedMessages.receivedMessages = (struct ReceivedMessage *)malloc(
-        json_items_n * sizeof(struct ReceivedMessage));
+    receivedMessages->receivedMessages = (struct ReceivedMessage **)malloc(
+        json_items_n * sizeof(struct ReceivedMessage *));
     for (i = 0; i < json_items_n; i++) {
       const JSON_Object *const json_obj = json_array_get_object(json_items, i);
-      struct ReceivedMessage receivedMessage;
-      struct PubsubMessage pubsubMessage = pubsubMessageNull;
+      struct ReceivedMessage *receivedMessage;
+      struct PubsubMessage *pubsubMessage = NULL;
       const JSON_Object *const messageObject =
           json_object_get_object(json_obj, "message");
 
@@ -255,25 +241,26 @@ receivedMessages_from_json(const JSON_Object *const jsonObject) {
           json_object_has_value(messageObject, "orderingKey") ||
           json_object_has_value(messageObject, "publishTime");
       if (pubsubMessage_contents) {
-        pubsubMessage.data = json_object_get_string(messageObject, "data");
-        pubsubMessage.messageId =
+        pubsubMessage = malloc(sizeof(struct PubsubMessage));
+        pubsubMessage->data = json_object_get_string(messageObject, "data");
+        pubsubMessage->messageId =
             json_object_get_string(messageObject, "messageId");
-        pubsubMessage.orderingKey =
+        pubsubMessage->orderingKey =
             json_object_get_string(messageObject, "orderingKey");
-        pubsubMessage.publishTime =
+        pubsubMessage->publishTime =
             json_object_get_string(messageObject, "publishTime");
       }
-      receivedMessage.message = pubsubMessage;
+      receivedMessage->message = pubsubMessage;
 
-      receivedMessage.ackId = json_object_get_string(json_obj, "ackId");
+      receivedMessage->ackId = json_object_get_string(json_obj, "ackId");
       if (json_object_has_value_of_type(json_obj, "deliveryAttempt",
                                         JSONNumber))
-        receivedMessage.deliveryAttempt =
+        receivedMessage->deliveryAttempt =
             (int)json_object_get_number(json_obj, "deliveryAttempt");
       else
-        receivedMessage.deliveryAttempt = 0;
+        receivedMessage->deliveryAttempt = 0;
 
-      receivedMessages.receivedMessages[i] = receivedMessage;
+      receivedMessages->receivedMessages[i] = receivedMessage;
     }
   }
   return receivedMessages;

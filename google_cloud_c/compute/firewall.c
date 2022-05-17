@@ -2,8 +2,6 @@
 
 #include <google_cloud_c/compute/firewall.h>
 
-const struct Firewall firewallNull = {NULL};
-
 bool firewall_exists(const char *const firewall) {
   /* CHECK IF FIREWALL EXISTS */
   /* https://cloud.google.com/compute/docs/reference/rest/v1/firewalls/get
@@ -11,20 +9,18 @@ bool firewall_exists(const char *const firewall) {
    * https://compute.googleapis.com/compute/v1/projects/{project}/global/firewalls/{resourceId}
    */
 
-  bool exists = false;
+  char *path;
+  asprintf(&path, "/v1/projects/%s/global/firewalls/%s",
+           AUTH_CONTEXT.project_id, firewall);
   {
-    char *path;
-    asprintf(&path, "/v1/projects/%s/global/firewalls/%s",
-             AUTH_CONTEXT.project_id, firewall);
     const struct ServerResponse response = gcloud_get(NULL, path, NULL);
     DEBUG_SERVER_RESPONSE("firewall_get_response");
-    exists = response.status_code == 200;
+    return response.status_code == 200;
   }
-  return exists;
 }
 
-struct OptionalFirewall firewall_create(const char *const network_name,
-                                        const char *const firewall_name) {
+struct Firewall *firewall_create(const char *const network_name,
+                                 const char *const firewall_name) {
   /* CREATE THE FIREWALL + RULES */
   /* https://cloud.google.com/compute/docs/reference/rest/v1/firewalls/insert
    * POST
@@ -74,37 +70,26 @@ struct OptionalFirewall firewall_create(const char *const network_name,
   {
     const struct ServerResponse response = gcloud_post(NULL, path, body, NULL);
     DEBUG_SERVER_RESPONSE("firewall_create_response");
-    {
-      const struct Firewall firewall = Firewall_from_name(firewall_name);
-      struct OptionalFirewall optionalFirewall;
-      optionalFirewall.set = response.status_code == 200;
-      optionalFirewall.firewall = firewall;
-      return optionalFirewall;
-    }
+    return response.status_code == 200 ? Firewall_from_name(firewall_name)
+                                       : NULL;
   }
 }
 
-struct OptionalFirewall firewall_get(const char *const firewall_name) {
+struct Firewall *firewall_get(const char *const firewall_name) {
   char *path;
   asprintf(&path, "/v1/projects/%s/global/firewalls", AUTH_CONTEXT.project_id);
-
   {
     const struct ServerResponse response = gcloud_get(NULL, path, NULL);
     DEBUG_SERVER_RESPONSE("firewall_get");
-    {
-      const struct Firewall firewall = Firewall_from_name(firewall_name);
-      struct OptionalFirewall optionalFirewall;
-      optionalFirewall.set = response.status_code == 200;
-      optionalFirewall.firewall = firewall;
-      return optionalFirewall;
-    }
+    return response.status_code == 200 ? Firewall_from_name(firewall_name)
+                                       : NULL;
   }
 }
 
 /* Utility functions */
 
-struct Firewall Firewall_from_name(const char *const firewall_name) {
-  struct Firewall firewall;
-  firewall.name = firewall_name;
+struct Firewall *Firewall_from_name(const char *const firewall_name) {
+  struct Firewall *firewall = malloc(sizeof(struct Firewall));
+  firewall->name = firewall_name;
   return firewall;
 }

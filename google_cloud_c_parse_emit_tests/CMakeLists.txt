@@ -1,5 +1,4 @@
 get_filename_component(EXEC_NAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
-set(EXEC_NAME "${EXEC_NAME}_exec")
 
 #########################
 # Dependencies download #
@@ -24,20 +23,22 @@ endif (NOT DEFINED TARGET_ARCH)
 
 configure_file("configure.h.in" "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_configure.h" @ONLY)
 
-###############
-# Test target #
-###############
+#######################
+# Test library target #
+#######################
 
-set(Header_Files "test_policy_to_json.h")
-source_group("${EXEC_NAME} Header Files" FILES "${Header_Files}")
+set(LIBRARY_NAME "${EXEC_NAME}_lib")
 
-set(Source_Files "test.c")
-source_group("${EXEC_NAME} Source Files" FILES "${Source_Files}")
+set(Header_Files "test_policy_to_json.h" "test_policy_from_json.h" "policy_mocks.h")
+source_group("${LIBRARY_NAME} Header Files" FILES "${Header_Files}")
 
-add_executable("${EXEC_NAME}" "${Header_Files}" "${Source_Files}")
+set(Source_Files "policy_mocks.c")
+source_group("${LIBRARY_NAME} Source Files" FILES "${Source_Files}")
+
+add_library("${LIBRARY_NAME}" "${Header_Files}" "${Source_Files}")
 
 target_include_directories(
-        "${EXEC_NAME}"
+        "${LIBRARY_NAME}"
         PRIVATE
         "$<BUILD_INTERFACE:${DOWNLOAD_DIR}>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
@@ -56,9 +57,53 @@ endif ()
 #find_package(libcurl-simple-https CONFIG REQUIRED)
 
 target_link_libraries(
+        "${LIBRARY_NAME}"
+        PRIVATE
+        #"${PROJECT_NAME}_compiler_flags"
+        "${PROJECT_NAME}_pubsub"
+)
+if (NOT WIN32)
+    target_compile_definitions("${LIBRARY_NAME}" PRIVATE C89STRINGUTILS_IMPLEMENTATION)
+endif (NOT WIN32)
+
+set_target_properties(
+        "${LIBRARY_NAME}"
+        PROPERTIES
+        LINKER_LANGUAGE
+        C
+)
+
+include(GenerateExportHeader)
+set(_export_file "${CMAKE_CURRENT_BINARY_DIR}/${LIBRARY_NAME}_export.h")
+generate_export_header("${LIBRARY_NAME}" EXPORT_FILE_NAME "${_export_file}")
+
+###############
+# Test target #
+###############
+
+set(EXEC_NAME "${EXEC_NAME}_exec")
+
+set(Source_Files "test.c")
+source_group("${EXEC_NAME} Source Files" FILES "${Source_Files}")
+
+add_executable("${EXEC_NAME}" "${Source_Files}")
+
+target_include_directories(
+        "${EXEC_NAME}"
+        PRIVATE
+        "$<BUILD_INTERFACE:${DOWNLOAD_DIR}>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+)
+
+#find_package(unofficial-parson CONFIG REQUIRED)
+#find_package(libcurl-simple-https CONFIG REQUIRED)
+
+target_link_libraries(
         "${EXEC_NAME}"
         PRIVATE
         #"${PROJECT_NAME}_compiler_flags"
+        "${LIBRARY_NAME}"
         "${PROJECT_NAME}_pubsub"
 )
 if (NOT WIN32)

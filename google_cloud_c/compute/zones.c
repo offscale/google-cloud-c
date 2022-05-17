@@ -22,8 +22,8 @@ struct Zones zone_list(void) {
       if (zone_json_items_n > 0) {
         size_t i;
 
-        struct Zone *zones =
-            (struct Zone *)malloc(zone_json_items_n * sizeof(struct Zone));
+        struct Zone **zones =
+            (struct Zone **)malloc(zone_json_items_n * sizeof(struct Zone *));
         for (i = 0; i < zone_json_items_n; i++)
           zones[i] = zone_from_json(json_array_get_object(zone_json_items, i));
         _zones.arr = zones, _zones.size = zone_json_items_n;
@@ -36,23 +36,24 @@ struct Zones zone_list(void) {
 
 /* utility functions */
 
-struct Zone zone_from_json(const JSON_Object *const jsonObject) {
-  struct Zone zone;
+struct Zone *zone_from_json(const JSON_Object *const jsonObject) {
+  struct Zone *zone = malloc(sizeof(struct Zone));
 
-  zone.id = json_object_get_string(jsonObject, "id");
-  zone.creationTimestamp =
+  zone->id = json_object_get_string(jsonObject, "id");
+  zone->creationTimestamp =
       json_object_get_string(jsonObject, "creationTimestamp");
-  zone.name = json_object_get_string(jsonObject, "name");
-  zone.description = json_object_get_string(jsonObject, "description");
-  zone.status = json_object_get_string(jsonObject, "status");
-  zone.region = json_object_get_string(jsonObject, "region");
-  zone.selfLink = json_object_get_string(jsonObject, "selfLink");
-  zone.availableCpuPlatforms = NULL;
+  zone->name = json_object_get_string(jsonObject, "name");
+  zone->description = json_object_get_string(jsonObject, "description");
+  zone->status = json_object_get_string(jsonObject, "status");
+  zone->region = json_object_get_string(jsonObject, "region");
+  zone->selfLink = json_object_get_string(jsonObject, "selfLink");
+  zone->availableCpuPlatforms = NULL;
   if (json_object_has_value_of_type(jsonObject, "supportsPzs", JSONBoolean))
-    zone.supportsPzs = (bool)json_object_get_boolean(jsonObject, "supportsPzs");
+    zone->supportsPzs =
+        (bool)json_object_get_boolean(jsonObject, "supportsPzs");
   else
-    zone.supportsPzs = false;
-  zone.kind = json_object_get_string(jsonObject, "kind");
+    zone->supportsPzs = false;
+  zone->kind = json_object_get_string(jsonObject, "kind");
 
   return zone;
 }

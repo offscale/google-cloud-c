@@ -24,7 +24,10 @@ extern "C" {
  * syntax.
  * */
 struct Expr {
-  const char *expression, *title, *description, *location;
+  const char *expression;
+  const char *title;
+  const char *description;
+  const char *location;
 };
 
 /* https://cloud.google.com/pubsub/docs/reference/rest/v1/Policy#binding
@@ -45,11 +48,6 @@ struct Policy {
   const char *etag;
 };
 
-struct OptionalPolicy {
-  bool set;
-  struct Policy policy;
-};
-
 enum RequestedPolicyVersion {
   POLICY_VERSION_0,
   POLICY_VERSION_1,
@@ -60,22 +58,20 @@ struct GetPolicyOptions {
   enum RequestedPolicyVersion requestedPolicyVersion;
 };
 
-extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const struct Policy policyNull;
-
 /* Routes */
 
 /* Gets the access control policy for a resource. Returns an empty policy if the
  * resource exists and does not have a policy set.
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/getIamPolicy
  * */
-extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct OptionalPolicy
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Policy *
 getIamPolicy(const char *, const struct GetPolicyOptions *);
 
 /* Sets the access control policy on the specified resource. Replaces any
  * existing policy.
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/setIamPolicy
  * */
-extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct OptionalPolicy
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Policy *
 setIamPolicy(const char *, const struct Policy *);
 
 /* utility functions */
@@ -83,7 +79,7 @@ setIamPolicy(const char *, const struct Policy *);
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
 GetPolicyOptions_to_json(const struct GetPolicyOptions *);
 
-extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Expr
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Expr *
 expr_from_json(const JSON_Object *);
 
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
@@ -91,7 +87,7 @@ expr_to_json(const struct Expr *);
 
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT void expr_cleanup(struct Expr *);
 
-extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Binding
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Binding *
 bindings_from_json(const JSON_Object *);
 
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
@@ -99,7 +95,7 @@ bindings_to_json(const struct Binding *);
 
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT void bindings_cleanup(struct Binding *);
 
-extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Policy
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct Policy *
 policy_from_json(const JSON_Object *);
 
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *

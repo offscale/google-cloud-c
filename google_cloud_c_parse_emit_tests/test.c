@@ -4,6 +4,7 @@
 
 #include <greatest.h>
 
+#include "test_policy_from_json.h"
 #include "test_policy_to_json.h"
 
 /* Add definitions that need to be in the test runner's main file. */
@@ -12,5 +13,6 @@ GREATEST_MAIN_DEFS();
 int main(int argc, char **argv) {
   GREATEST_MAIN_BEGIN();
   RUN_SUITE(parse_emit_policy_suite);
+  RUN_SUITE(parse_parse_policy_suite);
   GREATEST_MAIN_END();
 }

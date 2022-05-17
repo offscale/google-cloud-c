@@ -5,28 +5,6 @@
 
 struct InstanceContext INSTANCE_CONTEXT = {NULL, NULL, NULL};
 
-const struct Instance instanceNull = {NULL,
-                                      NULL,
-                                      NULL,
-                                      NULL,
-                                      NULL,
-                                      NULL,
-
-                                      /*NetworkInterface*/ NULL,
-                                      /*struct Disk*/ NULL,
-                                      /*Metadata*/ NULL,
-                                      /* selfLink*/ NULL,
-                                      NULL,
-                                      NULL,
-                                      NULL,
-                                      false,
-                                      false,
-                                      NULL,
-                                      NULL,
-                                      NULL,
-                                      NULL,
-                                      NULL};
-
 const struct Instances instancesNull = {NULL, 0};
 
 bool instance_exists(const char *const instance_name) {
@@ -36,18 +14,14 @@ bool instance_exists(const char *const instance_name) {
    * https://compute.googleapis.com/compute/v1/projects/{project}/zones/{zone}/instances/{resourceId}
    */
 
-  bool instance_exists = false;
+  char *path;
+  asprintf(&path, "/v1/projects/%s/zones/%s/instances/%s",
+           AUTH_CONTEXT.project_id, INSTANCE_CONTEXT.zone, instance_name);
   {
-    char *path;
-    asprintf(&path, "/v1/projects/%s/zones/%s/instances/%s",
-             AUTH_CONTEXT.project_id, INSTANCE_CONTEXT.zone, instance_name);
-    {
-      const struct ServerResponse response = gcloud_get(NULL, path, NULL);
-      DEBUG_SERVER_RESPONSE("instance_exists");
-      instance_exists = response.status_code == 200;
-    }
+    const struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    DEBUG_SERVER_RESPONSE("instance_exists");
+    return response.status_code == 200;
   }
-  return instance_exists;
 }
 
 struct Instances instances_list(void) {
@@ -70,16 +44,15 @@ struct Instances instances_list(void) {
       const size_t json_items_n = json_array_get_count(json_items);
 
       if (json_items_n > 0) {
-        struct Instance *instances =
-            (struct Instance *)malloc((json_items_n) * sizeof(struct Instance));
+        struct Instance **instances = (struct Instance **)malloc(
+            json_items_n * sizeof(struct Instance *));
         size_t i;
         for (i = 0; i < json_items_n; i++) {
           const JSON_Object *const json_obj =
               json_array_get_object(json_items, i);
-          const struct OptionalInstance optionalInstance =
-              optional_instance_from_json(json_obj);
-          assert(optionalInstance.set == true);
-          instances[i] = optionalInstance.instance;
+          struct Instance *instance = optional_instance_from_json(json_obj);
+          assert(instance != NULL);
+          instances[i] = instance;
         }
         _instances.arr = instances, _instances.size = json_items_n;
       }
@@ -88,7 +61,7 @@ struct Instances instances_list(void) {
   }
 }
 
-struct OptionalInstance instance_get(const char *const instance_name) {
+struct Instance *instance_get(const char *const instance_name) {
   /* https://cloud.google.com/compute/docs/reference/rest/v1/instances/get
    * GET
    * https://compute.googleapis.com/compute/v1/projects/{project}/zones/{zone}/instances/{resourceId}*/
@@ -98,9 +71,8 @@ struct OptionalInstance instance_get(const char *const instance_name) {
            AUTH_CONTEXT.project_id, INSTANCE_CONTEXT.zone, instance_name);
   {
     const struct ServerResponse response = gcloud_get(NULL, path, NULL);
-    struct OptionalInstance optionalInstance;
+    struct Instance *optionalInstance = NULL;
     DEBUG_SERVER_RESPONSE("instance_get");
-    optionalInstance.set = false, optionalInstance.instance = instanceNull;
     if (response.status_code == 200 && response.body != NULL &&
         response.body[0] != '\0')
       optionalInstance = optional_instance_from_json(
@@ -111,9 +83,9 @@ struct OptionalInstance instance_get(const char *const instance_name) {
   }
 }
 
-struct OptionalInstance
-instance_insert(const struct InstanceIncomplete *instance,
-                const char *network_name, const char *shell_script) {
+struct Instance *instance_insert(const struct InstanceIncomplete *instance,
+                                 const char *network_name,
+                                 const char *shell_script) {
   /* CREATE THE INSTANCE (with startup script) */
   /* https://cloud.google.com/compute/docs/reference/rest/v1/instances/insert
    * POST
@@ -187,9 +159,8 @@ instance_insert(const struct InstanceIncomplete *instance,
 
   {
     const struct ServerResponse response = gcloud_post(NULL, path, body, NULL);
-    struct OptionalInstance optionalInstance;
+    struct Instance *optionalInstance = NULL;
     DEBUG_SERVER_RESPONSE("instance_insert");
-    optionalInstance.set = false, optionalInstance.instance = instanceNull;
 
     if ((response.status_code == 200 || response.status_code == 201) &&
         response.body != NULL && response.body[0] != '\0') {
@@ -210,12 +181,10 @@ instance_insert(const struct InstanceIncomplete *instance,
       } else if (json_object_has_value(json_object, "kind") &&
                  strcmp(json_object_get_string(json_object, "kind"),
                         "compute#operation") == 0) {
-        const struct OptionalGoogleCloudOperation optionalGoogleCloudOperation =
+        const struct GoogleCloudOperation *optionalGoogleCloudOperation =
             google_cloud_operation_from_json(json_object);
-        if (optionalGoogleCloudOperation.set) {
-          const struct GoogleCloudOperation googleCloudOperation =
-              optionalGoogleCloudOperation.googleCloudOperation;
-          if (strcmp(googleCloudOperation.status, "RUNNING") == 0)
+        if (optionalGoogleCloudOperation != NULL) {
+          if (strcmp(optionalGoogleCloudOperation->status, "RUNNING") == 0)
             optionalInstance = instance_get(instance->name);
           else
             fprintf(stderr, "instance_insert operation not RUNNING. Got:\n%s\n",
@@ -232,7 +201,7 @@ instance_insert(const struct InstanceIncomplete *instance,
   }
 }
 
-struct OptionalInstance instance_incomplete_create_all(
+struct Instance *instance_incomplete_create_all(
     const struct InstanceIncomplete *instance, const char *network_name,
     const char *firewall_name, const char *const shell_script) {
   /* Creates network, firewall, and instance */
@@ -251,19 +220,19 @@ struct OptionalInstance instance_incomplete_create_all(
   }
 
   {
-    struct OptionalNetwork optionalNetwork = network_get(network_name);
+    struct Network *optionalNetwork = network_get(network_name);
 
-    bool network_existent = optionalNetwork.set, firewall_existent = false,
+    bool network_existent = optionalNetwork != NULL, firewall_existent = false,
          instance_existent = false;
 
     puts("instance_incomplete_create_all dance");
 
     if (!network_existent)
     create_network : {
-      struct OptionalNetwork found_network = network_create(network_name);
-      if (!found_network.set)
-        found_network.network.name = network_name;
-      printf("Creating the network \"%s\"\n", found_network.network.name);
+      struct Network *found_network = network_create(network_name);
+      if (found_network == NULL)
+        found_network->name = network_name;
+      printf("Creating the network \"%s\"\n", found_network->name);
 
       /* Wait 30 seconds: TODO check status continually until it's ready */
 #ifdef _WIN32
@@ -280,15 +249,15 @@ struct OptionalInstance instance_incomplete_create_all(
         sleep(100);
 #endif
         found_network = network_get(network_name);
-      } while (!found_network.set);
+      } while (found_network == NULL);
     }
 
       firewall_existent = firewall_exists(firewall_name);
 
     if (!firewall_existent) {
-      struct OptionalFirewall optionalFirewall =
+      struct Firewall *optionalFirewall =
           firewall_create(network_name, firewall_name);
-      printf("Firewall created: \"%s\"\n", optionalFirewall.firewall.name);
+      printf("Firewall created: \"%s\"\n", optionalFirewall->name);
 
       /* Wait 30 seconds: TODO check status continually until it's ready */
 #ifdef _WIN32
@@ -306,25 +275,25 @@ struct OptionalInstance instance_incomplete_create_all(
           sleep(100);
 #endif
           optionalFirewall = firewall_get(network_name);
-          if (--max_attempts == 0 && !optionalFirewall.set) {
+          if (--max_attempts == 0 && optionalFirewall == NULL) {
             max_attempts = 4;
             goto create_network;
           }
-        } while (!optionalFirewall.set);
+        } while (optionalFirewall == NULL);
       }
     }
 
     instance_existent = instance_exists(instance->name);
 
     {
-      struct OptionalInstance optionalInstance;
+      struct Instance *optionalInstance;
       if (!instance_existent) {
         optionalInstance =
             instance_insert(instance, network_name, shell_script);
-        if (optionalInstance.instance.name == NULL)
-          optionalInstance.instance.name = instance->name;
-        printf("Creating instance: \"%s\"\n", optionalInstance.instance.name);
-        if (strcmp(optionalInstance.instance.status, "RUNNING") == 0)
+        if (optionalInstance->name == NULL)
+          optionalInstance->name = instance->name;
+        printf("Creating instance: \"%s\"\n", optionalInstance->name);
+        if (strcmp(optionalInstance->status, "RUNNING") == 0)
           return optionalInstance;
 
           /* Wait 30 seconds: TODO check status continually until it's ready */
@@ -341,14 +310,14 @@ struct OptionalInstance instance_incomplete_create_all(
               goto create_network;
             }
             printf("Waiting for instance \"%s\" to be created.\n",
-                   optionalInstance.instance.name);
+                   instance->name);
 #ifdef _WIN32
             Sleep(10000);
 #else
             sleep(100);
 #endif
-            optionalInstance = instance_get(optionalInstance.instance.name);
-          } while (!optionalInstance.set);
+            optionalInstance = instance_get(optionalInstance->name);
+          } while (optionalInstance == NULL);
         }
       } else
         optionalInstance = instance_get((*instance).name);
@@ -376,10 +345,9 @@ const char *instance_to_json(const struct InstanceIncomplete *instance) {
   return instance_json_str;
 }
 
-struct OptionalInstance
+struct Instance *
 optional_instance_from_json(const JSON_Object *const jsonObject) {
-  struct OptionalInstance optionalInstance;
-  optionalInstance.set = false, optionalInstance.instance = instanceNull;
+  struct Instance *optionalInstance = NULL;
   if (json_object_has_value(jsonObject, "operationType") &&
       json_object_has_value(jsonObject, "name")) {
     const JSON_Array *network_json_items =
@@ -395,49 +363,61 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
       for (i = 0; i < network_json_items_n - 1; i++) {
         const JSON_Object *const network_json =
             json_array_get_object(network_json_items, i);
-        struct AccessConfigs *accessConfigs = NULL;
+        struct AccessConfigs **accessConfigs = NULL;
         const JSON_Array *ac_json_items =
             json_object_get_array(network_json, "accessConfigs");
         const size_t ac_json_items_n = json_array_get_count(ac_json_items);
         if (ac_json_items_n > 0) {
           size_t j;
-          accessConfigs = (struct AccessConfigs *)malloc(
-              ac_json_items_n * sizeof(struct AccessConfigs));
+          accessConfigs = (struct AccessConfigs **)malloc(
+              ac_json_items_n * sizeof(struct AccessConfigs *));
           for (j = 0; j < ac_json_items_n; j++)
             accessConfigs[j] = AccessConfigs_from_json(
                 json_array_get_object(ac_json_items, i));
         }
 
         {
-          struct NetworkInterface networkInterface =
+          struct NetworkInterface *networkInterface =
               NetworkInterface_from_json(network_json);
-          networkInterface.accessConfigs = &accessConfigs;
-          networkInterfaces[i] = &networkInterface;
+          networkInterface->accessConfigs = accessConfigs;
+          networkInterfaces[i] = networkInterface;
         }
       }
       networkInterfaces[network_json_items_n - 1] = NULL;
     }
 
+    optionalInstance = instance_from_json(jsonObject);
+
+    optionalInstance->networkInterfaces = networkInterfaces;
+
     {
-      struct Metadata metadata = {NULL /*std::vector<struct Item>()*/, ""};
+      struct Metadata *metadata = NULL;
+      optionalInstance->metadata = metadata;
+    }
 
-      struct Scheduling scheduling = {"", true, true};
+    {
+      struct Scheduling *scheduling = malloc(sizeof(struct Scheduling));
+      scheduling->onHostMaintenance = NULL, scheduling->automaticRestart = true,
+      scheduling->preemptible = true;
+      optionalInstance->scheduling = scheduling;
+    }
 
-      struct ShieldedInstanceConfig shieldedInstanceConfig = {false, true,
-                                                              true};
+    {
+      struct ShieldedInstanceConfig *shieldedInstanceConfig =
+          malloc(sizeof(struct ShieldedInstanceConfig));
+      shieldedInstanceConfig->enableSecureBoot = false,
+      shieldedInstanceConfig->enableVtpm = true,
+      shieldedInstanceConfig->enableIntegrityMonitoring = true;
+      optionalInstance->shieldedInstanceConfig = shieldedInstanceConfig;
+    }
 
-      struct ShieldedInstanceIntegrityPolicy shieldedInstanceIntegrityPolicy = {
-          true};
+    {
+      struct ShieldedInstanceIntegrityPolicy *shieldedInstanceIntegrityPolicy =
+          malloc(sizeof(struct ShieldedInstanceConfig));
+      shieldedInstanceIntegrityPolicy->updateAutoLearnPolicy = true;
 
-      struct Instance instance = instance_from_json(jsonObject);
-      instance.networkInterfaces = networkInterfaces;
-      instance.metadata = &metadata;
-      instance.scheduling = &scheduling;
-      instance.shieldedInstanceConfig = &shieldedInstanceConfig;
-      instance.shieldedInstanceIntegrityPolicy =
-          &shieldedInstanceIntegrityPolicy;
-
-      optionalInstance.set = true, optionalInstance.instance = instance;
+      optionalInstance->shieldedInstanceIntegrityPolicy =
+          shieldedInstanceIntegrityPolicy;
     }
   }
   return optionalInstance;
@@ -445,56 +425,58 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
 
 /* Utility functions */
 
-struct NetworkInterface
+struct NetworkInterface *
 NetworkInterface_from_json(const JSON_Object *const jsonObject) {
-  struct NetworkInterface networkInterface;
-  networkInterface.network = json_object_get_string(jsonObject, "network");
-  networkInterface.subnetwork =
+  struct NetworkInterface *networkInterface =
+      malloc(sizeof(struct NetworkInterface));
+  networkInterface->network = json_object_get_string(jsonObject, "network");
+  networkInterface->subnetwork =
       json_object_get_string(jsonObject, "subnetwork");
-  networkInterface.networkIP = json_object_get_string(jsonObject, "networkIP");
-  networkInterface.name = json_object_get_string(jsonObject, "name");
+  networkInterface->networkIP = json_object_get_string(jsonObject, "networkIP");
+  networkInterface->name = json_object_get_string(jsonObject, "name");
   return networkInterface;
 }
 
-struct AccessConfigs
+struct AccessConfigs *
 AccessConfigs_from_json(const JSON_Object *const jsonObject) {
-  struct AccessConfigs accessConfigs;
-  accessConfigs.type = json_object_get_string(jsonObject, "type");
-  accessConfigs.name = json_object_get_string(jsonObject, "name");
-  accessConfigs.natIP = json_object_get_string(jsonObject, "natIP");
-  accessConfigs.networkTier = json_object_get_string(jsonObject, "networkTier");
-  accessConfigs.kind = json_object_get_string(jsonObject, "kind");
+  struct AccessConfigs *accessConfigs = malloc(sizeof(struct AccessConfigs));
+  accessConfigs->type = json_object_get_string(jsonObject, "type");
+  accessConfigs->name = json_object_get_string(jsonObject, "name");
+  accessConfigs->natIP = json_object_get_string(jsonObject, "natIP");
+  accessConfigs->networkTier =
+      json_object_get_string(jsonObject, "networkTier");
+  accessConfigs->kind = json_object_get_string(jsonObject, "kind");
   return accessConfigs;
 }
 
-struct Instance instance_from_json(const JSON_Object *const jsonObject) {
-  struct Instance instance;
-  instance.id = json_object_get_string(jsonObject, "id");
-  instance.creationTimestamp =
+struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
+  struct Instance *instance = malloc(sizeof(struct Instance));
+  instance->id = json_object_get_string(jsonObject, "id");
+  instance->creationTimestamp =
       json_object_get_string(jsonObject, "creationTimestamp");
-  instance.name = json_object_get_string(jsonObject, "name");
-  instance.machineType = json_object_get_string(jsonObject, "machineType");
-  instance.status = json_object_get_string(jsonObject, "status");
-  instance.zone = json_object_get_string(jsonObject, "zone");
-  instance.disks = NULL /*std::vector<struct Disk>()*/;
-  instance.selfLink = json_object_get_string(jsonObject, "selfLink");
-  instance.cpuPlatform = json_object_get_string(jsonObject, "cpuPlatform");
-  instance.labelFingerprint =
+  instance->name = json_object_get_string(jsonObject, "name");
+  instance->machineType = json_object_get_string(jsonObject, "machineType");
+  instance->status = json_object_get_string(jsonObject, "status");
+  instance->zone = json_object_get_string(jsonObject, "zone");
+  instance->disks = NULL /*std::vector<struct Disk>()*/;
+  instance->selfLink = json_object_get_string(jsonObject, "selfLink");
+  instance->cpuPlatform = json_object_get_string(jsonObject, "cpuPlatform");
+  instance->labelFingerprint =
       json_object_get_string(jsonObject, "labelFingerprint");
   if (json_object_has_value_of_type(jsonObject, "startRestricted", JSONBoolean))
-    instance.startRestricted =
+    instance->startRestricted =
         (bool)json_object_get_boolean(jsonObject, "startRestricted");
   else
-    instance.startRestricted = false;
+    instance->startRestricted = false;
   if (json_object_has_value_of_type(jsonObject, "deletionProtection",
                                     JSONBoolean))
-    instance.deletionProtection =
+    instance->deletionProtection =
         (bool)json_object_get_boolean(jsonObject, "deletionProtection");
   else
-    instance.startRestricted = false;
-  instance.fingerprint = json_object_get_string(jsonObject, "fingerprint");
-  instance.lastStartTimestamp =
+    instance->startRestricted = false;
+  instance->fingerprint = json_object_get_string(jsonObject, "fingerprint");
+  instance->lastStartTimestamp =
       json_object_get_string(jsonObject, "lastStartTimestamp");
-  instance.kind = json_object_get_string(jsonObject, "kind");
+  instance->kind = json_object_get_string(jsonObject, "kind");
   return instance;
 }

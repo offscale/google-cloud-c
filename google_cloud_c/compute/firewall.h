@@ -18,13 +18,6 @@ struct Firewall {
   const char *name;
 };
 
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const struct Firewall firewallNull;
-
-struct OptionalFirewall {
-  bool set;
-  struct Firewall firewall;
-};
-
 /* =============
  * |  FIREWALL |
  * ============= */
@@ -38,18 +31,18 @@ extern GOOGLE_CLOUD_C_COMPUTE_EXPORT bool firewall_exists(const char *);
  * the request.
  * https://cloud.google.com/compute/docs/reference/rest/v1/firewalls/insert
  * */
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalFirewall
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Firewall *
 firewall_create(const char *, const char *);
 
 /* Returns the specified firewall.
  * https://cloud.google.com/compute/docs/reference/rest/v1/firewalls/get
  */
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct OptionalFirewall
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Firewall *
 firewall_get(const char *);
 
 /* Utility functions */
 
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Firewall
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Firewall *
 Firewall_from_name(const char *);
 
 #ifdef __cplusplus
