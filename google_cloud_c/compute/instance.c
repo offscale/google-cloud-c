@@ -415,7 +415,7 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
           networkInterfaces[i] = &networkInterface;
         }
       }
-      networkInterfaces[network_json_items_n] = NULL;
+      networkInterfaces[network_json_items_n - 1] = NULL;
     }
 
     {

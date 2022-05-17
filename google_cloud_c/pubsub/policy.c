@@ -140,7 +140,7 @@ struct Binding bindings_from_json(const JSON_Object *const jsonObject) {
                                                sizeof(const char *const));
       for (i = 0; i < members_json_items_n - 1; i++)
         bindings.members[i] = json_array_get_string(members_json_items, i);
-      bindings.members[members_json_items_n] = NULL;
+      bindings.members[members_json_items_n - 1] = NULL;
     }
   }
 
@@ -159,7 +159,7 @@ struct Binding bindings_from_json(const JSON_Object *const jsonObject) {
             expr_from_json(json_array_get_object(expr_json_items, i));
         bindings.condition[i] = &expr;
       }
-      bindings.condition[expr_json_items_n] = NULL;
+      bindings.condition[expr_json_items_n - 1] = NULL;
     }
   }
 
@@ -239,7 +239,7 @@ struct Policy policy_from_json(const JSON_Object *const jsonObject) {
             bindings_from_json(json_array_get_object(bindings_json_items, i));
         policy.bindings[i] = &binding;
       }
-      policy.bindings[bindings_json_items_n] = NULL;
+      policy.bindings[bindings_json_items_n - 1] = NULL;
     }
   }
 
