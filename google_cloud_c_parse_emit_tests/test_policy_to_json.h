@@ -52,7 +52,7 @@ TEST x_bindings_to_json(void) {
   binding->members[1] = strdup("member1"), binding->members[2] = NULL;
 
   ASSERT_STR_EQ(bindings_to_json(binding),
-                "{  \"role\": \"role\",  " MEMBERS_MOCK0 "}");
+                "{  " ROLE_MOCK0 ",  " MEMBERS_MOCK0 "}");
 
   binding->condition = (struct Expr **)malloc(sizeof(struct Expr) * 3);
 
@@ -102,7 +102,7 @@ TEST x_policy_to_json(void) {
 
   binding->condition[2] = NULL;
 
-  ASSERT_STR_EQ(bindings_to_json(binding), bindings_mock1);
+  ASSERT_STR_EQ(bindings_to_json(binding), bindings_mock0);
 
   policy->etag = strdup("etag"), policy->version = strdup("version");
 

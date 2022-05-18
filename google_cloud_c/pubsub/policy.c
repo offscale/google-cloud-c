@@ -210,7 +210,10 @@ void bindings_cleanup(struct Binding *binding) {
 struct Policy *policy_from_json(const JSON_Object *const jsonObject) {
   struct Policy *policy = malloc(sizeof(struct Policy));
 
-  const JSON_Object *policy_obj = json_object_get_object(jsonObject, "policy");
+  const JSON_Object *policy_obj =
+      json_object_has_value_of_type(jsonObject, "policy", JSONObject)
+          ? json_object_get_object(jsonObject, "policy")
+          : jsonObject;
 
   policy->version = json_object_get_string(policy_obj, "version");
 

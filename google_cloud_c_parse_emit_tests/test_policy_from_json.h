@@ -67,18 +67,31 @@ TEST x_policy_from_json(void) {
   const JSON_Object *policy_json = json_value_get_object(policy_val);
   struct Policy *policy = policy_from_json(policy_json);
 
-  if (policy->version != NULL)
-    ASSERT_STR_EQ(policy->version, "version");
+  ASSERT_STR_EQ(policy->version, "version");
 
-  if (policy->bindings != NULL) {
+  {
     struct Binding **binding;
     for (binding = policy->bindings; *binding; binding++) {
-      /*TODO*/
+      ASSERT_STR_EQ((**binding).role, "role");
+
+      {
+        const char **member0, **member1, *members[] = {"member0", "member1"};
+        for (member0 = (**binding).members, member1 = members; *member0;
+             member0++, member1++)
+          ASSERT_STR_EQ(*member0, *member1);
+      }
+
+      {
+        struct Expr **expr;
+        const char **expr_mock;
+        for (expr = (**binding).condition, expr_mock = expressions_mock; *expr;
+             expr++, expr_mock++)
+          ASSERT_STR_EQ(expr_to_json(*expr), *expr_mock);
+      }
     }
   }
 
-  if (policy->etag != NULL)
-    ASSERT_STR_EQ(policy->etag, "etag");
+  ASSERT_STR_EQ(policy->etag, "etag");
 
   policy_cleanup(policy);
   PASS();
