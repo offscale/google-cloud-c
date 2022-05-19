@@ -146,10 +146,21 @@ subscription_from_json(const JSON_Object *const jsonObject) {
     subscription->retainAckedMessages = false;
   subscription->messageRetentionDuration =
       json_object_get_string(jsonObject, "messageRetentionDuration");
-  if (json_object_has_value_of_type(jsonObject, "labels", JSONArray))
-    subscription->labels =
-        (const char **)json_object_get_array(jsonObject, "labels");
-  else
+  if (json_object_has_value_of_type(jsonObject, "labels", JSONArray)) {
+    const JSON_Array *labels_json_items =
+        json_object_get_array(jsonObject, "labels");
+    const size_t labels_json_items_n =
+        json_array_get_count(labels_json_items) + 1;
+    if (labels_json_items_n > 1) {
+      size_t i;
+
+      subscription->labels =
+          (const char **)malloc(labels_json_items_n * sizeof(char *));
+      for (i = 0; i < labels_json_items_n - 1; i++)
+        subscription->labels[i] = json_array_get_string(labels_json_items, i);
+      subscription->labels[labels_json_items_n - 1] = NULL;
+    }
+  } else
     subscription->labels = NULL;
   if (json_object_has_value_of_type(jsonObject, "enableMessageOrdering",
                                     JSONBoolean))
@@ -192,21 +203,22 @@ const char *subscription_to_json(const struct Subscription *subscription) {
     jasprintf(&s, "  \"ackDeadlineSeconds\": %d,",
               subscription->ackDeadlineSeconds);
   if (subscription->retainAckedMessages)
-    jasprintf(&s, "  \"retainAckedMessages\": %lu,",
-              subscription->retainAckedMessages);
+    jasprintf(&s, "  \"retainAckedMessages\": %s,",
+              subscription->retainAckedMessages ? "true" : "false");
   if (subscription->messageRetentionDuration != NULL &&
       subscription->messageRetentionDuration[0] != '\0')
     jasprintf(&s, "  \"messageRetentionDuration\": \"%s\",",
               subscription->messageRetentionDuration);
   /* "  \"labels\": \"%s\"," */
-  jasprintf(&s, "  \"enableMessageOrdering\": \"%s\",",
-            subscription->enableMessageOrdering);
+  jasprintf(&s, "  \"enableMessageOrdering\": %s,",
+            subscription->enableMessageOrdering ? "true" : "false");
   if (subscription->filter != NULL && subscription->filter[0] != '\0')
     jasprintf(&s, "  \"filter\": \"%s\",", subscription->filter);
   jasprintf(&s,
-            "  \"detached\": %lu,"
-            "  \"enableExactlyOnceDelivery\": %lu,",
-            subscription->detached, subscription->enableExactlyOnceDelivery);
+            "  \"detached\": %s,"
+            "  \"enableExactlyOnceDelivery\": %s,",
+            subscription->detached ? "true" : "false",
+            subscription->enableExactlyOnceDelivery ? "true" : "false");
   if (subscription->topicMessageRetentionDuration != NULL &&
       subscription->topicMessageRetentionDuration[0] != '\0')
     jasprintf(&s, "  \"topicMessageRetentionDuration\": \"%s\",",
@@ -215,6 +227,11 @@ const char *subscription_to_json(const struct Subscription *subscription) {
             PubSubState_to_str(subscription->state));
 
   return s;
+}
+
+void subscription_cleanup(struct Subscription *subscription) {
+  free(subscription->labels);
+  free(subscription);
 }
 
 struct ReceivedMessages *

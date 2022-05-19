@@ -97,7 +97,7 @@ TEST x_policy_from_json(void) {
   PASS();
 }
 
-SUITE(parse_parse_policy_suite) {
+SUITE(policy_from_json_suite) {
   RUN_TEST(x_expr_from_json);
   RUN_TEST(x_bindings_from_json);
   RUN_TEST(x_policy_from_json);

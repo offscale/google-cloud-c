@@ -29,10 +29,18 @@ configure_file("configure.h.in" "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_con
 
 set(LIBRARY_NAME "${EXEC_NAME}_lib")
 
-set(Header_Files "test_policy_to_json.h" "test_policy_from_json.h" "policy_mocks.h")
+set(Header_Files
+        "policy_mocks.h"
+        "test_policy_to_json.h"
+        "test_policy_from_json.h"
+
+        "subscription_mocks.h"
+        "test_subscription_to_json.h"
+        "test_subscription_from_json.h"
+)
 source_group("${LIBRARY_NAME} Header Files" FILES "${Header_Files}")
 
-set(Source_Files "policy_mocks.c")
+set(Source_Files "policy_mocks.c" "subscription_mocks.c")
 source_group("${LIBRARY_NAME} Source Files" FILES "${Source_Files}")
 
 add_library("${LIBRARY_NAME}" "${Header_Files}" "${Source_Files}")

@@ -116,7 +116,7 @@ TEST x_policy_to_json(void) {
   PASS();
 }
 
-SUITE(parse_emit_policy_suite) {
+SUITE(policy_to_json_suite) {
   RUN_TEST(x_expr_to_json);
   RUN_TEST(x_GetPolicyOptions_to_json);
   RUN_TEST(x_bindings_to_json);

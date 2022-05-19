@@ -1,0 +1,9 @@
+#ifndef GOOGLE_CLOUD_C_PARSE_EMIT_TESTS_SUBSCRIPTION_MOCKS_H
+#define GOOGLE_CLOUD_C_PARSE_EMIT_TESTS_SUBSCRIPTION_MOCKS_H
+
+#include "google_cloud_c_parse_emit_tests_lib_export.h"
+
+extern GOOGLE_CLOUD_C_PARSE_EMIT_TESTS_LIB_EXPORT const char
+    subscription_mock0[];
+
+#endif /* !GOOGLE_CLOUD_C_PARSE_EMIT_TESTS_SUBSCRIPTION_MOCKS_H */
