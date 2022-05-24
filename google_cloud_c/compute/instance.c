@@ -44,8 +44,7 @@ struct Instances instances_list(void) {
       const size_t json_items_n = json_array_get_count(json_items);
 
       if (json_items_n > 0) {
-        struct Instance **instances = (struct Instance **)malloc(
-            json_items_n * sizeof(struct Instance *));
+        struct Instance **instances = malloc(json_items_n * sizeof **instances);
         size_t i;
         for (i = 0; i < json_items_n; i++) {
           const JSON_Object *const json_obj =
@@ -358,8 +357,8 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
     struct NetworkInterface **networkInterfaces = NULL;
     if (network_json_items_n > 1) {
       size_t i;
-      networkInterfaces = (struct NetworkInterface **)malloc(
-          network_json_items_n * sizeof(struct NetworkInterface **));
+      networkInterfaces =
+          malloc(network_json_items_n * sizeof **networkInterfaces);
       for (i = 0; i < network_json_items_n - 1; i++) {
         const JSON_Object *const network_json =
             json_array_get_object(network_json_items, i);
@@ -369,8 +368,7 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
         const size_t ac_json_items_n = json_array_get_count(ac_json_items);
         if (ac_json_items_n > 0) {
           size_t j;
-          accessConfigs = (struct AccessConfigs **)malloc(
-              ac_json_items_n * sizeof(struct AccessConfigs *));
+          accessConfigs = malloc(ac_json_items_n * sizeof **accessConfigs);
           for (j = 0; j < ac_json_items_n; j++)
             accessConfigs[j] = AccessConfigs_from_json(
                 json_array_get_object(ac_json_items, i));
@@ -396,7 +394,7 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
     }
 
     {
-      struct Scheduling *scheduling = malloc(sizeof(struct Scheduling));
+      struct Scheduling *scheduling = malloc(sizeof *scheduling);
       scheduling->onHostMaintenance = NULL, scheduling->automaticRestart = true,
       scheduling->preemptible = true;
       optionalInstance->scheduling = scheduling;
@@ -404,7 +402,7 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
 
     {
       struct ShieldedInstanceConfig *shieldedInstanceConfig =
-          malloc(sizeof(struct ShieldedInstanceConfig));
+          malloc(sizeof *shieldedInstanceConfig);
       shieldedInstanceConfig->enableSecureBoot = false,
       shieldedInstanceConfig->enableVtpm = true,
       shieldedInstanceConfig->enableIntegrityMonitoring = true;
@@ -413,7 +411,7 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
 
     {
       struct ShieldedInstanceIntegrityPolicy *shieldedInstanceIntegrityPolicy =
-          malloc(sizeof(struct ShieldedInstanceConfig));
+          malloc(sizeof *shieldedInstanceIntegrityPolicy);
       shieldedInstanceIntegrityPolicy->updateAutoLearnPolicy = true;
 
       optionalInstance->shieldedInstanceIntegrityPolicy =
@@ -427,8 +425,7 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
 
 struct NetworkInterface *
 NetworkInterface_from_json(const JSON_Object *const jsonObject) {
-  struct NetworkInterface *networkInterface =
-      malloc(sizeof(struct NetworkInterface));
+  struct NetworkInterface *networkInterface = malloc(sizeof *networkInterface);
   networkInterface->network = json_object_get_string(jsonObject, "network");
   networkInterface->subnetwork =
       json_object_get_string(jsonObject, "subnetwork");
@@ -439,7 +436,7 @@ NetworkInterface_from_json(const JSON_Object *const jsonObject) {
 
 struct AccessConfigs *
 AccessConfigs_from_json(const JSON_Object *const jsonObject) {
-  struct AccessConfigs *accessConfigs = malloc(sizeof(struct AccessConfigs));
+  struct AccessConfigs *accessConfigs = malloc(sizeof *accessConfigs);
   accessConfigs->type = json_object_get_string(jsonObject, "type");
   accessConfigs->name = json_object_get_string(jsonObject, "name");
   accessConfigs->natIP = json_object_get_string(jsonObject, "natIP");
@@ -450,7 +447,7 @@ AccessConfigs_from_json(const JSON_Object *const jsonObject) {
 }
 
 struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
-  struct Instance *instance = malloc(sizeof(struct Instance));
+  struct Instance *instance = malloc(sizeof *instance);
   instance->id = json_object_get_string(jsonObject, "id");
   instance->creationTimestamp =
       json_object_get_string(jsonObject, "creationTimestamp");

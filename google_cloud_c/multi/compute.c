@@ -115,7 +115,7 @@ struct StatusAndArrayCStrArray compute(const struct configuration *const config,
       size_t i;
 
       if (_instances.size > 0) {
-        _instanceNames = (char **)malloc(_instances.size * sizeof(char *));
+        _instanceNames = malloc(_instances.size * sizeof **_instanceNames);
         for (i = 0; i < _instances.size; ++i)
           _instanceNames[i] = strdup(_instances.arr[i]->name);
         instanceNames.c_str_arr = _instanceNames;
@@ -128,7 +128,7 @@ struct StatusAndArrayCStrArray compute(const struct configuration *const config,
       char **_zoneNames = NULL;
       size_t i;
       if (_zones.size > 0) {
-        _zoneNames = (char **)malloc(_zones.size * sizeof(char *));
+        _zoneNames = malloc(_zones.size * sizeof **_zoneNames);
         for (i = 0; i < _zones.size; ++i)
           _zoneNames[i] = strdup(_zones.arr[i]->name);
 

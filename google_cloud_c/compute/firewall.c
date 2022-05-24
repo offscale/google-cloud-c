@@ -89,7 +89,7 @@ struct Firewall *firewall_get(const char *const firewall_name) {
 /* Utility functions */
 
 struct Firewall *Firewall_from_name(const char *const firewall_name) {
-  struct Firewall *firewall = malloc(sizeof(struct Firewall));
+  struct Firewall *firewall = malloc(sizeof *firewall);
   firewall->name = firewall_name;
   return firewall;
 }

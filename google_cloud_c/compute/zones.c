@@ -22,8 +22,7 @@ struct Zones zone_list(void) {
       if (zone_json_items_n > 0) {
         size_t i;
 
-        struct Zone **zones =
-            (struct Zone **)malloc(zone_json_items_n * sizeof(struct Zone *));
+        struct Zone **zones = malloc(zone_json_items_n * sizeof **zones);
         for (i = 0; i < zone_json_items_n; i++)
           zones[i] = zone_from_json(json_array_get_object(zone_json_items, i));
         _zones.arr = zones, _zones.size = zone_json_items_n;
@@ -37,7 +36,7 @@ struct Zones zone_list(void) {
 /* utility functions */
 
 struct Zone *zone_from_json(const JSON_Object *const jsonObject) {
-  struct Zone *zone = malloc(sizeof(struct Zone));
+  struct Zone *zone = malloc(sizeof *zone);
 
   zone->id = json_object_get_string(jsonObject, "id");
   zone->creationTimestamp =

@@ -15,7 +15,7 @@ google_cloud_operation_from_json(const JSON_Object *const jsonObject) {
     return NULL;
   } else {
     struct GoogleCloudOperation *googleCloudOperation =
-        malloc(sizeof(struct GoogleCloudOperation));
+        malloc(sizeof *googleCloudOperation);
     googleCloudOperation->id = json_object_get_string(jsonObject, "id");
     googleCloudOperation->name = json_object_get_string(jsonObject, "name");
     googleCloudOperation->zone = json_object_get_string(jsonObject, "zone");

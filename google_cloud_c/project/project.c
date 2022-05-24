@@ -55,8 +55,7 @@ struct Project **project_list(void) {
     const size_t projects_items_n = json_array_get_count(projects_items_json);
     /* if (projects_items_n == 0) return NULL; */
     if (projects_items_n > 0) {
-      projects = (struct Project **)malloc(projects_items_n *
-                                           sizeof(struct Project *));
+      projects = malloc(projects_items_n * sizeof **projects);
       size_t i;
       for (i = 0; i < projects_items_n; i++)
         projects[i] =
@@ -79,11 +78,11 @@ enum LifecycleState str_to_LifecycleState(const char *const state) {
 }
 
 struct Project *project_from_json(const JSON_Object *const jsonObject) {
-  struct Project *project = malloc(sizeof(struct Project));
+  struct Project *project = malloc(sizeof *project);
   if (json_object_has_value(jsonObject, "parent")) {
     const JSON_Object *const parent_obj =
         json_object_get_object(jsonObject, "parent");
-    struct ResourceId *parent = malloc(sizeof(struct ResourceId));
+    struct ResourceId *parent = malloc(sizeof *parent);
     parent->type = json_object_get_string(parent_obj, "type");
     parent->id = json_object_get_string(parent_obj, "id");
     project->parent = parent;

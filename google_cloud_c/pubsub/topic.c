@@ -86,14 +86,14 @@ const char *Encoding_to_str(enum Encoding encoding) {
 }
 
 struct Topic *topic_from_json(const JSON_Object *const jsonObject) {
-  struct Topic *topic = malloc(sizeof(struct Topic));
+  struct Topic *topic = malloc(sizeof *topic);
 
   topic->name = json_object_get_string(jsonObject, "name");
   if (json_object_has_value(jsonObject, "messageStoragePolicy")) {
     const JSON_Object *const jsonMessageStoragePolicy =
         json_object_get_object(jsonObject, "messageStoragePolicy");
     struct MessageStoragePolicy *messageStoragePolicy =
-        malloc(sizeof(struct MessageStoragePolicy));
+        malloc(sizeof *messageStoragePolicy);
     messageStoragePolicy->allowedPersistenceRegions =
         (const char **)json_object_get_array(jsonMessageStoragePolicy,
                                              "allowedPersistenceRegions");
@@ -104,8 +104,7 @@ struct Topic *topic_from_json(const JSON_Object *const jsonObject) {
   if (json_object_has_value(jsonObject, "SchemaSettings")) {
     const JSON_Object *const jsonSchemaSettings =
         json_object_get_object(jsonObject, "SchemaSettings");
-    struct SchemaSettings *schemaSettings =
-        malloc(sizeof(struct SchemaSettings));
+    struct SchemaSettings *schemaSettings = malloc(sizeof *schemaSettings);
     schemaSettings->schema =
         json_object_get_string(jsonSchemaSettings, "schema");
     if (json_object_has_value(jsonSchemaSettings, "encoding"))
@@ -118,7 +117,7 @@ struct Topic *topic_from_json(const JSON_Object *const jsonObject) {
     topic->schemaSettings = NULL;
   if (json_object_has_value_of_type(jsonObject, "satisfiesPzs", JSONBoolean))
     topic->satisfiesPzs =
-        (bool)json_object_get_boolean(jsonObject, "kmsKeyName");
+        (bool)json_object_get_boolean(jsonObject, "satisfiesPzs");
   else
     topic->satisfiesPzs = false;
   topic->messageRetentionDuration =
@@ -148,8 +147,8 @@ const char *topic_to_json(const struct Topic *topic) {
     jasprintf(&s, "  \"name\": \"%s\",", topic->name);
   if (topic->kmsKeyName != NULL && topic->kmsKeyName[0] != '\0')
     jasprintf(&s, "  \"kmsKeyName\": \"%s\",", topic->kmsKeyName);
-  if (topic->satisfiesPzs)
-    jasprintf(&s, "  \"satisfiesPzs\": %ld,", topic->satisfiesPzs);
+  jasprintf(&s, "  \"satisfiesPzs\": %s,",
+            topic->satisfiesPzs ? "true" : "false");
   if (topic->messageRetentionDuration != NULL &&
       topic->messageRetentionDuration[0] != '\0')
     jasprintf(&s, "  \"messageRetentionDuration\": \"%s\",",

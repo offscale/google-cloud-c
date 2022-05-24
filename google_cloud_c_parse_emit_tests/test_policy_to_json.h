@@ -21,7 +21,7 @@ extern "C" {
 #include "policy_mocks.h"
 
 TEST x_expr_to_json(void) {
-  struct Expr *expr = (struct Expr *)malloc(sizeof(struct Expr));
+  struct Expr *expr = malloc(sizeof *expr);
   expr->description = strdup("description0"),
   expr->expression = strdup("expression0"),
   expr->location = strdup("location0"), expr->title = strdup("title0");
@@ -31,8 +31,7 @@ TEST x_expr_to_json(void) {
 }
 
 TEST x_GetPolicyOptions_to_json(void) {
-  struct GetPolicyOptions *getPolicyOptions =
-      (struct GetPolicyOptions *)malloc(sizeof(struct GetPolicyOptions));
+  struct GetPolicyOptions *getPolicyOptions = malloc(sizeof *getPolicyOptions);
   getPolicyOptions->requestedPolicyVersion = POLICY_VERSION_1;
   ASSERT_STR_EQ(GetPolicyOptions_to_json(getPolicyOptions),
                 "{\"requestedPolicyVersion\": 1}");
@@ -41,28 +40,28 @@ TEST x_GetPolicyOptions_to_json(void) {
 }
 
 TEST x_bindings_to_json(void) {
-  struct Binding *binding = (struct Binding *)malloc(sizeof(struct Binding));
+  struct Binding *binding = malloc(sizeof *binding);
   binding->role = strdup("role"), binding->members = NULL,
   binding->condition = NULL;
 
   ASSERT_STR_EQ(bindings_to_json(binding), "{  \"role\": \"role\"}");
 
-  binding->members = malloc(sizeof(char *) * 3);
+  binding->members = malloc(3 * sizeof binding->members);
   binding->members[0] = strdup("member0"),
   binding->members[1] = strdup("member1"), binding->members[2] = NULL;
 
   ASSERT_STR_EQ(bindings_to_json(binding),
                 "{  " ROLE_MOCK0 ",  " MEMBERS_MOCK0 "}");
 
-  binding->condition = (struct Expr **)malloc(sizeof(struct Expr) * 3);
+  binding->condition = malloc(3 * sizeof binding->condition);
 
-  binding->condition[0] = malloc(sizeof(struct Expr));
+  binding->condition[0] = malloc(sizeof *binding->condition[0]);
   binding->condition[0]->description = strdup("description0"),
   binding->condition[0]->expression = strdup("expression0"),
   binding->condition[0]->location = strdup("location0"),
   binding->condition[0]->title = strdup("title0");
 
-  binding->condition[1] = malloc(sizeof(struct Expr));
+  binding->condition[1] = malloc(sizeof *binding->condition[1]);
   binding->condition[1]->description = strdup("description1"),
   binding->condition[1]->expression = strdup("expression1"),
   binding->condition[1]->location = strdup("location1"),
@@ -77,24 +76,24 @@ TEST x_bindings_to_json(void) {
 }
 
 TEST x_policy_to_json(void) {
-  struct Policy *policy = (struct Policy *)malloc(sizeof(struct Policy));
-  struct Binding *binding = (struct Binding *)malloc(sizeof(struct Binding));
+  struct Policy *policy = malloc(sizeof *policy);
+  struct Binding *binding = malloc(sizeof *binding);
 
   binding->role = strdup("role");
 
-  binding->members = malloc(sizeof(char *) * 3);
+  binding->members = malloc(3 * sizeof binding->members);
   binding->members[0] = strdup("member0"),
   binding->members[1] = strdup("member1"), binding->members[2] = NULL;
 
-  binding->condition = (struct Expr **)malloc(sizeof(struct Expr) * 3);
+  binding->condition = malloc(3 * sizeof binding->condition);
 
-  binding->condition[0] = malloc(sizeof(struct Expr));
+  binding->condition[0] = malloc(sizeof *binding->condition[0]);
   binding->condition[0]->description = strdup("description0"),
   binding->condition[0]->expression = strdup("expression0"),
   binding->condition[0]->location = strdup("location0"),
   binding->condition[0]->title = strdup("title0");
 
-  binding->condition[1] = malloc(sizeof(struct Expr));
+  binding->condition[1] = malloc(sizeof *binding->condition[1]);
   binding->condition[1]->description = strdup("description1"),
   binding->condition[1]->expression = strdup("expression1"),
   binding->condition[1]->location = strdup("location1"),
@@ -106,7 +105,7 @@ TEST x_policy_to_json(void) {
 
   policy->etag = strdup("etag"), policy->version = strdup("version");
 
-  policy->bindings = malloc(sizeof(struct Binding *) * 2);
+  policy->bindings = malloc(2 * sizeof policy->bindings);
   policy->bindings[0] = binding;
   policy->bindings[1] = NULL;
 

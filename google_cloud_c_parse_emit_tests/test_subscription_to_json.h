@@ -20,7 +20,7 @@ extern "C" {
 #include <google_cloud_c/pubsub/subscription.h>
 
 TEST x_subscription_to_json(void) {
-  struct Subscription *subscription = malloc(sizeof(struct Subscription));
+  struct Subscription *subscription = malloc(sizeof *subscription);
 
   subscription->name = "name";
   subscription->topic = "topic";
@@ -28,7 +28,7 @@ TEST x_subscription_to_json(void) {
   subscription->ackDeadlineSeconds = 0;
   subscription->retainAckedMessages = true;
   subscription->messageRetentionDuration = "messageRetentionDuration";
-  subscription->labels = malloc(sizeof(char *) * 2);
+  subscription->labels = malloc(2 * sizeof subscription->labels);
   subscription->labels[0] = "foo";
   subscription->labels[1] = NULL;
   subscription->enableMessageOrdering = true;

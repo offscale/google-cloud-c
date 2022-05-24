@@ -68,7 +68,7 @@ struct Notification *insert_bucket_notification(const char *const bucket_name,
 
 struct Notification *
 notification_from_json(const JSON_Object *const created_json_object) {
-  struct Notification *notification = malloc(sizeof(struct Notification));
+  struct Notification *notification = malloc(sizeof *notification);
 
   notification->id = json_object_get_string(created_json_object, "id");
   notification->topic = json_object_get_string(created_json_object, "topic");

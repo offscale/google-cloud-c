@@ -28,7 +28,7 @@ get_service_account(const char *const projectIdentifier) {
 struct ProjectServiceAccount *
 project_service_account_from_json(const JSON_Object *const jsonObject) {
   struct ProjectServiceAccount *project_service_account =
-      malloc(sizeof(struct ProjectServiceAccount));
+      malloc(sizeof *project_service_account);
   project_service_account->email_address =
       json_object_get_string(jsonObject, "email_address");
   project_service_account->kind = json_object_get_string(jsonObject, "kind");

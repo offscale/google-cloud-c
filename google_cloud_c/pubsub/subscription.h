@@ -45,8 +45,7 @@ struct Subscription {
   }
    "retryPolicy": {
     object (RetryPolicy)
-  }
-   */
+  } */
   bool detached;
   bool enableExactlyOnceDelivery;
   const char *topicMessageRetentionDuration;

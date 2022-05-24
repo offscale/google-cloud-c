@@ -128,7 +128,7 @@ const char *PubSubState_to_str(enum PubSubState state) {
 
 struct Subscription *
 subscription_from_json(const JSON_Object *const jsonObject) {
-  struct Subscription *subscription = malloc(sizeof(struct Subscription));
+  struct Subscription *subscription = malloc(sizeof *subscription);
 
   subscription->name = json_object_get_string(jsonObject, "name");
   subscription->topic = json_object_get_string(jsonObject, "topic");
@@ -155,7 +155,7 @@ subscription_from_json(const JSON_Object *const jsonObject) {
       size_t i;
 
       subscription->labels =
-          (const char **)malloc(labels_json_items_n * sizeof(char *));
+          malloc(labels_json_items_n * sizeof subscription->labels);
       for (i = 0; i < labels_json_items_n - 1; i++)
         subscription->labels[i] = json_array_get_string(labels_json_items, i);
       subscription->labels[labels_json_items_n - 1] = NULL;
@@ -236,15 +236,14 @@ void subscription_cleanup(struct Subscription *subscription) {
 
 struct ReceivedMessages *
 receivedMessages_from_json(const JSON_Object *const jsonObject) {
-  struct ReceivedMessages *receivedMessages =
-      malloc(sizeof(struct ReceivedMessages));
+  struct ReceivedMessages *receivedMessages = malloc(sizeof *receivedMessages);
   const JSON_Array *json_items =
       json_object_get_array(jsonObject, "receivedMessages");
   const size_t json_items_n = json_array_get_count(json_items);
   size_t i;
   if (json_items_n > 0) {
-    receivedMessages->receivedMessages = (struct ReceivedMessage **)malloc(
-        json_items_n * sizeof(struct ReceivedMessage *));
+    receivedMessages->receivedMessages =
+        malloc(json_items_n * sizeof receivedMessages->receivedMessages);
     for (i = 0; i < json_items_n; i++) {
       const JSON_Object *const json_obj = json_array_get_object(json_items, i);
       struct ReceivedMessage *receivedMessage;
@@ -258,7 +257,7 @@ receivedMessages_from_json(const JSON_Object *const jsonObject) {
           json_object_has_value(messageObject, "orderingKey") ||
           json_object_has_value(messageObject, "publishTime");
       if (pubsubMessage_contents) {
-        pubsubMessage = malloc(sizeof(struct PubsubMessage));
+        pubsubMessage = malloc(sizeof *pubsubMessage);
         pubsubMessage->data = json_object_get_string(messageObject, "data");
         pubsubMessage->messageId =
             json_object_get_string(messageObject, "messageId");

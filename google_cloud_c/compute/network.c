@@ -96,7 +96,7 @@ struct Network *network_get(const char *const network_name) {
 /* utility functions */
 
 struct Network *network_from_json(const JSON_Object *const jsonObject) {
-  struct Network *network = malloc(sizeof(struct Network));
+  struct Network *network = malloc(sizeof *network);
   network->id = json_object_get_string(jsonObject, "id");
   network->creationTimestamp =
       json_object_get_string(jsonObject, "creationTimestamp");

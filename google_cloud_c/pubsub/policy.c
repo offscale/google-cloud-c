@@ -58,7 +58,7 @@ struct Policy *setIamPolicy(const char *const resource,
 const char *
 GetPolicyOptions_to_json(const struct GetPolicyOptions *getPolicyOptions) {
   enum { n = 30 };
-  char *requestedPolicyVersion = malloc(sizeof(char) * n);
+  char *requestedPolicyVersion = malloc(n * sizeof *requestedPolicyVersion);
   memcpy(requestedPolicyVersion, "{\"requestedPolicyVersion\": \0}", n);
   requestedPolicyVersion[n - 1] = '\0';
   switch (getPolicyOptions->requestedPolicyVersion) {
@@ -76,7 +76,7 @@ GetPolicyOptions_to_json(const struct GetPolicyOptions *getPolicyOptions) {
 }
 
 struct Expr *expr_from_json(const JSON_Object *const jsonObject) {
-  struct Expr *expr = malloc(sizeof(struct Expr));
+  struct Expr *expr = malloc(sizeof *expr);
   expr->expression = json_object_get_string(jsonObject, "expression");
   expr->title = json_object_get_string(jsonObject, "title");
   expr->description = json_object_get_string(jsonObject, "description");
@@ -112,7 +112,7 @@ void expr_cleanup(struct Expr *expr) {
 }
 
 struct Binding *bindings_from_json(const JSON_Object *const jsonObject) {
-  struct Binding *bindings = malloc(sizeof(struct Binding));
+  struct Binding *bindings = malloc(sizeof *bindings);
 
   bindings->role = json_object_get_string(jsonObject, "role");
 
@@ -125,8 +125,8 @@ struct Binding *bindings_from_json(const JSON_Object *const jsonObject) {
     size_t i;
 
     if (members_json_items_n > 1) {
-      bindings->members = (const char **)malloc(members_json_items_n *
-                                                sizeof(const char *const));
+      bindings->members =
+          malloc(members_json_items_n * sizeof bindings->members);
       for (i = 0; i < members_json_items_n - 1; i++)
         bindings->members[i] = json_array_get_string(members_json_items, i);
       bindings->members[members_json_items_n - 1] = NULL;
@@ -142,7 +142,7 @@ struct Binding *bindings_from_json(const JSON_Object *const jsonObject) {
 
     if (expr_json_items_n > 1) {
       bindings->condition =
-          (struct Expr **)malloc(expr_json_items_n * sizeof(struct Expr *));
+          malloc(expr_json_items_n * sizeof bindings->condition);
       for (i = 0; i < expr_json_items_n - 1; i++) {
         struct Expr *expr =
             expr_from_json(json_array_get_object(expr_json_items, i));
@@ -208,7 +208,7 @@ void bindings_cleanup(struct Binding *binding) {
 }
 
 struct Policy *policy_from_json(const JSON_Object *const jsonObject) {
-  struct Policy *policy = malloc(sizeof(struct Policy));
+  struct Policy *policy = malloc(sizeof *policy);
 
   const JSON_Object *policy_obj =
       json_object_has_value_of_type(jsonObject, "policy", JSONObject)
@@ -226,8 +226,8 @@ struct Policy *policy_from_json(const JSON_Object *const jsonObject) {
     size_t i;
 
     if (bindings_json_items_n > 1) {
-      policy->bindings = (struct Binding **)malloc(bindings_json_items_n *
-                                                   sizeof(struct Policy *));
+      policy->bindings =
+          malloc(bindings_json_items_n * sizeof policy->bindings);
       for (i = 0; i < bindings_json_items_n - 1; i++) {
         struct Binding *binding =
             bindings_from_json(json_array_get_object(bindings_json_items, i));

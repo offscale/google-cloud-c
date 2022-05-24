@@ -35,8 +35,7 @@ struct Oauth2UserInfo *userinfo_get(const char *const google_access_token) {
 
 struct Oauth2UserInfo *
 oauth2_user_info_from_json(const JSON_Object *const jsonObject) {
-  struct Oauth2UserInfo *oauth2_user_info =
-      malloc(sizeof(struct Oauth2UserInfo));
+  struct Oauth2UserInfo *oauth2_user_info = malloc(sizeof *oauth2_user_info);
   oauth2_user_info->sub = json_object_get_string(jsonObject, "sub");
   oauth2_user_info->picture = json_object_get_string(jsonObject, "picture");
   oauth2_user_info->email = json_object_get_string(jsonObject, "email");

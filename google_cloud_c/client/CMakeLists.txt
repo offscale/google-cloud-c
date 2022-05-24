@@ -51,8 +51,8 @@ set(_export_file "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${DIRNAME}/${LIBRARY_NAME}
 generate_export_header("${LIBRARY_NAME}" EXPORT_FILE_NAME "${_export_file}")
 
 # setup the version numbering
-set_property(TARGET "${LIBRARY_NAME}" PROPERTY VERSION "1.0.0")
-set_property(TARGET "${LIBRARY_NAME}" PROPERTY SOVERSION "1")
+set_property(TARGET "${LIBRARY_NAME}" PROPERTY VERSION "${${PROJECT_NAME}_VERSION}")
+set_property(TARGET "${LIBRARY_NAME}" PROPERTY SOVERSION "${${PROJECT_NAME}_VERSION_MAJOR}")
 
 # install rules
 install(FILES "${_export_file}" ${Header_Files}
