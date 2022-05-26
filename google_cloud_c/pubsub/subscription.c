@@ -252,6 +252,17 @@ pubsubMessage_from_json(const JSON_Object *const jsonObject) {
   return pubsubMessage;
 }
 
+void pubsubMessage_cleanup(struct PubsubMessage *pubsubMessage) {
+  if (pubsubMessage == NULL)
+    return;
+  free((char *)pubsubMessage->data);
+  free((char *)pubsubMessage->messageId);
+  free((char *)pubsubMessage->orderingKey);
+  free((char *)pubsubMessage->publishTime);
+  free(pubsubMessage);
+  pubsubMessage = NULL;
+}
+
 struct ReceivedMessages *
 receivedMessages_from_json(const JSON_Object *const jsonObject) {
   struct ReceivedMessages *receivedMessages = NULL;
@@ -285,6 +296,27 @@ receivedMessages_from_json(const JSON_Object *const jsonObject) {
     receivedMessages->receivedMessages[json_items_n - 1] = NULL;
   }
   return receivedMessages;
+}
+
+void receivedMessage_cleanup(struct ReceivedMessage *receivedMessage) {
+  if (receivedMessage == NULL)
+    return;
+  free((char *)receivedMessage->ackId);
+  pubsubMessage_cleanup(receivedMessage->message);
+  receivedMessage->message = NULL;
+  free(receivedMessage);
+  receivedMessage = NULL;
+}
+
+void receivedMessages_cleanup(struct ReceivedMessages **receivedMessages) {
+  struct ReceivedMessage **receivedMessage;
+  if (receivedMessages == NULL)
+    return;
+  for (receivedMessage = (**receivedMessages).receivedMessages;
+       *receivedMessage; receivedMessage++)
+    receivedMessage_cleanup(*receivedMessage);
+  free(receivedMessages);
+  receivedMessages = NULL;
 }
 
 const char *AckIds_to_json_str(const struct AckIds *ack_ids) {

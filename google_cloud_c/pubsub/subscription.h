@@ -128,8 +128,17 @@ subscription_cleanup(struct Subscription *);
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct PubsubMessage *
 pubsubMessage_from_json(const JSON_Object *);
 
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT void
+pubsubMessage_cleanup(struct PubsubMessage *);
+
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct ReceivedMessages *
 receivedMessages_from_json(const JSON_Object *);
+
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT void
+receivedMessage_cleanup(struct ReceivedMessage *);
+
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT void
+receivedMessages_cleanup(struct ReceivedMessages **);
 
 #ifdef __cplusplus
 }

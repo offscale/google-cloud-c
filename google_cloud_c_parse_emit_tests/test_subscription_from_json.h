@@ -108,23 +108,31 @@ TEST x_receivedMessages_from_json(void) {
   receivedMessagesMock[2] = NULL;
 
   {
-    struct ReceivedMessage *receivedMessage;
-    size_t i=0;
-    for (receivedMessage = receivedMessages->receivedMessages[i];
-         receivedMessages->receivedMessages[i];
-         receivedMessage = receivedMessages->receivedMessages[++i]) {
-      ASSERT_STR_EQ(receivedMessagesMock[i]->ackId, (*receivedMessage).ackId);
-      ASSERT_STR_EQ(receivedMessagesMock[i]->message->publishTime,
-                    (*receivedMessage).message->publishTime);
-      ASSERT_STR_EQ(receivedMessagesMock[i]->message->orderingKey,
-                    (*receivedMessage).message->orderingKey);
-      ASSERT_STR_EQ(receivedMessagesMock[i]->message->messageId,
-                    (*receivedMessage).message->messageId);
-      ASSERT_STR_EQ(receivedMessagesMock[i]->message->data,
-                    (*receivedMessage).message->data);
-      ASSERT_EQ(receivedMessagesMock[i]->deliveryAttempt,
-                (*receivedMessage).deliveryAttempt);
+    struct ReceivedMessage *receivedMessage, *receivedMessageMock;
+    size_t i;
+    for (i = 0; receivedMessages->receivedMessages[i]; ++i) {
+      receivedMessage = receivedMessages->receivedMessages[i],
+      receivedMessageMock = receivedMessagesMock[i];
+
+      ASSERT_STR_EQ(receivedMessageMock->ackId, receivedMessage->ackId);
+      ASSERT_STR_EQ(receivedMessageMock->message->publishTime,
+                    receivedMessage->message->publishTime);
+      ASSERT_STR_EQ(receivedMessageMock->message->orderingKey,
+                    receivedMessage->message->orderingKey);
+      ASSERT_STR_EQ(receivedMessageMock->message->messageId,
+                    receivedMessage->message->messageId);
+      ASSERT_STR_EQ(receivedMessageMock->message->data,
+                    receivedMessage->message->data);
+      ASSERT_EQ(receivedMessageMock->deliveryAttempt,
+                receivedMessage->deliveryAttempt);
+
+      receivedMessage_cleanup(receivedMessage);
+      receivedMessage_cleanup(receivedMessageMock);
     }
+    ASSERT_EQ(receivedMessages->receivedMessages[i], NULL);
+    ASSERT_EQ(receivedMessagesMock[i], NULL);
+    receivedMessage_cleanup(receivedMessages->receivedMessages[i]);
+    receivedMessage_cleanup(receivedMessagesMock[i]);
   }
 
   PASS();
