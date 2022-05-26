@@ -234,50 +234,55 @@ void subscription_cleanup(struct Subscription *subscription) {
   free(subscription);
 }
 
+struct PubsubMessage *
+pubsubMessage_from_json(const JSON_Object *const jsonObject) {
+  struct PubsubMessage *pubsubMessage = NULL;
+  if (json_object_has_value(jsonObject, "data") ||
+      json_object_has_value(jsonObject, "messageId") ||
+      json_object_has_value(jsonObject, "orderingKey") ||
+      json_object_has_value(jsonObject, "publishTime")) {
+    pubsubMessage = malloc(sizeof *pubsubMessage);
+    pubsubMessage->data = json_object_get_string(jsonObject, "data");
+    pubsubMessage->messageId = json_object_get_string(jsonObject, "messageId");
+    pubsubMessage->orderingKey =
+        json_object_get_string(jsonObject, "orderingKey");
+    pubsubMessage->publishTime =
+        json_object_get_string(jsonObject, "publishTime");
+  }
+  return pubsubMessage;
+}
+
 struct ReceivedMessages *
 receivedMessages_from_json(const JSON_Object *const jsonObject) {
-  struct ReceivedMessages *receivedMessages = malloc(sizeof *receivedMessages);
+  struct ReceivedMessages *receivedMessages = NULL;
   const JSON_Array *json_items =
       json_object_get_array(jsonObject, "receivedMessages");
-  const size_t json_items_n = json_array_get_count(json_items);
+  const size_t json_items_n = json_array_get_count(json_items) + 1;
   size_t i;
-  if (json_items_n > 0) {
+  if (json_items_n > 1) {
+    receivedMessages = malloc(sizeof *receivedMessages);
     receivedMessages->receivedMessages =
         malloc(json_items_n * sizeof receivedMessages->receivedMessages);
-    for (i = 0; i < json_items_n; i++) {
+    for (i = 0; i < json_items_n - 1; i++) {
       const JSON_Object *const json_obj = json_array_get_object(json_items, i);
-      struct ReceivedMessage *receivedMessage;
-      struct PubsubMessage *pubsubMessage = NULL;
-      const JSON_Object *const messageObject =
-          json_object_get_object(json_obj, "message");
-
-      const bool pubsubMessage_contents =
-          json_object_has_value(messageObject, "data") ||
-          json_object_has_value(messageObject, "messageId") ||
-          json_object_has_value(messageObject, "orderingKey") ||
-          json_object_has_value(messageObject, "publishTime");
-      if (pubsubMessage_contents) {
-        pubsubMessage = malloc(sizeof *pubsubMessage);
-        pubsubMessage->data = json_object_get_string(messageObject, "data");
-        pubsubMessage->messageId =
-            json_object_get_string(messageObject, "messageId");
-        pubsubMessage->orderingKey =
-            json_object_get_string(messageObject, "orderingKey");
-        pubsubMessage->publishTime =
-            json_object_get_string(messageObject, "publishTime");
+      struct ReceivedMessage *receivedMessage = NULL;
+      struct PubsubMessage *pubsubMessage =
+          pubsubMessage_from_json(json_object_get_object(json_obj, "message"));
+      if (pubsubMessage != NULL || json_object_has_value(json_obj, "ackId")) {
+        receivedMessage = malloc(sizeof *receivedMessage);
+        receivedMessage->message = pubsubMessage;
+        receivedMessage->ackId = json_object_get_string(json_obj, "ackId");
+        if (json_object_has_value_of_type(json_obj, "deliveryAttempt",
+                                          JSONNumber))
+          receivedMessage->deliveryAttempt =
+              (int)json_object_get_number(json_obj, "deliveryAttempt");
+        else
+          receivedMessage->deliveryAttempt = 0;
       }
-      receivedMessage->message = pubsubMessage;
-
-      receivedMessage->ackId = json_object_get_string(json_obj, "ackId");
-      if (json_object_has_value_of_type(json_obj, "deliveryAttempt",
-                                        JSONNumber))
-        receivedMessage->deliveryAttempt =
-            (int)json_object_get_number(json_obj, "deliveryAttempt");
-      else
-        receivedMessage->deliveryAttempt = 0;
 
       receivedMessages->receivedMessages[i] = receivedMessage;
     }
+    receivedMessages->receivedMessages[json_items_n - 1] = NULL;
   }
   return receivedMessages;
 }

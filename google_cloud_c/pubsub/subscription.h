@@ -125,6 +125,9 @@ subscription_to_json(const struct Subscription *);
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT void
 subscription_cleanup(struct Subscription *);
 
+extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct PubsubMessage *
+pubsubMessage_from_json(const JSON_Object *);
+
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct ReceivedMessages *
 receivedMessages_from_json(const JSON_Object *);
 

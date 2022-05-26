@@ -49,7 +49,91 @@ TEST x_subscription_from_json(void) {
   PASS();
 }
 
-SUITE(subscription_from_json_suite) { RUN_TEST(x_subscription_from_json); }
+TEST x_receivedMessages_from_json(void) {
+  struct ReceivedMessage **receivedMessagesMock =
+      malloc(3 * sizeof **receivedMessagesMock);
+  static const char mock[] = "{\n"
+                             "  \"receivedMessages\": [\n"
+                             "    {\n"
+                             "       \"ackId\": \"ackId0\",\n"
+                             "       \"message\": {\n"
+                             "           \"data\": \"data0\",\n"
+                             /*"           \"attributes\": {\n"
+                             "             string: string,\n"
+                             "           },\n"*/
+                             "           \"messageId\": \"messageId0\",\n"
+                             "           \"publishTime\": \"publishTime0\",\n"
+                             "           \"orderingKey\": \"orderingKey0\"\n"
+                             "       },\n"
+                             "       \"deliveryAttempt\": 0\n"
+                             "    },\n"
+                             "    {\n"
+                             "       \"ackId\": \"ackId1\",\n"
+                             "       \"message\": {\n"
+                             "           \"data\": \"data1\",\n"
+                             /*"           \"attributes\": {\n"
+                             "             string: string,\n"
+                             "           },\n"*/
+                             "           \"messageId\": \"messageId1\",\n"
+                             "           \"publishTime\": \"publishTime1\",\n"
+                             "           \"orderingKey\": \"orderingKey1\"\n"
+                             "       },\n"
+                             "       \"deliveryAttempt\": 0\n"
+                             "    }\n"
+                             "  ]\n"
+                             "}";
+  struct ReceivedMessages *receivedMessages =
+      receivedMessages_from_json(json_object(json_parse_string(mock)));
+
+  receivedMessagesMock[0] = malloc(sizeof *receivedMessagesMock[0]);
+  receivedMessagesMock[0]->ackId = strdup("ackId0");
+  receivedMessagesMock[0]->message =
+      malloc(sizeof *receivedMessagesMock[0]->message);
+  receivedMessagesMock[0]->message->data = strdup("data0");
+  receivedMessagesMock[0]->message->messageId = strdup("messageId0");
+  receivedMessagesMock[0]->message->orderingKey = strdup("orderingKey0");
+  receivedMessagesMock[0]->message->publishTime = strdup("publishTime0");
+  receivedMessagesMock[0]->deliveryAttempt = 0;
+
+  receivedMessagesMock[1] = malloc(sizeof *receivedMessagesMock[1]);
+  receivedMessagesMock[1]->ackId = strdup("ackId1");
+  receivedMessagesMock[1]->message =
+      malloc(sizeof *receivedMessagesMock[1]->message);
+  receivedMessagesMock[1]->message->data = strdup("data1");
+  receivedMessagesMock[1]->message->messageId = strdup("messageId1");
+  receivedMessagesMock[1]->message->orderingKey = strdup("orderingKey1");
+  receivedMessagesMock[1]->message->publishTime = strdup("publishTime1");
+  receivedMessagesMock[1]->deliveryAttempt = 0;
+
+  receivedMessagesMock[2] = NULL;
+
+  {
+    struct ReceivedMessage *receivedMessage;
+    size_t i=0;
+    for (receivedMessage = receivedMessages->receivedMessages[i];
+         receivedMessages->receivedMessages[i];
+         receivedMessage = receivedMessages->receivedMessages[++i]) {
+      ASSERT_STR_EQ(receivedMessagesMock[i]->ackId, (*receivedMessage).ackId);
+      ASSERT_STR_EQ(receivedMessagesMock[i]->message->publishTime,
+                    (*receivedMessage).message->publishTime);
+      ASSERT_STR_EQ(receivedMessagesMock[i]->message->orderingKey,
+                    (*receivedMessage).message->orderingKey);
+      ASSERT_STR_EQ(receivedMessagesMock[i]->message->messageId,
+                    (*receivedMessage).message->messageId);
+      ASSERT_STR_EQ(receivedMessagesMock[i]->message->data,
+                    (*receivedMessage).message->data);
+      ASSERT_EQ(receivedMessagesMock[i]->deliveryAttempt,
+                (*receivedMessage).deliveryAttempt);
+    }
+  }
+
+  PASS();
+}
+
+SUITE(subscription_from_json_suite) {
+  RUN_TEST(x_subscription_from_json);
+  RUN_TEST(x_receivedMessages_from_json);
+}
 
 #ifdef __cplusplus
 }
