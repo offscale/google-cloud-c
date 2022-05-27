@@ -52,13 +52,14 @@ create_pubsub_subscription(const char *const subscription_id,
  * POST https://pubsub.googleapis.com/v1/{subscription}:pull
  * */
 struct ReceivedMessages *
-pull_pubsub_subscription(const char *const subscription_id) {
-  char *path;
+pull_pubsub_subscription(const char *const subscription_id, int maxMessages) {
+  char *path, *body;
   asprintf(&path, "/v1/%s:pull", subscription_id);
+  asprintf(&body, "{\"maxMessages\": %d}", maxMessages);
 
   {
     const struct ServerResponse response =
-        gcloud_pubsub_post(NULL, path, NULL, NULL);
+        gcloud_pubsub_post(NULL, path, body, NULL);
     DEBUG_SERVER_RESPONSE("pull_pubsub_subscription_response");
     return receivedMessages_from_json(
         json_value_get_object(json_parse_string(response.body)));

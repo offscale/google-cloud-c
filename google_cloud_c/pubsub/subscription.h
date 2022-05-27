@@ -96,7 +96,7 @@ create_pubsub_subscription(const char *, const struct Subscription *);
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.subscriptions/pull
  * */
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT struct ReceivedMessages *
-pull_pubsub_subscription(const char *subscription_id);
+pull_pubsub_subscription(const char *, int);
 
 /* Acknowledges the messages associated with the ackIds in the
  * AcknowledgeRequest. The Pub/Sub system can remove the relevant messages from
