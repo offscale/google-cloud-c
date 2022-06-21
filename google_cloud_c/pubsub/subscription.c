@@ -53,9 +53,12 @@ create_pubsub_subscription(const char *const subscription_id,
  * */
 struct ReceivedMessages *
 pull_pubsub_subscription(const char *const subscription_id, int maxMessages) {
-  char *path, *body;
+  char *path;
+  enum { n = 21 };
+  char body[n] = "{\"maxMessages\": %d}";
   asprintf(&path, "/v1/%s:pull", subscription_id);
-  asprintf(&body, "{\"maxMessages\": %d}", maxMessages);
+  sprintf(body, "%d", maxMessages);
+  body[16] = '}';
 
   {
     const struct ServerResponse response =
@@ -148,7 +151,7 @@ subscription_from_json(const JSON_Object *const jsonObject) {
   subscription->messageRetentionDuration =
       json_object_get_string(jsonObject, "messageRetentionDuration");
   if (json_object_has_value_of_type(jsonObject, "labels", JSONArray)) {
-    const JSON_Array *labels_json_items =
+    const JSON_Array *const labels_json_items =
         json_object_get_array(jsonObject, "labels");
     const size_t labels_json_items_n =
         json_array_get_count(labels_json_items) + 1;
@@ -267,7 +270,7 @@ void pubsubMessage_cleanup(struct PubsubMessage *pubsubMessage) {
 struct ReceivedMessages *
 receivedMessages_from_json(const JSON_Object *const jsonObject) {
   struct ReceivedMessages *receivedMessages = NULL;
-  const JSON_Array *json_items =
+  const JSON_Array *const json_items =
       json_object_get_array(jsonObject, "receivedMessages");
   const size_t json_items_n = json_array_get_count(json_items) + 1;
   size_t i;

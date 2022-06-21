@@ -16,7 +16,7 @@ struct Zones zone_list(void) {
         response.body[0] != '\0') {
       const JSON_Value *const zones_json_item =
           json_parse_string(response.body);
-      const JSON_Array *zone_json_items = json_object_get_array(
+      const JSON_Array *const zone_json_items = json_object_get_array(
           json_value_get_object(zones_json_item), "items");
       const size_t zone_json_items_n = json_array_get_count(zone_json_items);
       if (zone_json_items_n > 0) {

@@ -39,7 +39,7 @@ struct Instances instances_list(void) {
     if (response.status_code == 200 && response.body != NULL &&
         response.body[0] != '\0') {
       const JSON_Value *const json_item = json_parse_string(response.body);
-      const JSON_Array *json_items =
+      const JSON_Array *const json_items =
           json_object_get_array(json_value_get_object(json_item), "items");
       const size_t json_items_n = json_array_get_count(json_items);
 
@@ -49,7 +49,8 @@ struct Instances instances_list(void) {
         for (i = 0; i < json_items_n; i++) {
           const JSON_Object *const json_obj =
               json_array_get_object(json_items, i);
-          struct Instance *instance = optional_instance_from_json(json_obj);
+          struct Instance *const instance =
+              optional_instance_from_json(json_obj);
           assert(instance != NULL);
           instances[i] = instance;
         }
@@ -169,7 +170,7 @@ struct Instance *instance_insert(const struct InstanceIncomplete *instance,
       if (json_object_has_value(json_object, "machineType"))
         optionalInstance = optional_instance_from_json(json_object);
       else if (json_object_has_value(json_object, "items")) {
-        const JSON_Array *_json_items =
+        const JSON_Array *const _json_items =
             json_object_get_array(json_object, "items");
         if (json_array_get_count(_json_items) > 0) {
           const JSON_Object *const _json_object =
@@ -180,7 +181,7 @@ struct Instance *instance_insert(const struct InstanceIncomplete *instance,
       } else if (json_object_has_value(json_object, "kind") &&
                  strcmp(json_object_get_string(json_object, "kind"),
                         "compute#operation") == 0) {
-        const struct GoogleCloudOperation *optionalGoogleCloudOperation =
+        const struct GoogleCloudOperation *const optionalGoogleCloudOperation =
             google_cloud_operation_from_json(json_object);
         if (optionalGoogleCloudOperation != NULL) {
           if (strcmp(optionalGoogleCloudOperation->status, "RUNNING") == 0)
@@ -229,7 +230,10 @@ struct Instance *instance_incomplete_create_all(
     if (!network_existent)
     create_network : {
       struct Network *found_network = network_create(network_name);
-      if (found_network == NULL)
+      if (found_network == NULL) {
+        found_network = malloc(sizeof *found_network);
+        found_network->name = network_name;
+      } else if (found_network->name == NULL)
         found_network->name = network_name;
       printf("Creating the network \"%s\"\n", found_network->name);
 
@@ -349,7 +353,7 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
   struct Instance *optionalInstance = NULL;
   if (json_object_has_value(jsonObject, "operationType") &&
       json_object_has_value(jsonObject, "name")) {
-    const JSON_Array *network_json_items =
+    const JSON_Array *const network_json_items =
         json_object_get_array(jsonObject, "networkInterfaces");
     const size_t network_json_items_n =
         json_array_get_count(network_json_items) + 1;
@@ -363,7 +367,7 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
         const JSON_Object *const network_json =
             json_array_get_object(network_json_items, i);
         struct AccessConfigs **accessConfigs = NULL;
-        const JSON_Array *ac_json_items =
+        const JSON_Array *const ac_json_items =
             json_object_get_array(network_json, "accessConfigs");
         const size_t ac_json_items_n = json_array_get_count(ac_json_items);
         if (ac_json_items_n > 0) {

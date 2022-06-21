@@ -118,7 +118,7 @@ struct Binding *bindings_from_json(const JSON_Object *const jsonObject) {
 
   bindings->members = NULL;
   if (json_object_has_value_of_type(jsonObject, "members", JSONArray)) {
-    const JSON_Array *members_json_items =
+    const JSON_Array *const members_json_items =
         json_object_get_array(jsonObject, "members");
     const size_t members_json_items_n =
         json_array_get_count(members_json_items) + 1;
@@ -135,7 +135,7 @@ struct Binding *bindings_from_json(const JSON_Object *const jsonObject) {
 
   bindings->condition = NULL;
   if (json_object_has_value_of_type(jsonObject, "condition", JSONArray)) {
-    const JSON_Array *expr_json_items =
+    const JSON_Array *const expr_json_items =
         json_object_get_array(jsonObject, "condition");
     const size_t expr_json_items_n = json_array_get_count(expr_json_items) + 1;
     size_t i;
@@ -219,7 +219,7 @@ struct Policy *policy_from_json(const JSON_Object *const jsonObject) {
 
   policy->bindings = NULL;
   if (json_object_has_value_of_type(policy_obj, "bindings", JSONArray)) {
-    const JSON_Array *bindings_json_items =
+    const JSON_Array *const bindings_json_items =
         json_object_get_array(policy_obj, "bindings");
     const size_t bindings_json_items_n =
         json_array_get_count(bindings_json_items) + 1;

@@ -50,7 +50,7 @@ struct Project **project_list(void) {
 
   if (response.status_code == 200) {
     const JSON_Value *const json_value = json_parse_string(response.body);
-    const JSON_Array *projects_items_json =
+    const JSON_Array *const projects_items_json =
         json_object_get_array(json_value_get_object(json_value), "projects");
     const size_t projects_items_n = json_array_get_count(projects_items_json);
     /* if (projects_items_n == 0) return NULL; */

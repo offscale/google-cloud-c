@@ -74,7 +74,7 @@ struct ReceivedMessages {
 };
 
 struct AckIds {
-  const char *const *ackIds;
+  const char **ackIds;
 };
 
 extern GOOGLE_CLOUD_C_PUBSUB_EXPORT const char *
