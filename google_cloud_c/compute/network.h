@@ -12,12 +12,8 @@ extern "C" {
 #include <parson.h>
 
 #include <google_cloud_c/client/cloud_auth.h>
+#include <google_cloud_c/cloud_common/cloud_common.h>
 #include <google_cloud_c/compute/google_cloud_c_compute_export.h>
-
-struct Operation {
-  const char *const id, *name, *operationType, *targetLink, *targetId, *status,
-      *user, *progress, *insertTime, *startTime, *selfLink, *kind;
-};
 
 struct RoutingConfig {
   const char *const routingMode;
@@ -47,7 +43,7 @@ network_get(const char *network_name);
 /* Creates a network in the specified project using the data included in the
  * request.
  * https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert */
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Network *
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Operation *
 network_create(const char *network_name);
 
 /* utility functions */

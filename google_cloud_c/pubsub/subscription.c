@@ -324,12 +324,14 @@ void receivedMessages_cleanup(struct ReceivedMessages **receivedMessages) {
 }
 
 const char *AckIds_to_json_str(const struct AckIds *ack_ids) {
-  char *s = NULL, *w;
+  char *s = NULL;
   size_t n;
+  const char **w;
   jasprintf(&s, "{\"ackIds\": [");
 
-  for (w = (char *)ack_ids->ackIds; w != NULL; w++)
-    jasprintf(&s, "\"%s\",", w);
+  for (w = ack_ids->ackIds; *w; w++)
+    jasprintf(&s, "\"%s\",", *w);
+
   jasprintf(&s, "\0\0");
   n = strlen(s);
   s[n - 2] = ']';

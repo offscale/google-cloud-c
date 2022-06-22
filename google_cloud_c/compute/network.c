@@ -19,7 +19,7 @@ bool network_exists(const char *const network) {
   }
 }
 
-struct Network *network_create(const char *const network_name) {
+struct Operation *network_create(const char *const network_name) {
   /* CREATE THE NETWORK */
   /* https://cloud.google.com/compute/docs/reference/rest/v1/networks/insert
    * POST
@@ -38,7 +38,7 @@ struct Network *network_create(const char *const network_name) {
   asprintf(&path, "/v1/projects/%s/global/networks", AUTH_CONTEXT.project_id);
   {
     const struct ServerResponse response = gcloud_post(NULL, path, body, NULL);
-    struct Network *optional_network = NULL;
+    struct Operation *operation = NULL;
     DEBUG_SERVER_RESPONSE("network_create");
     if (response.body != NULL && response.body[0] != '\0') {
       const JSON_Value *const res_json_value = json_parse_string(response.body);
@@ -51,14 +51,16 @@ struct Network *network_create(const char *const network_name) {
         fprintf(stderr, "[code=%u] %s",
                 (unsigned)json_object_get_number(err, "code"),
                 json_object_get_string(err, "message"));
-      } else if (!json_object_has_value(res_json_object,
-                                        "autoCreateSubnetworks"))
-        fputs(response.body, stderr);
+      } else if (json_object_has_value_of_type(res_json_object, "targetId",
+                                               JSONString) &&
+                 json_object_has_value_of_type(res_json_object, "operationType",
+                                               JSONString))
+        operation = operation_from_json(res_json_object);
       else
-        optional_network = network_from_json(res_json_object);
+        fputs("Invalid response.body", stderr);
     } else
       fputs("Empty response.body", stderr);
-    return optional_network;
+    return operation;
   }
 }
 

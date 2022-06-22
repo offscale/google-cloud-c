@@ -231,7 +231,7 @@ struct Instance *instance_incomplete_create_all(
     create_network : {
       struct Network *found_network = network_create(network_name);
       if (found_network == NULL) {
-        found_network = malloc(sizeof *found_network);
+        found_network = malloc(sizeof(struct Network));
         found_network->name = network_name;
       } else if (found_network->name == NULL)
         found_network->name = network_name;
