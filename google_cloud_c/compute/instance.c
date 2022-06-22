@@ -234,7 +234,8 @@ struct Instance *instance_incomplete_create_all(
              OperationStatus_to_str(network_operation->status), network_name);
 
       while (network_operation->status != DONE) {
-        printf("[%s] Waiting for network \"%s\" to be created.\n", OperationStatus_to_str(network_operation->status), network_name);
+        printf("[%s] Waiting for network \"%s\" to be created.\n",
+               OperationStatus_to_str(network_operation->status), network_name);
 #ifdef _WIN32
         Sleep(10000);
 #else
@@ -263,7 +264,9 @@ struct Instance *instance_incomplete_create_all(
 #endif
 
       while (firewall_operation->status != DONE) {
-        printf("[%s] Waiting for firewall \"%s\" to be created.\n", OperationStatus_to_str(firewall_operation->status), firewall_name);
+        printf("[%s] Waiting for firewall \"%s\" to be created.\n",
+               OperationStatus_to_str(firewall_operation->status),
+               firewall_name);
 #ifdef _WIN32
         Sleep(10000);
 #else

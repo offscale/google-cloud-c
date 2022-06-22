@@ -77,9 +77,9 @@ struct ShieldedInstanceIntegrityPolicy {
 };
 
 enum InstanceStatus {
-  PROVISIONING,
-  STAGING,
-  INSTANCE_RUNNING=RUNNING,
+  PROVISIONING = -1,
+  STAGING = 0,
+  INSTANCE_RUNNING = RUNNING,
   STOPPING,
   SUSPENDING,
   SUSPENDED,

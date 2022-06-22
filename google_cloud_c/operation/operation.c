@@ -116,8 +116,7 @@ struct Operation *operation_from_json(const JSON_Object *const json_object) {
   return operation;
 }
 
-const char *
-operation_to_json(const struct Operation *operation) {
+const char *operation_to_json(const struct Operation *operation) {
   char *s = NULL;
   jasprintf(&s, "{");
 
