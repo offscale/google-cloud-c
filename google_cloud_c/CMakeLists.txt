@@ -1,6 +1,6 @@
 add_library("${PROJECT_NAME}" INTERFACE)
 foreach (lib
-        "common" "client" "cloud_common"
+        "common" "client" "operation"
         "compute" "project" "pubsub"
         "storage" "userinfo" "multi")
   add_subdirectory("${lib}")
@@ -8,7 +8,7 @@ foreach (lib
   list(APPEND installable_libs "${lib_name}")
   target_link_libraries("${PROJECT_NAME}" INTERFACE "${lib_name}")
 endforeach (lib
-            "common" "client" "cloud_common"
+            "common" "client" "operation"
             "compute" "project" "pubsub"
             "storage" "userinfo" "multi")
 

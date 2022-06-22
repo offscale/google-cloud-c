@@ -76,8 +76,20 @@ struct ShieldedInstanceIntegrityPolicy {
   bool updateAutoLearnPolicy /*=true*/;
 };
 
+enum InstanceStatus {
+  PROVISIONING,
+  STAGING,
+  INSTANCE_RUNNING=RUNNING,
+  STOPPING,
+  SUSPENDING,
+  SUSPENDED,
+  REPAIRING,
+  TERMINATED
+};
+
 struct Instance {
-  const char *id, *creationTimestamp, *name, *machineType, *status, *zone;
+  const char *id, *creationTimestamp, *name, *machineType, *zone;
+  enum InstanceStatus status;
   struct NetworkInterface **networkInterfaces;
   struct Disk *disks;
   struct Metadata *metadata;
@@ -153,6 +165,12 @@ NetworkInterface_from_json(const JSON_Object *);
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct AccessConfigs *
 AccessConfigs_from_json(const JSON_Object *);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT enum InstanceStatus
+str_to_InstanceStatus(const char *);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const char *
+    InstanceStatus_to_str(enum InstanceStatus);
 
 #ifdef __cplusplus
 }

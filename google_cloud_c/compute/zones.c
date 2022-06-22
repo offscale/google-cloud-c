@@ -6,7 +6,7 @@ struct Zones zone_list(void) {
   /* https://cloud.google.com/compute/docs/reference/rest/v1/zones/list
    * GET https://compute.googleapis.com/compute/v1/projects/{project}/zones */
   char *path;
-  asprintf(&path, "/compute/v1/projects/%s/zones", AUTH_CONTEXT.project_id);
+  asprintf(&path, "/v1/projects/%s/zones", AUTH_CONTEXT.project_id);
 
   {
     const struct ServerResponse response = gcloud_get(NULL, path, NULL);

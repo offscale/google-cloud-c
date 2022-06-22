@@ -3,7 +3,75 @@
 #endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
 #include <c89stringutils_string_extras.h>
 
-#include <google_cloud_c/cloud_common/cloud_common.h>
+#include <google_cloud_c/client/cloud_auth.h>
+#include <google_cloud_c/operation/operation.h>
+
+struct Operation *global_operation_get(const char *project_id,
+                                       const char *resourceId) {
+  /* Retrieves the specified Operations resource.
+   * https://cloud.google.com/compute/docs/reference/rest/v1/globalOperations/get
+   * GET
+   * https://compute.googleapis.com/compute/v1/projects/{project}/global/operations/{resourceId}
+   */
+
+  char *path;
+  asprintf(&path, "/v1/projects/%s/global/operations/%s", project_id,
+           resourceId);
+  {
+    const struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    DEBUG_SERVER_RESPONSE("operation_get_response");
+
+    return response.status_code == 200
+               ? operation_from_json(
+                     json_value_get_object(json_parse_string(response.body)))
+               : NULL;
+  }
+}
+
+struct Operation *zonal_operation_get(const char *project_id, const char *zone,
+                                      const char *resourceId) {
+  /* Retrieves the specified zone-specific Operations resource.
+   * https://cloud.google.com/compute/docs/reference/rest/v1/zoneOperations/get
+   * GET
+   * https://compute.googleapis.com/compute/v1/projects/{project}/zones/{zone}/operations/{resourceId}
+   * */
+  char *path;
+  asprintf(&path, "/v1/projects/%s/zones/%s/operations/%s", project_id, zone,
+           resourceId);
+  {
+    const struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    DEBUG_SERVER_RESPONSE("zonal_operation_get_response");
+
+    return response.status_code == 200
+               ? operation_from_json(
+                     json_value_get_object(json_parse_string(response.body)))
+               : NULL;
+  }
+}
+
+struct Operation *regional_operation_get(const char *project_id,
+                                         const char *region,
+                                         const char *resourceId) {
+  /* Retrieves the specified region-specific Operations resource.
+   * https://cloud.google.com/compute/docs/reference/rest/v1/regionOperations/get
+   * GET
+   * https://compute.googleapis.com/compute/v1/projects/{project}/regions/{region}/operations/{resourceId}
+   * */
+  char *path;
+  asprintf(&path, "/v1/projects/%s/regions/%s/operations/%s", project_id,
+           region, resourceId);
+  {
+    const struct ServerResponse response = gcloud_get(NULL, path, NULL);
+    DEBUG_SERVER_RESPONSE("regional_operation_get_response");
+
+    return response.status_code == 200
+               ? operation_from_json(
+                     json_value_get_object(json_parse_string(response.body)))
+               : NULL;
+  }
+}
+
+/* utility functions */
 
 struct Operation *operation_from_json(const JSON_Object *const json_object) {
   struct Operation *operation = malloc(sizeof *operation);
@@ -20,7 +88,9 @@ struct Operation *operation_from_json(const JSON_Object *const json_object) {
       json_object_get_string(json_object, "operationType");
   operation->targetLink = json_object_get_string(json_object, "targetLink");
   operation->targetId = json_object_get_string(json_object, "targetId");
-  operation->status = json_object_get_string(json_object, "status");
+  if (json_object_has_value_of_type(json_object, "status", JSONString))
+    operation->status =
+        str_to_OperationStatus(json_object_get_string(json_object, "status"));
   operation->statusMessage =
       json_object_get_string(json_object, "statusMessage");
   operation->user = json_object_get_string(json_object, "user");
@@ -46,7 +116,7 @@ struct Operation *operation_from_json(const JSON_Object *const json_object) {
   return operation;
 }
 
-extern GOOGLE_CLOUD_C_CLOUD_COMMON_EXPORT const char *
+const char *
 operation_to_json(const struct Operation *operation) {
   char *s = NULL;
   jasprintf(&s, "{");
@@ -82,8 +152,8 @@ operation_to_json(const struct Operation *operation) {
   if (operation->targetId != NULL && operation->targetId[0] != '\0')
     jasprintf(&s, "  \"targetId\": \"%s\",", operation->targetId);
 
-  if (operation->status != NULL && operation->status[0] != '\0')
-    jasprintf(&s, "  \"status\": \"%s\",", operation->status);
+  jasprintf(&s, "  \"status\": \"%s\",",
+            OperationStatus_to_str(operation->status));
 
   if (operation->statusMessage != NULL && operation->statusMessage[0] != '\0')
     jasprintf(&s, "  \"statusMessage\": \"%s\",", operation->statusMessage);
@@ -130,4 +200,24 @@ operation_to_json(const struct Operation *operation) {
   jasprintf(&s, "\0");
   s[strlen(s) - 1] = '}';
   return s;
+}
+
+enum OperationStatus str_to_OperationStatus(const char *const status) {
+  if (strcmp(status, "DONE") == 0)
+    return DONE;
+  else if (strcmp(status, "RUNNING") == 0)
+    return RUNNING;
+  return PENDING;
+}
+
+const char *OperationStatus_to_str(enum OperationStatus status) {
+  switch (status) {
+  case RUNNING:
+    return "RUNNING";
+  case DONE:
+    return "DONE";
+  case PENDING:
+  default:
+    return "PENDING";
+  }
 }

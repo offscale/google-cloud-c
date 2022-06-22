@@ -12,8 +12,8 @@ extern "C" {
 #include <parson.h>
 
 #include <google_cloud_c/client/cloud_auth.h>
-#include <google_cloud_c/cloud_common/cloud_common.h>
 #include <google_cloud_c/compute/google_cloud_c_compute_export.h>
+#include <google_cloud_c/operation/operation.h>
 
 struct RoutingConfig {
   const char *const routingMode;

@@ -1,11 +1,6 @@
 #ifndef GOOGLE_CLOUD_C_FIREWALL_H
 #define GOOGLE_CLOUD_C_FIREWALL_H
 
-#include <stdio.h>
-
-#include <google_cloud_c/client/cloud_auth.h>
-#include <google_cloud_c/compute/google_cloud_c_compute_export.h>
-
 #ifdef __cplusplus
 extern "C" {
 #elif __STDC_VERSION__ >= 199901L
@@ -13,6 +8,12 @@ extern "C" {
 #else
 #include <google_cloud_c/common/google_cloud_c_stdbool.h>
 #endif /* __cplusplus */
+
+#include <stdio.h>
+
+#include <google_cloud_c/client/cloud_auth.h>
+#include <google_cloud_c/compute/google_cloud_c_compute_export.h>
+#include <google_cloud_c/operation/operation.h>
 
 struct Firewall {
   const char *name;
@@ -31,7 +32,7 @@ extern GOOGLE_CLOUD_C_COMPUTE_EXPORT bool firewall_exists(const char *);
  * the request.
  * https://cloud.google.com/compute/docs/reference/rest/v1/firewalls/insert
  * */
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Firewall *
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Operation *
 firewall_create(const char *, const char *);
 
 /* Returns the specified firewall.

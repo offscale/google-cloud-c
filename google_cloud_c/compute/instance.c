@@ -62,7 +62,8 @@ struct Instances instances_list(void) {
 }
 
 struct Instance *instance_get(const char *const instance_name) {
-  /* https://cloud.google.com/compute/docs/reference/rest/v1/instances/get
+  /* Returns the specified Instance resource.
+   * https://cloud.google.com/compute/docs/reference/rest/v1/instances/get
    * GET
    * https://compute.googleapis.com/compute/v1/projects/{project}/zones/{zone}/instances/{resourceId}*/
 
@@ -208,7 +209,6 @@ struct Instance *instance_incomplete_create_all(
 
   /* TODO: Proper request/response handling with structs and all for network and
    * firewall rules */
-  unsigned short max_attempts = 4;
   char *_network_name, *_firewall_name;
   if (network_name == NULL) {
     asprintf(&_network_name, "%s-net", instance->name);
@@ -227,40 +227,33 @@ struct Instance *instance_incomplete_create_all(
 
     puts("instance_incomplete_create_all dance");
 
-    if (!network_existent)
-    create_network : {
-      struct Network *found_network = network_create(network_name);
-      if (found_network == NULL) {
-        found_network = malloc(sizeof(struct Network));
-        found_network->name = network_name;
-      } else if (found_network->name == NULL)
-        found_network->name = network_name;
-      printf("Creating the network \"%s\"\n", found_network->name);
+    if (!network_existent) {
+      struct Operation *network_operation = network_create(network_name);
+      const char *const network_targetId = strdup(network_operation->targetId);
+      printf("[%s] Creating the network \"%s\"\n",
+             OperationStatus_to_str(network_operation->status), network_name);
 
-      /* Wait 30 seconds: TODO check status continually until it's ready */
-#ifdef _WIN32
-      Sleep(30000);
-#else
-      sleep(30);
-#endif
-
-      do {
-        printf("Waiting for network \"%s\" to be created.\n", network_name);
+      while (network_operation->status != DONE) {
+        printf("[%s] Waiting for network \"%s\" to be created.\n", OperationStatus_to_str(network_operation->status), network_name);
 #ifdef _WIN32
         Sleep(10000);
 #else
         sleep(100);
 #endif
-        found_network = network_get(network_name);
-      } while (found_network == NULL);
+        network_operation =
+            global_operation_get(AUTH_CONTEXT.project_id, network_targetId);
+      }
     }
 
-      firewall_existent = firewall_exists(firewall_name);
+    firewall_existent = firewall_exists(firewall_name);
 
     if (!firewall_existent) {
-      struct Firewall *optionalFirewall =
+      struct Operation *firewall_operation =
           firewall_create(network_name, firewall_name);
-      printf("Firewall created: \"%s\"\n", optionalFirewall->name);
+      const char *const firewall_targetId =
+          strdup(firewall_operation->targetId);
+      printf("[%s] Creating the firewall \"%s\"\n",
+             OperationStatus_to_str(firewall_operation->status), firewall_name);
 
       /* Wait 30 seconds: TODO check status continually until it's ready */
 #ifdef _WIN32
@@ -269,63 +262,51 @@ struct Instance *instance_incomplete_create_all(
       sleep(30);
 #endif
 
-      {
-        do {
-          printf("Waiting for firewall \"%s\" to be created.\n", firewall_name);
+      while (firewall_operation->status != DONE) {
+        printf("[%s] Waiting for firewall \"%s\" to be created.\n", OperationStatus_to_str(firewall_operation->status), firewall_name);
 #ifdef _WIN32
-          Sleep(10000);
+        Sleep(10000);
 #else
-          sleep(100);
+        sleep(100);
 #endif
-          optionalFirewall = firewall_get(network_name);
-          if (--max_attempts == 0 && optionalFirewall == NULL) {
-            max_attempts = 4;
-            goto create_network;
-          }
-        } while (optionalFirewall == NULL);
+        firewall_operation =
+            global_operation_get(AUTH_CONTEXT.project_id, firewall_targetId);
       }
     }
 
     instance_existent = instance_exists(instance->name);
 
     {
-      struct Instance *optionalInstance;
+      struct Instance *instance_created;
       if (!instance_existent) {
-        optionalInstance =
+        instance_created =
             instance_insert(instance, network_name, shell_script);
-        if (optionalInstance->name == NULL)
-          optionalInstance->name = instance->name;
-        printf("Creating instance: \"%s\"\n", optionalInstance->name);
-        if (strcmp(optionalInstance->status, "RUNNING") == 0)
-          return optionalInstance;
-
+        printf("[%s] Creating instance: \"%s\"\n",
+               InstanceStatus_to_str(instance_created->status),
+               instance_created->name);
+        while (instance_created->status != INSTANCE_RUNNING) {
           /* Wait 30 seconds: TODO check status continually until it's ready */
 #ifdef _WIN32
-        Sleep(30000);
+          Sleep(30000);
 #else
-        sleep(30);
+          sleep(30);
 #endif
 
-        {
-          do {
-            if (--max_attempts == 0) {
-              max_attempts = 4;
-              goto create_network;
-            }
-            printf("Waiting for instance \"%s\" to be created.\n",
-                   instance->name);
+          printf("[%s] Waiting for instance \"%s\" to be created and start "
+                 "running.\n",
+                 InstanceStatus_to_str(instance_created->status),
+                 instance->name);
 #ifdef _WIN32
-            Sleep(10000);
+          Sleep(10000);
 #else
-            sleep(100);
+          sleep(100);
 #endif
-            optionalInstance = instance_get(optionalInstance->name);
-          } while (optionalInstance == NULL);
+          instance_created = instance_get(instance_created->name);
         }
       } else
-        optionalInstance = instance_get((*instance).name);
+        instance_created = instance_get((*instance).name);
 
-      return optionalInstance;
+      return instance_created;
     }
   }
 }
@@ -457,7 +438,9 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
       json_object_get_string(jsonObject, "creationTimestamp");
   instance->name = json_object_get_string(jsonObject, "name");
   instance->machineType = json_object_get_string(jsonObject, "machineType");
-  instance->status = json_object_get_string(jsonObject, "status");
+  if (json_object_has_value_of_type(jsonObject, "status", JSONString))
+    instance->status =
+        str_to_InstanceStatus(json_object_get_string(jsonObject, "status"));
   instance->zone = json_object_get_string(jsonObject, "zone");
   instance->disks = NULL /*std::vector<struct Disk>()*/;
   instance->selfLink = json_object_get_string(jsonObject, "selfLink");
@@ -480,4 +463,45 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
       json_object_get_string(jsonObject, "lastStartTimestamp");
   instance->kind = json_object_get_string(jsonObject, "kind");
   return instance;
+}
+
+enum InstanceStatus str_to_InstanceStatus(const char *const status) {
+  if (strcmp(status, "PROVISIONING") == 0)
+    return PROVISIONING;
+  else if (strcmp(status, "RUNNING") == 0)
+    return INSTANCE_RUNNING;
+  else if (strcmp(status, "STOPPING") == 0)
+    return STOPPING;
+  else if (strcmp(status, "SUSPENDING") == 0)
+    return SUSPENDING;
+  else if (strcmp(status, "SUSPENDED") == 0)
+    return SUSPENDED;
+  else if (strcmp(status, "REPAIRING") == 0)
+    return REPAIRING;
+  else if (strcmp(status, "TERMINATED") == 0)
+    return TERMINATED;
+  /*else if (strcmp(status, "STAGING") == 0)*/
+  return STAGING;
+}
+
+const char *InstanceStatus_to_str(enum InstanceStatus status) {
+  switch (status) {
+  case PROVISIONING:
+    return "PROVISIONING";
+  case INSTANCE_RUNNING:
+    return "RUNNING";
+  case STOPPING:
+    return "STOPPING";
+  case SUSPENDING:
+    return "SUSPENDING";
+  case SUSPENDED:
+    return "SUSPENDED";
+  case REPAIRING:
+    return "REPAIRING";
+  case TERMINATED:
+    return "TERMINATED";
+  case STAGING:
+  default:
+    return "STAGING";
+  }
 }
