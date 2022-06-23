@@ -1,9 +1,5 @@
 #include <parson.h>
 
-#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
-#define C89STRINGUTILS_IMPLEMENTATION
-#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
-
 #include <google_cloud_c/compute/compute_common.h>
 
 struct GoogleCloudOperation *

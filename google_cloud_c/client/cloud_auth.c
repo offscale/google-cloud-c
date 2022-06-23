@@ -1,6 +1,3 @@
-#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
-#define C89STRINGUTILS_IMPLEMENTATION
-#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
 #include <c89stringutils_string_extras.h>
 
 #include <google_cloud_c/client/cloud_auth.h>
