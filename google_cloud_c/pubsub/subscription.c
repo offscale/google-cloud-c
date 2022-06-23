@@ -1,5 +1,6 @@
 #include <parson.h>
 
+#define C89STRINGUTILS_IMPLEMENTATION
 #include <c89stringutils_string_extras.h>
 
 #include <google_cloud_c/client/cloud_auth.h>

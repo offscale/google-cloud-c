@@ -32,6 +32,9 @@ target_link_libraries(
         "unofficial::parson::parson"
 )
 
+find_path(C89STRINGUTILS_INCLUDE_DIRS "c89stringutils_string_extras.h")
+target_include_directories("${LIBRARY_NAME}" PRIVATE ${C89STRINGUTILS_INCLUDE_DIRS})
+
 set_target_properties(
         "${LIBRARY_NAME}"
         PROPERTIES

@@ -31,13 +31,18 @@ else ()
     get_curl(CURL_LINK_LIBRARIES)
 endif ()
 
+find_path(C89STRINGUTILS_INCLUDE_DIRS "c89stringutils_string_extras.h")
+
 target_link_libraries(
         "${LIBRARY_NAME}"
         PUBLIC
         "unofficial::parson::parson"
         "libcurl-simple-https"
         "${CURL_LINK_LIBRARIES}"
+        "${PROJECT_NAME}_client"
 )
+
+target_include_directories("${LIBRARY_NAME}" PRIVATE ${C89STRINGUTILS_INCLUDE_DIRS})
 
 set_target_properties(
         "${LIBRARY_NAME}"

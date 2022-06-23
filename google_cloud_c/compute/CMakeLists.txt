@@ -44,6 +44,7 @@ target_link_libraries(
         "${LIBRARY_NAME}"
         PUBLIC
         "${PROJECT_NAME}_common"
+        "${PROJECT_NAME}_operation"
 )
 
 set_target_properties(

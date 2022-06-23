@@ -70,9 +70,9 @@ target_link_libraries(
         #"${PROJECT_NAME}_compiler_flags"
         "${PROJECT_NAME}_pubsub"
 )
-if (NOT WIN32)
-    target_compile_definitions("${LIBRARY_NAME}" PRIVATE C89STRINGUTILS_IMPLEMENTATION)
-endif (NOT WIN32)
+#if (NOT WIN32)
+#    target_compile_definitions("${LIBRARY_NAME}" PRIVATE C89STRINGUTILS_IMPLEMENTATION)
+#endif (NOT WIN32)
 
 set_target_properties(
         "${LIBRARY_NAME}"
@@ -114,9 +114,9 @@ target_link_libraries(
         "${LIBRARY_NAME}"
         "${PROJECT_NAME}_pubsub"
 )
-if (NOT WIN32)
-    target_compile_definitions("${EXEC_NAME}" PRIVATE C89STRINGUTILS_IMPLEMENTATION)
-endif (NOT WIN32)
+#if (NOT WIN32)
+#    target_compile_definitions("${EXEC_NAME}" PRIVATE C89STRINGUTILS_IMPLEMENTATION)
+#endif (NOT WIN32)
 
 add_test(NAME "${EXEC_NAME}"
          COMMAND "${EXEC_NAME}"

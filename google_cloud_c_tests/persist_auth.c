@@ -12,7 +12,9 @@
 #define NUM_FORMAT "ld"
 #endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
 
-#include <cauthflow_server.h>
+#include <string.h>
+/*#include <cauthflow_server.h>
+#include "cauthflow_types_common.h"*/
 #include <google_auth.h>
 
 #include "google_cloud_c_configure.h"
@@ -24,6 +26,30 @@ time_t ACCESS_TOKEN_EXPIRY = 0;
 const char *PROJECT_ID = NULL;
 
 const char *get_file_contents(const char *);
+
+/*struct StrStr {
+  const char *first, *second;
+};*/
+
+struct StrStr mocked_redirect_dance(const char *s, const char *h) {
+  const struct StrStr str_str = {s, h};
+  return str_str;
+}
+
+extern struct GoogleCloudProject mocked_get_google_auth(
+    const char *client_id, const char *client_secret, const char *refresh_token,
+    struct StrStr (*redirect_handler)(const char *, const char *)) {
+  struct GoogleCloudProject project;
+  project.google_access_token = NULL;
+  project.google_access_token_expiry = 0;
+  project.google_refresh_token = NULL;
+  project.projectId = client_id;
+  project.name = client_secret;
+  project.lifecycleState = refresh_token;
+  project.projectNumber = NULL;
+  redirect_handler(client_id, refresh_token);
+  return project;
+}
 
 void auth() {
 #define REFRESH_FILEPATH "refresh_token.txt"
@@ -43,8 +69,8 @@ void auth() {
       ACCESS_TOKEN_EXPIRY = strtol(
           strdup(get_file_contents(ACCESS_TOKEN_EXPIRY_FILEPATH)), &end, 10);
     } else {
-      struct GoogleCloudProject google_cloud_project = get_google_auth(
-          CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN, redirect_dance);
+      struct GoogleCloudProject google_cloud_project = mocked_get_google_auth(
+          CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN, mocked_redirect_dance);
       FILE *fh;
 #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
       fopen_s(&fh, ACCESS_FILEPATH, "wt");
@@ -55,9 +81,9 @@ void auth() {
       fclose(fh);
     }
   } else {
-    struct GoogleCloudProject google_cloud_project =
-        get_google_auth(CLIENT_ID, CLIENT_SECRET,
-                        /*refresh_token*/ REFRESH_TOKEN, redirect_dance);
+    struct GoogleCloudProject google_cloud_project = mocked_get_google_auth(
+        CLIENT_ID, CLIENT_SECRET,
+        /*refresh_token*/ REFRESH_TOKEN, mocked_redirect_dance);
 
     FILE *fh;
 #if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)

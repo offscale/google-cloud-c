@@ -84,15 +84,15 @@ target_link_libraries(
         "${PROJECT_NAME}"
 )
 
-find_package(cauthflow CONFIG REQUIRED)
-target_link_libraries(
-        "${EXEC_NAME}"
-        PRIVATE
-        "cauthflow"
-        "cauthflow_utils"
-        "cauthflow_google_auth"
-        "cauthflow_compiler_flags"
-)
+#find_package(cauthflow CONFIG REQUIRED)
+#target_link_libraries(
+#        "${EXEC_NAME}"
+#        PRIVATE
+#        "cauthflow"
+#        "cauthflow_utils"
+#        "cauthflow_google_auth"
+#        "cauthflow_compiler_flags"
+#)
 
 add_test(NAME "${EXEC_NAME}"
          COMMAND "${EXEC_NAME}"
