@@ -31,8 +31,6 @@ else ()
     get_curl(CURL_LINK_LIBRARIES)
 endif ()
 
-find_path(C89STRINGUTILS_INCLUDE_DIRS "c89stringutils_string_extras.h")
-
 target_link_libraries(
         "${LIBRARY_NAME}"
         PUBLIC
@@ -42,7 +40,8 @@ target_link_libraries(
         "${PROJECT_NAME}_client"
 )
 
-target_include_directories("${LIBRARY_NAME}" PRIVATE ${C89STRINGUTILS_INCLUDE_DIRS})
+find_package(c89stringutils CONFIG REQUIRED)
+target_link_libraries("${LIBRARY_NAME}" PRIVATE "c89stringutils" "c89stringutils_compiler_flags")
 
 set_target_properties(
         "${LIBRARY_NAME}"
