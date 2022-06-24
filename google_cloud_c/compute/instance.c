@@ -350,7 +350,7 @@ const char *instance_complete_to_json(const struct Instance *const instance) {
     jasprintf(&s, "  \"machineType\": \"%s\",", instance->machineType);
 
   jasprintf(&s, "  \"status\": \"%s\",",
-            str_to_InstanceStatus(instance->status));
+            InstanceStatus_to_str(instance->status));
 
   if (instance->zone != NULL && instance->zone[0] != '\0')
     jasprintf(&s, "  \"zone\": \"%s\",", instance->zone);
