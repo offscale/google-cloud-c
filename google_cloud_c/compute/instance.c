@@ -349,8 +349,8 @@ const char *instance_complete_to_json(const struct Instance *const instance) {
   if (instance->machineType != NULL && instance->machineType[0] != '\0')
     jasprintf(&s, "  \"machineType\": \"%s\",", instance->machineType);
 
-  /*if (instance->status != NULL && instance->status[0] != '\0')
-    jasprintf(&s, "  \"status\": \"%s\",", instance->status);*/
+  jasprintf(&s, "  \"status\": \"%s\",",
+            str_to_InstanceStatus(instance->status));
 
   if (instance->zone != NULL && instance->zone[0] != '\0')
     jasprintf(&s, "  \"zone\": \"%s\",", instance->zone);
@@ -603,10 +603,11 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
 
   /*instance->tags = json_object_get_string(jsonObject, "tags");*/
 
-  instance->machineType =
-      json_object_get_string(jsonObject, "machineType");
+  instance->machineType = json_object_get_string(jsonObject, "machineType");
 
-  /*instance->status = json_object_get_string(jsonObject, "status");*/
+  if (json_object_has_value_of_type(jsonObject, "status", JSONString))
+    instance->status =
+        str_to_InstanceStatus(json_object_get_string(jsonObject, "status"));
 
   instance->zone = json_object_get_string(jsonObject, "zone");
 
@@ -622,8 +623,7 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
   /*instance->scheduling = json_object_get_string(jsonObject,
    * "scheduling");*/
 
-  instance->cpuPlatform =
-      json_object_get_string(jsonObject, "cpuPlatform");
+  instance->cpuPlatform = json_object_get_string(jsonObject, "cpuPlatform");
 
   instance->labelFingerprint =
       json_object_get_string(jsonObject, "labelFingerprint");
@@ -640,8 +640,7 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
   instance->shieldedInstanceIntegrityPolicy =
   json_object_get_string(jsonObject, "shieldedInstanceIntegrityPolicy");*/
 
-  instance->fingerprint =
-      json_object_get_string(jsonObject, "fingerprint");
+  instance->fingerprint = json_object_get_string(jsonObject, "fingerprint");
 
   return instance;
 }
