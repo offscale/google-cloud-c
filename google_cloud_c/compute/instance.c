@@ -210,6 +210,12 @@ struct Instance *instance_incomplete_create_all(
   /* TODO: Proper request/response handling with structs and all for network and
    * firewall rules */
   char *_network_name, *_firewall_name;
+  struct Network *optionalNetwork;
+
+  bool network_existent, firewall_existent = false, instance_existent = false;
+
+  struct Instance *instance_found;
+
   if (network_name == NULL) {
     asprintf(&_network_name, "%s-net", instance->name);
     network_name = _network_name;
@@ -219,43 +225,66 @@ struct Instance *instance_incomplete_create_all(
     firewall_name = _firewall_name;
   }
 
-  {
-    struct Network *optionalNetwork = network_get(network_name);
+  optionalNetwork = network_get(network_name);
+  network_existent = optionalNetwork != NULL;
 
-    bool network_existent = optionalNetwork != NULL, firewall_existent = false,
-         instance_existent = false;
+  puts("instance_incomplete_create_all dance");
 
-    puts("instance_incomplete_create_all dance");
+  if (!network_existent) {
+    struct Operation *network_operation = network_create(network_name);
+    const char *const network_op_name = strdup(network_operation->name);
+    printf("[%s] Creating the network \"%s\"\n",
+           OperationStatus_to_str(network_operation->status), network_name);
 
-    if (!network_existent) {
-      struct Operation *network_operation = network_create(network_name);
-      const char *const network_targetId = strdup(network_operation->targetId);
-      printf("[%s] Creating the network \"%s\"\n",
+    while (network_operation->status != DONE) {
+      printf("[%s] Waiting for network \"%s\" to be created.\n",
              OperationStatus_to_str(network_operation->status), network_name);
-
-      while (network_operation->status != DONE) {
-        printf("[%s] Waiting for network \"%s\" to be created.\n",
-               OperationStatus_to_str(network_operation->status), network_name);
 #ifdef _WIN32
-        Sleep(10000);
+      Sleep(10000);
 #else
-        sleep(100);
+      sleep(100);
 #endif
-        network_operation =
-            global_operation_get(AUTH_CONTEXT.project_id, network_targetId);
-      }
+      network_operation =
+          global_operation_get(AUTH_CONTEXT.project_id, network_op_name);
     }
+  }
 
-    firewall_existent = firewall_exists(firewall_name);
+  firewall_existent = firewall_exists(firewall_name);
 
-    if (!firewall_existent) {
-      struct Operation *firewall_operation =
-          firewall_create(network_name, firewall_name);
-      const char *const firewall_targetId =
-          strdup(firewall_operation->targetId);
-      printf("[%s] Creating the firewall \"%s\"\n",
+  if (!firewall_existent) {
+    struct Operation *firewall_operation =
+        firewall_create(network_name, firewall_name);
+    const char *const firewall_op_name = strdup(firewall_operation->name);
+    printf("[%s] Creating the firewall \"%s\"\n",
+           OperationStatus_to_str(firewall_operation->status), firewall_name);
+
+    /* Wait 30 seconds: TODO check status continually until it's ready */
+#ifdef _WIN32
+    Sleep(30000);
+#else
+    sleep(30);
+#endif
+
+    while (firewall_operation->status != DONE) {
+      printf("[%s] Waiting for firewall \"%s\" to be created.\n",
              OperationStatus_to_str(firewall_operation->status), firewall_name);
+#ifdef _WIN32
+      Sleep(10000);
+#else
+      sleep(100);
+#endif
+      firewall_operation =
+          global_operation_get(AUTH_CONTEXT.project_id, firewall_op_name);
+    }
+  }
 
+  instance_existent = instance_exists(instance->name);
+
+  if (!instance_existent) {
+    instance_found = instance_insert(instance, network_name, shell_script);
+    printf("[%s] Creating instance: \"%s\"\n",
+           InstanceStatus_to_str(instance_found->status), instance_found->name);
+    while (instance_found->status != INSTANCE_RUNNING) {
       /* Wait 30 seconds: TODO check status continually until it's ready */
 #ifdef _WIN32
       Sleep(30000);
@@ -263,55 +292,20 @@ struct Instance *instance_incomplete_create_all(
       sleep(30);
 #endif
 
-      while (firewall_operation->status != DONE) {
-        printf("[%s] Waiting for firewall \"%s\" to be created.\n",
-               OperationStatus_to_str(firewall_operation->status),
-               firewall_name);
+      printf("[%s] Waiting for instance \"%s\" to be created and start "
+             "running.\n",
+             InstanceStatus_to_str(instance_found->status), instance->name);
 #ifdef _WIN32
-        Sleep(10000);
+      Sleep(10000);
 #else
-        sleep(100);
+      sleep(100);
 #endif
-        firewall_operation =
-            global_operation_get(AUTH_CONTEXT.project_id, firewall_targetId);
-      }
+      instance_found = instance_get(instance_found->name);
     }
+  } else
+    instance_found = instance_get(instance->name);
 
-    instance_existent = instance_exists(instance->name);
-
-    {
-      struct Instance *instance_created;
-      if (!instance_existent) {
-        instance_created =
-            instance_insert(instance, network_name, shell_script);
-        printf("[%s] Creating instance: \"%s\"\n",
-               InstanceStatus_to_str(instance_created->status),
-               instance_created->name);
-        while (instance_created->status != INSTANCE_RUNNING) {
-          /* Wait 30 seconds: TODO check status continually until it's ready */
-#ifdef _WIN32
-          Sleep(30000);
-#else
-          sleep(30);
-#endif
-
-          printf("[%s] Waiting for instance \"%s\" to be created and start "
-                 "running.\n",
-                 InstanceStatus_to_str(instance_created->status),
-                 instance->name);
-#ifdef _WIN32
-          Sleep(10000);
-#else
-          sleep(100);
-#endif
-          instance_created = instance_get(instance_created->name);
-        }
-      } else
-        instance_created = instance_get((*instance).name);
-
-      return instance_created;
-    }
-  }
+  return instance_found;
 }
 
 /* Utility functions */
@@ -330,6 +324,85 @@ const char *instance_to_json(const struct InstanceIncomplete *instance) {
            instance->name, instance->zone, instance->machineType,
            instance->cpuPlatform, instance->hostname, instance->kind);
   return instance_json_str;
+}
+
+const char *instance_complete_to_json(const struct Instance *const instance) {
+  char *s = NULL;
+  jasprintf(&s, "{");
+  if (instance->kind != NULL && instance->kind[0] != '\0')
+    jasprintf(&s, "  \"kind\": \"%s\",", instance->kind);
+
+  if (instance->id != NULL && instance->id[0] != '\0')
+    jasprintf(&s, "  \"id\": \"%s\",", instance->id);
+
+  if (instance->creationTimestamp != NULL &&
+      instance->creationTimestamp[0] != '\0')
+    jasprintf(&s, "  \"creationTimestamp\": \"%s\",",
+              instance->creationTimestamp);
+
+  if (instance->name != NULL && instance->name[0] != '\0')
+    jasprintf(&s, "  \"name\": \"%s\",", instance->name);
+
+  /*if (instance->tags != NULL && instance->tags[0] != '\0')
+    jasprintf(&s, "  \"tags\": \"%s\",", instance->tags);*/
+
+  if (instance->machineType != NULL && instance->machineType[0] != '\0')
+    jasprintf(&s, "  \"machineType\": \"%s\",", instance->machineType);
+
+  /*if (instance->status != NULL && instance->status[0] != '\0')
+    jasprintf(&s, "  \"status\": \"%s\",", instance->status);*/
+
+  if (instance->zone != NULL && instance->zone[0] != '\0')
+    jasprintf(&s, "  \"zone\": \"%s\",", instance->zone);
+
+  /*if (instance->networkInterfaces != NULL && instance->networkInterfaces[0] !=
+    '\0') jasprintf(&s, "  \"networkInterfaces\": \"%s\",",
+    instance->networkInterfaces);*/
+
+  if (instance->disks != NULL && instance->disks[0] != '\0')
+    jasprintf(&s, "  \"disks\": \"%s\",", instance->disks);
+
+  if (instance->metadata != NULL && instance->metadata[0] != '\0')
+    jasprintf(&s, "  \"metadata\": \"%s\",", instance->metadata);
+
+  if (instance->selfLink != NULL && instance->selfLink[0] != '\0')
+    jasprintf(&s, "  \"selfLink\": \"%s\",", instance->selfLink);
+
+  /*if (instance->scheduling != NULL && instance->scheduling[0] != '\0')
+    jasprintf(&s, "  \"scheduling\": \"%s\",", instance->scheduling);*/
+
+  if (instance->cpuPlatform != NULL && instance->cpuPlatform[0] != '\0')
+    jasprintf(&s, "  \"cpuPlatform\": \"%s\",", instance->cpuPlatform);
+
+  if (instance->labelFingerprint != NULL &&
+      instance->labelFingerprint[0] != '\0')
+    jasprintf(&s, "  \"labelFingerprint\": \"%s\",",
+              instance->labelFingerprint);
+
+  /*if (instance->startRestricted != NULL && instance->startRestricted[0] !=
+    '\0') jasprintf(&s, "  \"startRestricted\": \"%s\",",
+    instance->startRestricted);*/
+
+  /*if (instance->deletionProtection != NULL && instance->deletionProtection[0]
+    != '\0') jasprintf(&s, "  \"deletionProtection\": \"%s\",",
+    instance->deletionProtection);*/
+
+  if (instance->shieldedInstanceConfig != NULL &&
+      instance->shieldedInstanceConfig[0] != '\0')
+    jasprintf(&s, "  \"shieldedInstanceConfig\": \"%s\",",
+              instance->shieldedInstanceConfig);
+
+  if (instance->shieldedInstanceIntegrityPolicy != NULL &&
+      instance->shieldedInstanceIntegrityPolicy[0] != '\0')
+    jasprintf(&s, "  \"shieldedInstanceIntegrityPolicy\": \"%s\",",
+              instance->shieldedInstanceIntegrityPolicy);
+
+  if (instance->fingerprint != NULL && instance->fingerprint[0] != '\0')
+    jasprintf(&s, "  \"fingerprint\": \"%s\",", instance->fingerprint);
+
+  jasprintf(&s, "\0");
+  s[strlen(s) - 1] = '}';
+  return s;
 }
 
 struct Instance *
@@ -406,6 +479,58 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
           shieldedInstanceIntegrityPolicy;
     }
   }
+
+  optionalInstance->kind = json_object_get_string(jsonObject, "kind");
+
+  optionalInstance->id = json_object_get_string(jsonObject, "id");
+
+  optionalInstance->creationTimestamp =
+      json_object_get_string(jsonObject, "creationTimestamp");
+
+  optionalInstance->name = json_object_get_string(jsonObject, "name");
+
+  /*optionalInstance->tags = json_object_get_string(jsonObject, "tags");*/
+
+  optionalInstance->machineType =
+      json_object_get_string(jsonObject, "machineType");
+
+  /*optionalInstance->status = json_object_get_string(jsonObject, "status");*/
+
+  optionalInstance->zone = json_object_get_string(jsonObject, "zone");
+
+  /*optionalInstance->networkInterfaces = json_object_get_string(jsonObject,
+   * "networkInterfaces");*/
+
+  /*optionalInstance->disks = json_object_get_string(jsonObject, "disks");
+
+  optionalInstance->metadata = json_object_get_string(jsonObject, "metadata");*/
+
+  optionalInstance->selfLink = json_object_get_string(jsonObject, "selfLink");
+
+  /*optionalInstance->scheduling = json_object_get_string(jsonObject,
+   * "scheduling");*/
+
+  optionalInstance->cpuPlatform =
+      json_object_get_string(jsonObject, "cpuPlatform");
+
+  optionalInstance->labelFingerprint =
+      json_object_get_string(jsonObject, "labelFingerprint");
+
+  /*optionalInstance->startRestricted = json_object_get_string(jsonObject,
+  "startRestricted");
+
+  optionalInstance->deletionProtection = json_object_get_string(jsonObject,
+  "deletionProtection");
+
+  optionalInstance->shieldedInstanceConfig = json_object_get_string(jsonObject,
+  "shieldedInstanceConfig");
+
+  optionalInstance->shieldedInstanceIntegrityPolicy =
+  json_object_get_string(jsonObject, "shieldedInstanceIntegrityPolicy");*/
+
+  optionalInstance->fingerprint =
+      json_object_get_string(jsonObject, "fingerprint");
+
   return optionalInstance;
 }
 
@@ -465,6 +590,59 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
   instance->lastStartTimestamp =
       json_object_get_string(jsonObject, "lastStartTimestamp");
   instance->kind = json_object_get_string(jsonObject, "kind");
+
+  /* generated versions */
+  instance->kind = json_object_get_string(jsonObject, "kind");
+
+  instance->id = json_object_get_string(jsonObject, "id");
+
+  instance->creationTimestamp =
+      json_object_get_string(jsonObject, "creationTimestamp");
+
+  instance->name = json_object_get_string(jsonObject, "name");
+
+  /*instance->tags = json_object_get_string(jsonObject, "tags");*/
+
+  instance->machineType =
+      json_object_get_string(jsonObject, "machineType");
+
+  /*instance->status = json_object_get_string(jsonObject, "status");*/
+
+  instance->zone = json_object_get_string(jsonObject, "zone");
+
+  /*instance->networkInterfaces = json_object_get_string(jsonObject,
+   * "networkInterfaces");*/
+
+  /*instance->disks = json_object_get_string(jsonObject, "disks");
+
+  instance->metadata = json_object_get_string(jsonObject, "metadata");*/
+
+  instance->selfLink = json_object_get_string(jsonObject, "selfLink");
+
+  /*instance->scheduling = json_object_get_string(jsonObject,
+   * "scheduling");*/
+
+  instance->cpuPlatform =
+      json_object_get_string(jsonObject, "cpuPlatform");
+
+  instance->labelFingerprint =
+      json_object_get_string(jsonObject, "labelFingerprint");
+
+  /*instance->startRestricted = json_object_get_string(jsonObject,
+  "startRestricted");
+
+  instance->deletionProtection = json_object_get_string(jsonObject,
+  "deletionProtection");
+
+  instance->shieldedInstanceConfig = json_object_get_string(jsonObject,
+  "shieldedInstanceConfig");
+
+  instance->shieldedInstanceIntegrityPolicy =
+  json_object_get_string(jsonObject, "shieldedInstanceIntegrityPolicy");*/
+
+  instance->fingerprint =
+      json_object_get_string(jsonObject, "fingerprint");
+
   return instance;
 }
 
