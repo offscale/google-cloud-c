@@ -37,10 +37,19 @@ set(Header_Files
         "subscription_mocks.h"
         "test_subscription_to_json.h"
         "test_subscription_from_json.h"
+
+        "instance_mocks.h"
+        "test_instance_from_json.h"
 )
 source_group("${LIBRARY_NAME} Header Files" FILES "${Header_Files}")
 
-set(Source_Files "policy_mocks.c" "subscription_mocks.c")
+set(Source_Files
+        "policy_mocks.c"
+
+        "subscription_mocks.c"
+
+        "instance_mocks.c"
+)
 source_group("${LIBRARY_NAME} Source Files" FILES "${Source_Files}")
 
 add_library("${LIBRARY_NAME}" "${Header_Files}" "${Source_Files}")
@@ -69,6 +78,7 @@ target_link_libraries(
         PRIVATE
         #"${PROJECT_NAME}_compiler_flags"
         "${PROJECT_NAME}_pubsub"
+        "${PROJECT_NAME}_compute"
 )
 #if (NOT WIN32)
 #    target_compile_definitions("${LIBRARY_NAME}" PRIVATE C89STRINGUTILS_IMPLEMENTATION)

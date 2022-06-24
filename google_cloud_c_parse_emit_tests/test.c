@@ -4,6 +4,7 @@
 
 #include <greatest.h>
 
+#include "test_instance_from_json.h"
 #include "test_policy_from_json.h"
 #include "test_policy_to_json.h"
 #include "test_subscription_from_json.h"
@@ -18,5 +19,6 @@ int main(int argc, char **argv) {
   RUN_SUITE(policy_from_json_suite);
   RUN_SUITE(subscription_to_json_suite);
   RUN_SUITE(subscription_from_json_suite);
+  RUN_SUITE(instance_from_json_suite);
   GREATEST_MAIN_END();
 }
