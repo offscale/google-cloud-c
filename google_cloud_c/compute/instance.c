@@ -359,11 +359,11 @@ const char *instance_complete_to_json(const struct Instance *const instance) {
     '\0') jasprintf(&s, "  \"networkInterfaces\": \"%s\",",
     instance->networkInterfaces);*/
 
-  if (instance->disks != NULL && instance->disks[0] != '\0')
+  /*if (instance->disks != NULL && instance->disks[0] != '\0')
     jasprintf(&s, "  \"disks\": \"%s\",", instance->disks);
 
   if (instance->metadata != NULL && instance->metadata[0] != '\0')
-    jasprintf(&s, "  \"metadata\": \"%s\",", instance->metadata);
+    jasprintf(&s, "  \"metadata\": \"%s\",", instance->metadata);*/
 
   if (instance->selfLink != NULL && instance->selfLink[0] != '\0')
     jasprintf(&s, "  \"selfLink\": \"%s\",", instance->selfLink);
@@ -387,15 +387,15 @@ const char *instance_complete_to_json(const struct Instance *const instance) {
     != '\0') jasprintf(&s, "  \"deletionProtection\": \"%s\",",
     instance->deletionProtection);*/
 
-  if (instance->shieldedInstanceConfig != NULL &&
+  /*if (instance->shieldedInstanceConfig != NULL &&
       instance->shieldedInstanceConfig[0] != '\0')
     jasprintf(&s, "  \"shieldedInstanceConfig\": \"%s\",",
-              instance->shieldedInstanceConfig);
+              instance->shieldedInstanceConfig);*/
 
-  if (instance->shieldedInstanceIntegrityPolicy != NULL &&
+  /*if (instance->shieldedInstanceIntegrityPolicy != NULL &&
       instance->shieldedInstanceIntegrityPolicy[0] != '\0')
     jasprintf(&s, "  \"shieldedInstanceIntegrityPolicy\": \"%s\",",
-              instance->shieldedInstanceIntegrityPolicy);
+              instance->shieldedInstanceIntegrityPolicy);*/
 
   if (instance->fingerprint != NULL && instance->fingerprint[0] != '\0')
     jasprintf(&s, "  \"fingerprint\": \"%s\",", instance->fingerprint);
