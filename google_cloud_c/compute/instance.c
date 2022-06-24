@@ -480,23 +480,30 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
     }
   }
 
-  optionalInstance->kind = json_object_get_string(jsonObject, "kind");
+  if (json_object_has_value_of_type(jsonObject, "kind", JSONString))
+    optionalInstance->kind = json_object_get_string(jsonObject, "kind");
 
-  optionalInstance->id = json_object_get_string(jsonObject, "id");
+  if (json_object_has_value_of_type(jsonObject, "id", JSONString))
+    optionalInstance->id = json_object_get_string(jsonObject, "id");
 
-  optionalInstance->creationTimestamp =
-      json_object_get_string(jsonObject, "creationTimestamp");
+  if (json_object_has_value_of_type(jsonObject, "creationTimestamp",
+                                    JSONString))
+    optionalInstance->creationTimestamp =
+        json_object_get_string(jsonObject, "creationTimestamp");
 
-  optionalInstance->name = json_object_get_string(jsonObject, "name");
+  if (json_object_has_value_of_type(jsonObject, "name", JSONString))
+    optionalInstance->name = json_object_get_string(jsonObject, "name");
 
   /*optionalInstance->tags = json_object_get_string(jsonObject, "tags");*/
 
-  optionalInstance->machineType =
-      json_object_get_string(jsonObject, "machineType");
+  if (json_object_has_value_of_type(jsonObject, "machineType", JSONString))
+    optionalInstance->machineType =
+        json_object_get_string(jsonObject, "machineType");
 
   /*optionalInstance->status = json_object_get_string(jsonObject, "status");*/
 
-  optionalInstance->zone = json_object_get_string(jsonObject, "zone");
+  if (json_object_has_value_of_type(jsonObject, "zone", JSONString))
+    optionalInstance->zone = json_object_get_string(jsonObject, "zone");
 
   /*optionalInstance->networkInterfaces = json_object_get_string(jsonObject,
    * "networkInterfaces");*/
@@ -505,16 +512,19 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
 
   optionalInstance->metadata = json_object_get_string(jsonObject, "metadata");*/
 
-  optionalInstance->selfLink = json_object_get_string(jsonObject, "selfLink");
+  if (json_object_has_value_of_type(jsonObject, "selfLink", JSONString))
+    optionalInstance->selfLink = json_object_get_string(jsonObject, "selfLink");
 
   /*optionalInstance->scheduling = json_object_get_string(jsonObject,
    * "scheduling");*/
 
-  optionalInstance->cpuPlatform =
-      json_object_get_string(jsonObject, "cpuPlatform");
+  if (json_object_has_value_of_type(jsonObject, "cpuPlatform", JSONString))
+    optionalInstance->cpuPlatform =
+        json_object_get_string(jsonObject, "cpuPlatform");
 
-  optionalInstance->labelFingerprint =
-      json_object_get_string(jsonObject, "labelFingerprint");
+  if (json_object_has_value_of_type(jsonObject, "labelFingerprint", JSONString))
+    optionalInstance->labelFingerprint =
+        json_object_get_string(jsonObject, "labelFingerprint");
 
   /*optionalInstance->startRestricted = json_object_get_string(jsonObject,
   "startRestricted");
@@ -528,8 +538,9 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
   optionalInstance->shieldedInstanceIntegrityPolicy =
   json_object_get_string(jsonObject, "shieldedInstanceIntegrityPolicy");*/
 
-  optionalInstance->fingerprint =
-      json_object_get_string(jsonObject, "fingerprint");
+  if (json_object_has_value_of_type(jsonObject, "fingerprint", JSONString))
+    optionalInstance->fingerprint =
+        json_object_get_string(jsonObject, "fingerprint");
 
   return optionalInstance;
 }
@@ -561,20 +572,7 @@ AccessConfigs_from_json(const JSON_Object *const jsonObject) {
 
 struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
   struct Instance *instance = malloc(sizeof *instance);
-  instance->id = json_object_get_string(jsonObject, "id");
-  instance->creationTimestamp =
-      json_object_get_string(jsonObject, "creationTimestamp");
-  instance->name = json_object_get_string(jsonObject, "name");
-  instance->machineType = json_object_get_string(jsonObject, "machineType");
-  if (json_object_has_value_of_type(jsonObject, "status", JSONString))
-    instance->status =
-        str_to_InstanceStatus(json_object_get_string(jsonObject, "status"));
-  instance->zone = json_object_get_string(jsonObject, "zone");
-  instance->disks = NULL /*std::vector<struct Disk>()*/;
-  instance->selfLink = json_object_get_string(jsonObject, "selfLink");
-  instance->cpuPlatform = json_object_get_string(jsonObject, "cpuPlatform");
-  instance->labelFingerprint =
-      json_object_get_string(jsonObject, "labelFingerprint");
+
   if (json_object_has_value_of_type(jsonObject, "startRestricted", JSONBoolean))
     instance->startRestricted =
         (bool)json_object_get_boolean(jsonObject, "startRestricted");
@@ -586,30 +584,30 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
         (bool)json_object_get_boolean(jsonObject, "deletionProtection");
   else
     instance->startRestricted = false;
-  instance->fingerprint = json_object_get_string(jsonObject, "fingerprint");
-  instance->lastStartTimestamp =
-      json_object_get_string(jsonObject, "lastStartTimestamp");
-  instance->kind = json_object_get_string(jsonObject, "kind");
 
-  /* generated versions */
-  instance->kind = json_object_get_string(jsonObject, "kind");
+  if (json_object_has_value_of_type(jsonObject, "kind", JSONString))
+    instance->kind = json_object_get_string(jsonObject, "kind");
 
-  instance->id = json_object_get_string(jsonObject, "id");
+  if (json_object_has_value_of_type(jsonObject, "id", JSONString))
+    instance->id = json_object_get_string(jsonObject, "id");
 
-  instance->creationTimestamp =
-      json_object_get_string(jsonObject, "creationTimestamp");
+  if (json_object_has_value_of_type(jsonObject, "creationTimestamp",
+                                    JSONString))
+    instance->creationTimestamp =
+        json_object_get_string(jsonObject, "creationTimestamp");
 
-  instance->name = json_object_get_string(jsonObject, "name");
+  if (json_object_has_value_of_type(jsonObject, "name", JSONString))
+    instance->name = json_object_get_string(jsonObject, "name");
 
   /*instance->tags = json_object_get_string(jsonObject, "tags");*/
 
-  instance->machineType = json_object_get_string(jsonObject, "machineType");
+  if (json_object_has_value_of_type(jsonObject, "machineType", JSONString))
+    instance->machineType = json_object_get_string(jsonObject, "machineType");
 
-  if (json_object_has_value_of_type(jsonObject, "status", JSONString))
-    instance->status =
-        str_to_InstanceStatus(json_object_get_string(jsonObject, "status"));
+  /*instance->status = json_object_get_string(jsonObject, "status");*/
 
-  instance->zone = json_object_get_string(jsonObject, "zone");
+  if (json_object_has_value_of_type(jsonObject, "zone", JSONString))
+    instance->zone = json_object_get_string(jsonObject, "zone");
 
   /*instance->networkInterfaces = json_object_get_string(jsonObject,
    * "networkInterfaces");*/
@@ -618,15 +616,18 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
 
   instance->metadata = json_object_get_string(jsonObject, "metadata");*/
 
-  instance->selfLink = json_object_get_string(jsonObject, "selfLink");
+  if (json_object_has_value_of_type(jsonObject, "selfLink", JSONString))
+    instance->selfLink = json_object_get_string(jsonObject, "selfLink");
 
   /*instance->scheduling = json_object_get_string(jsonObject,
    * "scheduling");*/
 
-  instance->cpuPlatform = json_object_get_string(jsonObject, "cpuPlatform");
+  if (json_object_has_value_of_type(jsonObject, "cpuPlatform", JSONString))
+    instance->cpuPlatform = json_object_get_string(jsonObject, "cpuPlatform");
 
-  instance->labelFingerprint =
-      json_object_get_string(jsonObject, "labelFingerprint");
+  if (json_object_has_value_of_type(jsonObject, "labelFingerprint", JSONString))
+    instance->labelFingerprint =
+        json_object_get_string(jsonObject, "labelFingerprint");
 
   /*instance->startRestricted = json_object_get_string(jsonObject,
   "startRestricted");
@@ -640,7 +641,8 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
   instance->shieldedInstanceIntegrityPolicy =
   json_object_get_string(jsonObject, "shieldedInstanceIntegrityPolicy");*/
 
-  instance->fingerprint = json_object_get_string(jsonObject, "fingerprint");
+  if (json_object_has_value_of_type(jsonObject, "fingerprint", JSONString))
+    instance->fingerprint = json_object_get_string(jsonObject, "fingerprint");
 
   return instance;
 }
