@@ -2,6 +2,17 @@
 
 #include "instance_mocks.h"
 
+#define ACCESS_CONFIG_MOCK0                                                    \
+  "        {\n"                                                                \
+  "          \"kind\": \"compute#accessConfig\",\n"                            \
+  "          \"type\": \"ONE_TO_ONE_NAT\",\n"                                  \
+  "          \"name\": \"external-nat\",\n"                                    \
+  "          \"natIP\": \"34.0.0.1\",\n"                                       \
+  "          \"networkTier\": \"PREMIUM\"\n"                                   \
+  "        }\n"
+
+const char access_config_mock0[] = ACCESS_CONFIG_MOCK0;
+
 #define NETWORK_INTERFACE_MOCK0                                                \
   "    {\n"                                                                    \
   "      \"kind\": \"compute#networkInterface\",\n"                            \
@@ -14,15 +25,7 @@
   "myprojectid-bucket-vm0-net\",\n"                                            \
   "      \"networkIP\": \"10.0.0.1\",\n"                                       \
   "      \"name\": \"nic0\",\n"                                                \
-  "      \"accessConfigs\": [\n"                                               \
-  "        {\n"                                                                \
-  "          \"kind\": \"compute#accessConfig\",\n"                            \
-  "          \"type\": \"ONE_TO_ONE_NAT\",\n"                                  \
-  "          \"name\": \"external-nat\",\n"                                    \
-  "          \"natIP\": \"34.0.0.1\",\n"                                       \
-  "          \"networkTier\": \"PREMIUM\"\n"                                   \
-  "        }\n"                                                                \
-  "      ],\n"                                                                 \
+  "      \"accessConfigs\": [\n" ACCESS_CONFIG_MOCK0 "      ],\n"              \
   "      \"fingerprint\": \"ufVDhkGBA88=\",\n"                                 \
   "      \"stackType\": \"IPV4_ONLY\"\n"                                       \
   "    }\n"
@@ -64,7 +67,7 @@ const char disk_mock0[] = DISK_MOCK0;
 #define METADATA_MOCK_ITEM0                                                    \
   "      {\n"                                                                  \
   "        \"key\": \"startup-script\",\n"                                     \
-  "        \"value\": \"#!/usr/bin/env bash\\n\\nset -vaeuo pipefail\\id\\n"   \
+  "        \"value\": \"#!/bin/id\""                                           \
   "      }\n"
 
 #define METADATA_MOCK0                                                         \
@@ -128,6 +131,7 @@ const char disk_mock0[] = DISK_MOCK0;
   " " SHIELDED_INSTANCE_INTEGRITY_POLICY_MOCK0 ",\n"                           \
   "  \"fingerprint\": \"iPWd2IQdU6U=\",\n"                                     \
   "  \"lastStartTimestamp\": \"2022-06-23T18:49:40.998-07:00\"\n"              \
+  "}"                                                                          \
   "}"
 
 const char instance_mock0[] = INSTANCE_MOCK0;

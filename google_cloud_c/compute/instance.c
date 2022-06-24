@@ -550,11 +550,30 @@ optional_instance_from_json(const JSON_Object *const jsonObject) {
 struct NetworkInterface *
 NetworkInterface_from_json(const JSON_Object *const jsonObject) {
   struct NetworkInterface *networkInterface = malloc(sizeof *networkInterface);
+  networkInterface->kind = json_object_get_string(jsonObject, "kind");
   networkInterface->network = json_object_get_string(jsonObject, "network");
   networkInterface->subnetwork =
       json_object_get_string(jsonObject, "subnetwork");
   networkInterface->networkIP = json_object_get_string(jsonObject, "networkIP");
   networkInterface->name = json_object_get_string(jsonObject, "name");
+  networkInterface->fingerprint =
+      json_object_get_string(jsonObject, "fingerprint");
+  networkInterface->stackType = json_object_get_string(jsonObject, "stackType");
+  if (json_object_has_value_of_type(jsonObject, "accessConfigs", JSONArray)) {
+    const JSON_Array *const json_items =
+        json_object_get_array(jsonObject, "accessConfigs");
+    const size_t json_items_n = json_array_get_count(json_items) + 1;
+    size_t i;
+
+    if (json_items_n > 1) {
+      networkInterface->accessConfigs =
+          malloc(json_items_n * sizeof networkInterface->accessConfigs);
+      for (i = 0; i < json_items_n - 1; i++)
+        networkInterface->accessConfigs[i] =
+            AccessConfigs_from_json(json_array_get_object(json_items, i));
+      networkInterface->accessConfigs[i] = NULL;
+    }
+  }
   return networkInterface;
 }
 
@@ -604,13 +623,29 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
   if (json_object_has_value_of_type(jsonObject, "machineType", JSONString))
     instance->machineType = json_object_get_string(jsonObject, "machineType");
 
-  /*instance->status = json_object_get_string(jsonObject, "status");*/
+  if (json_object_has_value_of_type(jsonObject, "status", JSONString))
+    instance->status =
+        str_to_InstanceStatus(json_object_get_string(jsonObject, "status"));
 
   if (json_object_has_value_of_type(jsonObject, "zone", JSONString))
     instance->zone = json_object_get_string(jsonObject, "zone");
 
-  /*instance->networkInterfaces = json_object_get_string(jsonObject,
-   * "networkInterfaces");*/
+  if (json_object_has_value_of_type(jsonObject, "networkInterfaces",
+                                    JSONArray)) {
+    const JSON_Array *const json_items =
+        json_object_get_array(jsonObject, "networkInterfaces");
+    const size_t json_items_n = json_array_get_count(json_items) + 1;
+    size_t i;
+
+    if (json_items_n > 1) {
+      instance->networkInterfaces =
+          malloc(json_items_n * sizeof instance->networkInterfaces);
+      for (i = 0; i < json_items_n - 1; i++)
+        instance->networkInterfaces[i] =
+            NetworkInterface_from_json(json_array_get_object(json_items, i));
+      instance->networkInterfaces[i] = NULL;
+    }
+  }
 
   /*instance->disks = json_object_get_string(jsonObject, "disks");
 
@@ -629,13 +664,16 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
     instance->labelFingerprint =
         json_object_get_string(jsonObject, "labelFingerprint");
 
-  /*instance->startRestricted = json_object_get_string(jsonObject,
-  "startRestricted");
+  if (json_object_has_value_of_type(jsonObject, "startRestricted", JSONBoolean))
+    instance->startRestricted =
+        (bool)json_object_get_boolean(jsonObject, "startRestricted");
 
-  instance->deletionProtection = json_object_get_string(jsonObject,
-  "deletionProtection");
+  if (json_object_has_value_of_type(jsonObject, "deletionProtection",
+                                    JSONBoolean))
+    instance->deletionProtection =
+        (bool)json_object_get_boolean(jsonObject, "deletionProtection");
 
-  instance->shieldedInstanceConfig = json_object_get_string(jsonObject,
+  /*instance->shieldedInstanceConfig = json_object_get_string(jsonObject,
   "shieldedInstanceConfig");
 
   instance->shieldedInstanceIntegrityPolicy =

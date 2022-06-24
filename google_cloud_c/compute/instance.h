@@ -33,7 +33,8 @@ struct AccessConfigs {
 };
 
 struct NetworkInterface {
-  const char *network, *subnetwork, *networkIP, *name;
+  const char *network, *subnetwork, *networkIP, *name, *kind, *fingerprint,
+      *stackType;
   struct AccessConfigs **accessConfigs;
 };
 

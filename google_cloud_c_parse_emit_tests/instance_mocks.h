@@ -14,4 +14,7 @@ extern GOOGLE_CLOUD_C_PARSE_EMIT_TESTS_LIB_EXPORT const char
 
 extern GOOGLE_CLOUD_C_PARSE_EMIT_TESTS_LIB_EXPORT const char disk_mock0[];
 
+extern GOOGLE_CLOUD_C_PARSE_EMIT_TESTS_LIB_EXPORT const char
+    access_config_mock0[];
+
 #endif /* !GOOGLE_CLOUD_C_PARSE_EMIT_TESTS_INSTANCE_MOCKS_H */
