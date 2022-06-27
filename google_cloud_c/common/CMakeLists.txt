@@ -1,13 +1,25 @@
 get_filename_component(DIRNAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
 set(LIBRARY_NAME "${PROJECT_NAME}_${DIRNAME}")
 
-set(Header_Files "google_cloud_c_types_common.h" "google_cloud_c_stdbool.h")
+set(Header_Files
+        "google_cloud_c_json_common.h"
+        "google_cloud_c_stdbool.h"
+        "google_cloud_c_types_common.h")
 source_group("${LIBRARY_NAME} Header Files" FILES "${Header_Files}")
 
-set(Source_Files "google_cloud_c_types_common.c")
+set(Source_Files
+        "google_cloud_c_json_common.c"
+        "google_cloud_c_types_common.c")
 source_group("${LIBRARY_NAME} Source Files" FILES "${Source_Files}")
 
 add_library("${LIBRARY_NAME}" "${Header_Files}" "${Source_Files}")
+
+find_package(unofficial-parson CONFIG REQUIRED)
+target_link_libraries(
+        "${LIBRARY_NAME}"
+        PRIVATE
+        "unofficial::parson::parson"
+)
 
 include(GNUInstallDirs)
 get_filename_component(PROJECT_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}" DIRECTORY)

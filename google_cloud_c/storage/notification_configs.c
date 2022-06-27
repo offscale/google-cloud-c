@@ -3,6 +3,7 @@
 #include <c89stringutils_string_extras.h>
 
 #include <google_cloud_c/client/cloud_auth.h>
+#include <google_cloud_c/common/google_cloud_c_json_common.h>
 #include <google_cloud_c/storage/notification_configs.h>
 
 struct Notification *
@@ -74,8 +75,8 @@ notification_from_json(const JSON_Object *const created_json_object) {
   notification->topic = json_object_get_string(created_json_object, "topic");
   if (json_object_has_value_of_type(created_json_object, "event_types",
                                     JSONArray))
-    notification->event_types = (const char **)json_object_get_array(
-        created_json_object, "event_types");
+    notification->event_types = json_array_to_cstr_array(
+        json_object_get_array(created_json_object, "event_types"));
   else
     notification->event_types = NULL;
   notification->payload_format =

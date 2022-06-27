@@ -1,5 +1,6 @@
 #include <c89stringutils_string_extras.h>
 
+#include <google_cloud_c/common/google_cloud_c_json_common.h>
 #include <google_cloud_c/compute/compute_common.h>
 #include <google_cloud_c/compute/instance.h>
 
@@ -469,7 +470,7 @@ struct Disk *Disk_from_json(const JSON_Object *const jsonObject) {
     disk->autoDelete = (bool)json_object_get_boolean(jsonObject, "autoDelete");
   if (json_object_has_value_of_type(jsonObject, "licenses", JSONArray))
     disk->licenses =
-        (const char **)json_object_get_array(jsonObject, "licenses");
+        json_array_to_cstr_array(json_object_get_array(jsonObject, "licenses"));
   disk->interface = json_object_get_string(jsonObject, "interface");
   if (json_object_has_value_of_type(jsonObject, "guestOsFeatures", JSONArray))
     disk->guestOsFeatures = GuestOsFeatures_arr_from_json(
@@ -589,7 +590,7 @@ struct ShieldedInstanceIntegrityPolicy *
 ShieldedInstanceIntegrityPolicy_from_json(const JSON_Object *const jsonObject) {
   struct ShieldedInstanceIntegrityPolicy *shielded_instance_integrity_policy =
       NULL;
-  if (json_object_has_value_of_type(jsonObject, "enableSecureBoot",
+  if (json_object_has_value_of_type(jsonObject, "updateAutoLearnPolicy",
                                     JSONBoolean)) {
     shielded_instance_integrity_policy =
         malloc(sizeof *shielded_instance_integrity_policy);
@@ -658,7 +659,7 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
     }
   }
 
-  if (json_object_has_value_of_type(jsonObject, "disks", JSONObject))
+  if (json_object_has_value_of_type(jsonObject, "disks", JSONArray))
     instance->disks =
         Disks_from_json(json_object_get_array(jsonObject, "disks"));
 

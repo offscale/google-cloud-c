@@ -3,6 +3,7 @@
 #include <c89stringutils_string_extras.h>
 
 #include <google_cloud_c/client/cloud_auth.h>
+#include <google_cloud_c/common/google_cloud_c_json_common.h>
 #include <google_cloud_c/pubsub/topic.h>
 
 /* Gets the configuration of a topic.
@@ -95,8 +96,8 @@ struct Topic *topic_from_json(const JSON_Object *const jsonObject) {
     struct MessageStoragePolicy *messageStoragePolicy =
         malloc(sizeof *messageStoragePolicy);
     messageStoragePolicy->allowedPersistenceRegions =
-        (const char **)json_object_get_array(jsonMessageStoragePolicy,
-                                             "allowedPersistenceRegions");
+        json_array_to_cstr_array(json_object_get_array(
+            jsonMessageStoragePolicy, "allowedPersistenceRegions"));
     topic->messageStoragePolicy = messageStoragePolicy;
   } else
     topic->messageStoragePolicy = NULL;

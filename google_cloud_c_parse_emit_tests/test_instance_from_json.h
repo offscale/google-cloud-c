@@ -123,33 +123,73 @@ TEST x_instance_from_json(void) {
     ASSERT_EQ(instance->networkInterfaces[1], NULL);
   }
 
-  /*ASSERT_STR_EQ(instance->disks, "[{'kind': 'compute#attachedDisk', 'type':
-   * 'PERSISTENT', 'mode': 'READ_WRITE', 'source':
-   * 'https://www.googleapis.com/compute/v1/projects/myprojectid/zones/australia-southeast2-a/disks/myprojectid-bucket-vm0',
-   * 'deviceName': 'persistent-disk-0', 'index': 0, 'boot': True, 'autoDelete':
-   * True, 'licenses':
-   * ['https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-10-buster'],
-   * 'interface': 'SCSI', 'guestOsFeatures': [{'type': 'UEFI_COMPATIBLE'},
-   * {'type': 'VIRTIO_SCSI_MULTIQUEUE'}], 'diskSizeGb': '10'}]");*/
+  {
+    struct Disk *disk = instance->disks[0];
+    ASSERT_STR_EQ(disk->kind, "compute#attachedDisk");
+    ASSERT_STR_EQ(disk->type, "PERSISTENT");
+    ASSERT_STR_EQ(disk->mode, "READ_WRITE");
+    ASSERT_STR_EQ(disk->source,
+                  "https://www.googleapis.com/compute/v1/projects/myprojectid/"
+                  "zones/australia-southeast2-a/disks/myprojectid-bucket-vm0");
+    ASSERT_STR_EQ(disk->deviceName, "persistent-disk-0");
+    ASSERT_EQ(disk->index, 0);
+    ASSERT_FALSE(!disk->boot);
+    ASSERT_FALSE(!disk->autoDelete);
+    ASSERT_STR_EQ(disk->licenses[0],
+                  "https://www.googleapis.com/compute/v1/projects/debian-cloud/"
+                  "global/licenses/debian-10-buster");
+    ASSERT_EQ(disk->licenses[1], NULL);
+    ASSERT_STR_EQ(disk->interface, "SCSI");
+    {
+      struct GuestOsFeatures **guestOsFeatures;
+      const char *guest_os_features_types[] = {"UEFI_COMPATIBLE",
+                                               "VIRTIO_SCSI_MULTIQUEUE", NULL};
+      const char **mock_guest_os_features_type;
+      for (mock_guest_os_features_type = guest_os_features_types,
+          guestOsFeatures = disk->guestOsFeatures;
+           *guest_os_features_types != NULL && *guestOsFeatures != NULL;
+           ++mock_guest_os_features_type, ++guestOsFeatures)
+        ASSERT_STR_EQ((*guestOsFeatures)->type, *mock_guest_os_features_type);
+      ASSERT_EQ(*mock_guest_os_features_type, NULL);
+      ASSERT_EQ(*guestOsFeatures, NULL);
+    }
+    ASSERT_STR_EQ(disk->diskSizeGb, "10");
 
-  /*ASSERT_STR_EQ(instance->metadata, "{'kind': 'compute#metadata',
-   * 'fingerprint': 'fKPvkD-3x7E=', 'items': [{'key': 'startup-script', 'value':
-   * "#!/usr/bin/id"}]}");*/
+    ASSERT_EQ(instance->disks[1], NULL);
+  }
+
+  {
+    const struct Metadata *const metadata = instance->metadata;
+    ASSERT_STR_EQ(metadata->kind, "compute#metadata");
+    ASSERT_STR_EQ(metadata->fingerprint, "dPeprQ1djYA=");
+
+    ASSERT_STR_EQ(metadata->items[0]->key, "startup-script");
+    ASSERT_STR_EQ(metadata->items[0]->value, "#!/bin/id");
+    ASSERT_EQ(metadata->items[1], NULL);
+  }
+
   ASSERT_STR_EQ(
       instance->selfLink,
       "https://www.googleapis.com/compute/v1/projects/myprojectid/zones/"
       "australia-southeast2-a/instances/myprojectid-bucket-vm0");
-  /*ASSERT_STR_EQ(instance->scheduling, "{'onHostMaintenance': 'MIGRATE',
-   * 'automaticRestart': True, 'preemptible': False, 'provisioningModel':
-   * 'STANDARD'}");*/
+
+  ASSERT_STR_EQ(instance->scheduling->onHostMaintenance, "MIGRATE");
+  ASSERT_FALSE(!instance->scheduling->automaticRestart);
+  ASSERT_FALSE(instance->scheduling->preemptible);
+  ASSERT_STR_EQ(instance->scheduling->provisioningModel, "STANDARD");
+
   ASSERT_STR_EQ(instance->cpuPlatform, "Intel Broadwell");
   ASSERT_STR_EQ(instance->labelFingerprint, "42WmSpB8rSM=");
   ASSERT_FALSE(instance->startRestricted);
   ASSERT_FALSE(instance->deletionProtection);
-  /*ASSERT_STR_EQ(instance->shieldedInstanceConfig, "{'enableSecureBoot': False,
-   * 'enableVtpm': True, 'enableIntegrityMonitoring': True}");*/
-  /*ASSERT_STR_EQ(instance->shieldedInstanceIntegrityPolicy,
-   * "{'updateAutoLearnPolicy': True}");*/
+
+  ASSERT_FALSE(instance->shieldedInstanceConfig->enableSecureBoot);
+  ASSERT_FALSE(!instance->shieldedInstanceConfig->enableVtpm);
+  ASSERT_FALSE(!instance->shieldedInstanceConfig->enableIntegrityMonitoring);
+
+  ASSERT_FALSE(
+      !instance->shieldedInstanceIntegrityPolicy->updateAutoLearnPolicy);
+
   ASSERT_STR_EQ(instance->fingerprint, "iPWd2IQdU6U=");
 
   json_value_free(instance_val);
