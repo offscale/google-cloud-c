@@ -49,8 +49,7 @@ struct Instances instances_list(void) {
         for (i = 0; i < json_items_n; i++) {
           const JSON_Object *const json_obj =
               json_array_get_object(json_items, i);
-          struct Instance *const instance =
-              optional_instance_from_json(json_obj);
+          struct Instance *const instance = instance_from_json(json_obj);
           assert(instance != NULL);
           instances[i] = instance;
         }
@@ -76,7 +75,7 @@ struct Instance *instance_get(const char *const instance_name) {
     DEBUG_SERVER_RESPONSE("instance_get");
     if (response.status_code == 200 && response.body != NULL &&
         response.body[0] != '\0')
-      optionalInstance = optional_instance_from_json(
+      optionalInstance = instance_from_json(
           json_value_get_object(json_parse_string(response.body)));
     else if (response.status_code != 404)
       fputs(response.body, stderr);
@@ -169,7 +168,7 @@ struct Instance *instance_insert(const struct InstanceIncomplete *instance,
       const JSON_Object *const json_object = json_value_get_object(json_item);
 
       if (json_object_has_value(json_object, "machineType"))
-        optionalInstance = optional_instance_from_json(json_object);
+        optionalInstance = instance_from_json(json_object);
       else if (json_object_has_value(json_object, "items")) {
         const JSON_Array *const _json_items =
             json_object_get_array(json_object, "items");
@@ -177,7 +176,7 @@ struct Instance *instance_insert(const struct InstanceIncomplete *instance,
           const JSON_Object *const _json_object =
               json_array_get_object(_json_items, 0);
           if (json_object_has_value(_json_object, "machineType"))
-            optionalInstance = optional_instance_from_json(_json_object);
+            optionalInstance = instance_from_json(_json_object);
         }
       } else if (json_object_has_value(json_object, "kind") &&
                  strcmp(json_object_get_string(json_object, "kind"),
@@ -405,147 +404,79 @@ const char *instance_complete_to_json(const struct Instance *const instance) {
   return s;
 }
 
-struct Instance *
-optional_instance_from_json(const JSON_Object *const jsonObject) {
-  struct Instance *optionalInstance = NULL;
-  if (json_object_has_value(jsonObject, "operationType") &&
-      json_object_has_value(jsonObject, "name")) {
-    const JSON_Array *const network_json_items =
-        json_object_get_array(jsonObject, "networkInterfaces");
-    const size_t network_json_items_n =
-        json_array_get_count(network_json_items) + 1;
+/* Utility functions */
 
-    struct NetworkInterface **networkInterfaces = NULL;
-    if (network_json_items_n > 1) {
-      size_t i;
-      networkInterfaces =
-          malloc(network_json_items_n * sizeof **networkInterfaces);
-      for (i = 0; i < network_json_items_n - 1; i++) {
-        const JSON_Object *const network_json =
-            json_array_get_object(network_json_items, i);
-        struct AccessConfigs **accessConfigs = NULL;
-        const JSON_Array *const ac_json_items =
-            json_object_get_array(network_json, "accessConfigs");
-        const size_t ac_json_items_n = json_array_get_count(ac_json_items);
-        if (ac_json_items_n > 0) {
-          size_t j;
-          accessConfigs = malloc(ac_json_items_n * sizeof **accessConfigs);
-          for (j = 0; j < ac_json_items_n; j++)
-            accessConfigs[j] = AccessConfigs_from_json(
-                json_array_get_object(ac_json_items, i));
-        }
-
-        {
-          struct NetworkInterface *networkInterface =
-              NetworkInterface_from_json(network_json);
-          networkInterface->accessConfigs = accessConfigs;
-          networkInterfaces[i] = networkInterface;
-        }
-      }
-      networkInterfaces[network_json_items_n - 1] = NULL;
-    }
-
-    optionalInstance = instance_from_json(jsonObject);
-
-    optionalInstance->networkInterfaces = networkInterfaces;
-
-    {
-      struct Metadata *metadata = NULL;
-      optionalInstance->metadata = metadata;
-    }
-
-    {
-      struct Scheduling *scheduling = malloc(sizeof *scheduling);
-      scheduling->onHostMaintenance = NULL, scheduling->automaticRestart = true,
-      scheduling->preemptible = true;
-      optionalInstance->scheduling = scheduling;
-    }
-
-    {
-      struct ShieldedInstanceConfig *shieldedInstanceConfig =
-          malloc(sizeof *shieldedInstanceConfig);
-      shieldedInstanceConfig->enableSecureBoot = false,
-      shieldedInstanceConfig->enableVtpm = true,
-      shieldedInstanceConfig->enableIntegrityMonitoring = true;
-      optionalInstance->shieldedInstanceConfig = shieldedInstanceConfig;
-    }
-
-    {
-      struct ShieldedInstanceIntegrityPolicy *shieldedInstanceIntegrityPolicy =
-          malloc(sizeof *shieldedInstanceIntegrityPolicy);
-      shieldedInstanceIntegrityPolicy->updateAutoLearnPolicy = true;
-
-      optionalInstance->shieldedInstanceIntegrityPolicy =
-          shieldedInstanceIntegrityPolicy;
-    }
-  }
-
-  if (json_object_has_value_of_type(jsonObject, "kind", JSONString))
-    optionalInstance->kind = json_object_get_string(jsonObject, "kind");
-
-  if (json_object_has_value_of_type(jsonObject, "id", JSONString))
-    optionalInstance->id = json_object_get_string(jsonObject, "id");
-
-  if (json_object_has_value_of_type(jsonObject, "creationTimestamp",
-                                    JSONString))
-    optionalInstance->creationTimestamp =
-        json_object_get_string(jsonObject, "creationTimestamp");
-
-  if (json_object_has_value_of_type(jsonObject, "name", JSONString))
-    optionalInstance->name = json_object_get_string(jsonObject, "name");
-
-  /*optionalInstance->tags = json_object_get_string(jsonObject, "tags");*/
-
-  if (json_object_has_value_of_type(jsonObject, "machineType", JSONString))
-    optionalInstance->machineType =
-        json_object_get_string(jsonObject, "machineType");
-
-  /*optionalInstance->status = json_object_get_string(jsonObject, "status");*/
-
-  if (json_object_has_value_of_type(jsonObject, "zone", JSONString))
-    optionalInstance->zone = json_object_get_string(jsonObject, "zone");
-
-  /*optionalInstance->networkInterfaces = json_object_get_string(jsonObject,
-   * "networkInterfaces");*/
-
-  /*optionalInstance->disks = json_object_get_string(jsonObject, "disks");
-
-  optionalInstance->metadata = json_object_get_string(jsonObject, "metadata");*/
-
-  if (json_object_has_value_of_type(jsonObject, "selfLink", JSONString))
-    optionalInstance->selfLink = json_object_get_string(jsonObject, "selfLink");
-
-  /*optionalInstance->scheduling = json_object_get_string(jsonObject,
-   * "scheduling");*/
-
-  if (json_object_has_value_of_type(jsonObject, "cpuPlatform", JSONString))
-    optionalInstance->cpuPlatform =
-        json_object_get_string(jsonObject, "cpuPlatform");
-
-  if (json_object_has_value_of_type(jsonObject, "labelFingerprint", JSONString))
-    optionalInstance->labelFingerprint =
-        json_object_get_string(jsonObject, "labelFingerprint");
-
-  /*optionalInstance->startRestricted = json_object_get_string(jsonObject,
-  "startRestricted");
-
-  optionalInstance->deletionProtection = json_object_get_string(jsonObject,
-  "deletionProtection");
-
-  optionalInstance->shieldedInstanceConfig = json_object_get_string(jsonObject,
-  "shieldedInstanceConfig");
-
-  optionalInstance->shieldedInstanceIntegrityPolicy =
-  json_object_get_string(jsonObject, "shieldedInstanceIntegrityPolicy");*/
-
+struct Tags *Tags_from_json(const JSON_Object *const jsonObject) {
+  struct Tags *tags = malloc(sizeof *tags);
   if (json_object_has_value_of_type(jsonObject, "fingerprint", JSONString))
-    optionalInstance->fingerprint =
-        json_object_get_string(jsonObject, "fingerprint");
-
-  return optionalInstance;
+    tags->fingerprint = json_object_get_string(jsonObject, "fingerprint");
+  return tags;
 }
 
-/* Utility functions */
+struct GuestOsFeatures **
+GuestOsFeatures_arr_from_json(const JSON_Array *const json_items) {
+  struct GuestOsFeatures **guest_os_features_arr = NULL;
+  const size_t json_items_n = json_array_get_count(json_items) + 1;
+  size_t i;
+
+  if (json_items_n > 1) {
+    guest_os_features_arr =
+        malloc(json_items_n * sizeof **guest_os_features_arr);
+    for (i = 0; i < json_items_n - 1; i++)
+      guest_os_features_arr[i] =
+          GuestOsFeatures_from_json(json_array_get_object(json_items, i));
+    guest_os_features_arr[i] = NULL;
+  }
+  return guest_os_features_arr;
+}
+
+struct GuestOsFeatures *
+GuestOsFeatures_from_json(const JSON_Object *const jsonObject) {
+  struct GuestOsFeatures *guest_os_features = malloc(sizeof *guest_os_features);
+  if (json_object_has_value_of_type(jsonObject, "type", JSONString)) {
+    guest_os_features = malloc(sizeof *guest_os_features);
+    guest_os_features->type = json_object_get_string(jsonObject, "type");
+  }
+  return guest_os_features;
+}
+
+struct Disk **Disks_from_json(const JSON_Array *const json_items) {
+  struct Disk **disks = NULL;
+  const size_t json_items_n = json_array_get_count(json_items) + 1;
+  size_t i;
+
+  if (json_items_n > 1) {
+    disks = malloc(json_items_n * sizeof **disks);
+    for (i = 0; i < json_items_n - 1; i++)
+      disks[i] = Disk_from_json(json_array_get_object(json_items, i));
+    disks[i] = NULL;
+  }
+  return disks;
+}
+
+struct Disk *Disk_from_json(const JSON_Object *const jsonObject) {
+  struct Disk *disk = malloc(sizeof *disk);
+  disk->kind = json_object_get_string(jsonObject, "kind");
+  disk->type = json_object_get_string(jsonObject, "type");
+  disk->mode = json_object_get_string(jsonObject, "mode");
+  disk->source = json_object_get_string(jsonObject, "source");
+  disk->deviceName = json_object_get_string(jsonObject, "deviceName");
+  if (json_object_has_value_of_type(jsonObject, "index", JSONNumber))
+    disk->index = (int)json_object_get_number(jsonObject, "index");
+  if (json_object_has_value_of_type(jsonObject, "boot", JSONBoolean))
+    disk->boot = (bool)json_object_get_boolean(jsonObject, "boot");
+  if (json_object_has_value_of_type(jsonObject, "autoDelete", JSONBoolean))
+    disk->autoDelete = (bool)json_object_get_boolean(jsonObject, "autoDelete");
+  if (json_object_has_value_of_type(jsonObject, "licenses", JSONArray))
+    disk->licenses =
+        (const char **)json_object_get_array(jsonObject, "licenses");
+  disk->interface = json_object_get_string(jsonObject, "interface");
+  if (json_object_has_value_of_type(jsonObject, "guestOsFeatures", JSONArray))
+    disk->guestOsFeatures = GuestOsFeatures_arr_from_json(
+        json_object_get_array(jsonObject, "guestOsFeatures"));
+  disk->diskSizeGb = json_object_get_string(jsonObject, "diskSizeGb");
+  return disk;
+}
 
 struct NetworkInterface *
 NetworkInterface_from_json(const JSON_Object *const jsonObject) {
@@ -589,6 +520,85 @@ AccessConfigs_from_json(const JSON_Object *const jsonObject) {
   return accessConfigs;
 }
 
+struct Item *Item_from_json(const JSON_Object *const jsonObject) {
+  struct Item *item = malloc(sizeof *item);
+  item->key = json_object_get_string(jsonObject, "key");
+  item->value = json_object_get_string(jsonObject, "value");
+  return item;
+}
+
+struct Item **items_from_json(const JSON_Array *const json_items) {
+  struct Item **items = NULL;
+  const size_t json_items_n = json_array_get_count(json_items) + 1;
+  size_t i;
+
+  if (json_items_n > 1) {
+    items = malloc(json_items_n * sizeof **items);
+    for (i = 0; i < json_items_n - 1; i++)
+      items[i] = Item_from_json(json_array_get_object(json_items, i));
+    items[i] = NULL;
+  }
+  return items;
+}
+
+struct Metadata *Metadata_from_json(const JSON_Object *const jsonObject) {
+  struct Metadata *metadata = malloc(sizeof *metadata);
+  metadata->kind = json_object_get_string(jsonObject, "kind");
+  metadata->fingerprint = json_object_get_string(jsonObject, "fingerprint");
+  if (json_object_has_value_of_type(jsonObject, "items", JSONArray))
+    metadata->items =
+        items_from_json(json_object_get_array(jsonObject, "items"));
+  return metadata;
+}
+
+struct Scheduling *Scheduling_from_json(const JSON_Object *const jsonObject) {
+  struct Scheduling *scheduling = malloc(sizeof *scheduling);
+  scheduling->onHostMaintenance =
+      json_object_get_string(jsonObject, "onHostMaintenance");
+  if (json_object_has_value_of_type(jsonObject, "automaticRestart",
+                                    JSONBoolean))
+    scheduling->automaticRestart =
+        json_object_get_boolean(jsonObject, "automaticRestart");
+  if (json_object_has_value_of_type(jsonObject, "preemptible", JSONBoolean))
+    scheduling->preemptible =
+        json_object_get_boolean(jsonObject, "preemptible");
+  scheduling->provisioningModel =
+      json_object_get_string(jsonObject, "provisioningModel");
+  return scheduling;
+}
+
+struct ShieldedInstanceConfig *
+ShieldedInstanceConfig_from_json(const JSON_Object *const jsonObject) {
+  struct ShieldedInstanceConfig *shielded_instance_config =
+      malloc(sizeof *shielded_instance_config);
+  if (json_object_has_value_of_type(jsonObject, "enableSecureBoot",
+                                    JSONBoolean))
+    shielded_instance_config->enableSecureBoot =
+        json_object_get_boolean(jsonObject, "enableSecureBoot");
+  if (json_object_has_value_of_type(jsonObject, "enableVtpm", JSONBoolean))
+    shielded_instance_config->enableVtpm =
+        json_object_get_boolean(jsonObject, "enableVtpm");
+  if (json_object_has_value_of_type(jsonObject, "enableIntegrityMonitoring",
+                                    JSONBoolean))
+    shielded_instance_config->enableIntegrityMonitoring =
+        json_object_get_boolean(jsonObject, "enableIntegrityMonitoring");
+  return shielded_instance_config;
+}
+
+struct ShieldedInstanceIntegrityPolicy *
+ShieldedInstanceIntegrityPolicy_from_json(const JSON_Object *const jsonObject) {
+  struct ShieldedInstanceIntegrityPolicy *shielded_instance_integrity_policy =
+      NULL;
+  if (json_object_has_value_of_type(jsonObject, "enableSecureBoot",
+                                    JSONBoolean)) {
+    shielded_instance_integrity_policy =
+        malloc(sizeof *shielded_instance_integrity_policy);
+    shielded_instance_integrity_policy->updateAutoLearnPolicy =
+        (bool)json_object_get_boolean(jsonObject, "updateAutoLearnPolicy");
+  }
+  return shielded_instance_integrity_policy;
+}
+
 struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
   struct Instance *instance = malloc(sizeof *instance);
 
@@ -618,7 +628,8 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
   if (json_object_has_value_of_type(jsonObject, "name", JSONString))
     instance->name = json_object_get_string(jsonObject, "name");
 
-  /*instance->tags = json_object_get_string(jsonObject, "tags");*/
+  if (json_object_has_value_of_type(jsonObject, "tags", JSONObject))
+    instance->tags = Tags_from_json(json_object_get_object(jsonObject, "tags"));
 
   if (json_object_has_value_of_type(jsonObject, "machineType", JSONString))
     instance->machineType = json_object_get_string(jsonObject, "machineType");
@@ -647,15 +658,20 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
     }
   }
 
-  /*instance->disks = json_object_get_string(jsonObject, "disks");
+  if (json_object_has_value_of_type(jsonObject, "disks", JSONObject))
+    instance->disks =
+        Disks_from_json(json_object_get_array(jsonObject, "disks"));
 
-  instance->metadata = json_object_get_string(jsonObject, "metadata");*/
+  if (json_object_has_value_of_type(jsonObject, "metadata", JSONObject))
+    instance->metadata =
+        Metadata_from_json(json_object_get_object(jsonObject, "metadata"));
 
   if (json_object_has_value_of_type(jsonObject, "selfLink", JSONString))
     instance->selfLink = json_object_get_string(jsonObject, "selfLink");
 
-  /*instance->scheduling = json_object_get_string(jsonObject,
-   * "scheduling");*/
+  if (json_object_has_value_of_type(jsonObject, "scheduling", JSONObject))
+    instance->scheduling =
+        Scheduling_from_json(json_object_get_object(jsonObject, "scheduling"));
 
   if (json_object_has_value_of_type(jsonObject, "cpuPlatform", JSONString))
     instance->cpuPlatform = json_object_get_string(jsonObject, "cpuPlatform");
@@ -673,14 +689,24 @@ struct Instance *instance_from_json(const JSON_Object *const jsonObject) {
     instance->deletionProtection =
         (bool)json_object_get_boolean(jsonObject, "deletionProtection");
 
-  /*instance->shieldedInstanceConfig = json_object_get_string(jsonObject,
-  "shieldedInstanceConfig");
+  if (json_object_has_value_of_type(jsonObject, "shieldedInstanceConfig",
+                                    JSONObject))
+    instance->shieldedInstanceConfig = ShieldedInstanceConfig_from_json(
+        json_object_get_object(jsonObject, "shieldedInstanceConfig"));
 
-  instance->shieldedInstanceIntegrityPolicy =
-  json_object_get_string(jsonObject, "shieldedInstanceIntegrityPolicy");*/
+  if (json_object_has_value_of_type(
+          jsonObject, "shieldedInstanceIntegrityPolicy", JSONObject))
+    instance->shieldedInstanceIntegrityPolicy =
+        ShieldedInstanceIntegrityPolicy_from_json(json_object_get_object(
+            jsonObject, "shieldedInstanceIntegrityPolicy"));
 
   if (json_object_has_value_of_type(jsonObject, "fingerprint", JSONString))
     instance->fingerprint = json_object_get_string(jsonObject, "fingerprint");
+
+  if (json_object_has_value_of_type(jsonObject, "lastStartTimestamp",
+                                    JSONString))
+    instance->lastStartTimestamp =
+        json_object_get_string(jsonObject, "lastStartTimestamp");
 
   return instance;
 }

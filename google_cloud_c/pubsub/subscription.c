@@ -53,12 +53,9 @@ create_pubsub_subscription(const char *const subscription_id,
  * */
 struct ReceivedMessages *
 pull_pubsub_subscription(const char *const subscription_id, int maxMessages) {
-  char *path;
-  enum { n = 21 };
-  char body[n] = "{\"maxMessages\": %d}";
+  char *path, *body;
   asprintf(&path, "/v1/%s:pull", subscription_id);
-  sprintf(body, "%d", maxMessages);
-  body[16] = '}';
+  asprintf(&body, "{\"maxMessages\": %d}", maxMessages);
 
   {
     const struct ServerResponse response =

@@ -93,14 +93,6 @@ TEST x_instance_from_json(void) {
   ASSERT_STR_EQ(instance->zone,
                 "https://www.googleapis.com/compute/v1/projects/myprojectid/"
                 "zones/australia-southeast2-a");
-  /*ASSERT_STR_EQ(instance->networkInterfaces, "[{'kind':
-   * 'compute#networkInterface', 'network':
-   * 'https://www.googleapis.com/compute/v1/projects/myprojectid/global/networks/myprojectid-bucket-vm0-net',
-   * 'subnetwork':
-   * 'https://www.googleapis.com/compute/v1/projects/myprojectid/regions/australia-southeast2/subnetworks/myprojectid-bucket-vm0-net',
-   * 'name': 'nic0', 'accessConfigs': [{'kind': 'compute#accessConfig', 'type':
-   * 'ONE_TO_ONE_NAT', 'name': 'external-nat', 'networkTier': 'PREMIUM'}],
-   * 'fingerprint': 'B4dWGbVNkuw=', 'stackType': 'IPV4_ONLY'}]");*/
 
   {
     struct NetworkInterface *network_interface = instance->networkInterfaces[0];
@@ -141,7 +133,8 @@ TEST x_instance_from_json(void) {
    * {'type': 'VIRTIO_SCSI_MULTIQUEUE'}], 'diskSizeGb': '10'}]");*/
 
   /*ASSERT_STR_EQ(instance->metadata, "{'kind': 'compute#metadata',
-   * 'fingerprint': 'fKPvkD-3x7E=', 'items': [{'key': 'startup-script', 'value': "#!/usr/bin/id"}]}");*/
+   * 'fingerprint': 'fKPvkD-3x7E=', 'items': [{'key': 'startup-script', 'value':
+   * "#!/usr/bin/id"}]}");*/
   ASSERT_STR_EQ(
       instance->selfLink,
       "https://www.googleapis.com/compute/v1/projects/myprojectid/zones/"

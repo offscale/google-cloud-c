@@ -43,29 +43,35 @@ struct GuestOsFeatures {
 };
 
 struct Disk {
+  const char *kind;
   const char *type;
   const char *mode;
   const char *source;
+  const char *deviceName;
   int index;
-  bool boot, autoDelete;
+  bool boot;
+  bool autoDelete;
   const char **licenses;
   const char *interface;
-  struct GuestOsFeatures *guestOsFeatures;
-  const char *diskSizeGb, *kind;
+  struct GuestOsFeatures **guestOsFeatures;
+  const char *diskSizeGb;
 };
 
 struct Item {
-  const char *key, *value;
+  const char *key;
+  const char *value;
 };
 
 struct Metadata {
+  const char *kind;
+  const char *fingerprint;
   struct Item **items;
-  const char *const kind;
 };
 
 struct Scheduling {
   const char *onHostMaintenance;
   bool automaticRestart, preemptible;
+  const char *provisioningModel;
 };
 
 struct ShieldedInstanceConfig {
@@ -88,11 +94,17 @@ enum InstanceStatus {
   TERMINATED
 };
 
+struct Tags {
+  /* obviously there can be arbitrary properties, so this is more a placeholder
+   */
+  const char *fingerprint;
+};
+
 struct Instance {
   const char *id, *creationTimestamp, *name, *machineType, *zone;
   enum InstanceStatus status;
   struct NetworkInterface **networkInterfaces;
-  struct Disk *disks;
+  struct Disk **disks;
   struct Metadata *metadata;
   const char *selfLink;
   struct Scheduling *scheduling;
@@ -102,6 +114,7 @@ struct Instance {
   struct ShieldedInstanceConfig *shieldedInstanceConfig;
   struct ShieldedInstanceIntegrityPolicy *shieldedInstanceIntegrityPolicy;
   const char *fingerprint, *lastStartTimestamp, *kind;
+  struct Tags *tags;
 };
 
 struct Instances {
@@ -149,9 +162,6 @@ instance_get(const char *instance_name);
 /* Utility functions */
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Instance *
-optional_instance_from_json(const JSON_Object *);
-
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Instance *
 instance_from_json(const JSON_Object *);
 
 /* Creates network, firewall, and instance */
@@ -166,6 +176,33 @@ NetworkInterface_from_json(const JSON_Object *);
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct AccessConfigs *
 AccessConfigs_from_json(const JSON_Object *);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Tags *
+Tags_from_json(const JSON_Object *);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct GuestOsFeatures **
+GuestOsFeatures_arr_from_json(const JSON_Array *);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct GuestOsFeatures *
+GuestOsFeatures_from_json(const JSON_Object *);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Scheduling *
+Scheduling_from_json(const JSON_Object *);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct ShieldedInstanceConfig *
+ShieldedInstanceConfig_from_json(const JSON_Object *);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct ShieldedInstanceIntegrityPolicy *
+ShieldedInstanceIntegrityPolicy_from_json(const JSON_Object *);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Item **
+items_from_json(const JSON_Array *);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Disk **
+Disks_from_json(const JSON_Array *);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Disk *
+Disk_from_json(const JSON_Object *);
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT enum InstanceStatus
 str_to_InstanceStatus(const char *);

@@ -97,15 +97,18 @@ const char disk_mock0[] = DISK_MOCK0;
   "    \"updateAutoLearnPolicy\": true\n"                                      \
   "  }"
 
+#define TAGS_MOCK0                                                             \
+  "{\n"                                                                        \
+  "    \"fingerprint\": \"42WmSpB8rSM=\"\n"                                    \
+  "  }"
+
 #define INSTANCE_MOCK0                                                         \
   "{\n"                                                                        \
   "  \"kind\": \"compute#instance\",\n"                                        \
   "  \"id\": \"828639566970267330\",\n"                                        \
   "  \"creationTimestamp\": \"2022-06-23T18:49:33.789-07:00\",\n"              \
   "  \"name\": \"myprojectid-bucket-vm0\",\n"                                  \
-  "  \"tags\": {\n"                                                            \
-  "    \"fingerprint\": \"42WmSpB8rSM=\"\n"                                    \
-  "  },\n"                                                                     \
+  "  \"tags\": " TAGS_MOCK0 ",\n"                                              \
   "  \"machineType\": "                                                        \
   "\"https://www.googleapis.com/compute/v1/projects/myprojectid/"              \
   "zones/australia-southeast2-a/machineTypes/n1-standard-1\",\n"               \
