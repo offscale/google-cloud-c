@@ -19,6 +19,16 @@ extern "C" {
 #include "subscription_mocks.h"
 #include <google_cloud_c/pubsub/subscription.h>
 
+TEST x_AckIds_to_json_str(void) {
+  struct AckIds ackIds;
+  const char *s_arr[] = {"FOO", "bar", NULL};
+  ackIds.ackIds = NULL;
+  ASSERT_STR_EQ(AckIds_to_json_str(&ackIds), "{\"ackIds\": []}");
+  ackIds.ackIds = s_arr;
+  ASSERT_STR_EQ(AckIds_to_json_str(&ackIds), "{\"ackIds\": [\"FOO\",\"bar\"]}");
+  PASS();
+}
+
 TEST x_subscription_to_json(void) {
   struct Subscription *subscription = malloc(sizeof *subscription);
 
@@ -44,7 +54,10 @@ TEST x_subscription_to_json(void) {
   PASS();
 }
 
-SUITE(subscription_to_json_suite) { RUN_TEST(x_subscription_to_json); }
+SUITE(subscription_to_json_suite) {
+  RUN_TEST(x_AckIds_to_json_str);
+  RUN_TEST(x_subscription_to_json);
+}
 
 #ifdef __cplusplus
 }

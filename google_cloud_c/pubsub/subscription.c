@@ -327,11 +327,14 @@ const char *AckIds_to_json_str(const struct AckIds *const ack_ids) {
   const char **w;
   jasprintf(&s, "{\"ackIds\": [");
 
-  for (w = ack_ids->ackIds; *w; w++)
+  for (w = ack_ids->ackIds; w != NULL && *w != NULL; w++)
     jasprintf(&s, "\"%s\",", *w);
 
-  jasprintf(&s, "\0\0");
+  jasprintf(&s, "$$");
   n = strlen(s);
+  if (s[n - 3] == ',')
+    s[--n] = '\0';
+  printf("s[n-3] = '%c'\n", s[n - 3]);
   s[n - 2] = ']';
   s[n - 1] = '}';
   return s;

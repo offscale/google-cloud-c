@@ -86,8 +86,7 @@ struct Instance *instance_get(const char *const instance_name) {
 
 struct Instance *
 instance_insert(const struct InstanceIncomplete *const instance,
-                const char *const network_name,
-                const char *shell_script) {
+                const char *const network_name, const char *shell_script) {
   /* CREATE THE INSTANCE (with startup script) */
   /* https://cloud.google.com/compute/docs/reference/rest/v1/instances/insert
    * POST
