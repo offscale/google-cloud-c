@@ -10,8 +10,9 @@
 /* GET https://pubsub.googleapis.com/v1/{resource}:getIamPolicy
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/getIamPolicy
  * */
-struct Policy *getIamPolicy(const char *const resource,
-                            const struct GetPolicyOptions *getPolicyOptions) {
+struct Policy *
+getIamPolicy(const char *const resource,
+             const struct GetPolicyOptions *const getPolicyOptions) {
   char *path;
   asprintf(&path, "/v1/%s:getIamPolicy", resource);
   {
@@ -38,7 +39,7 @@ struct Policy *getIamPolicy(const char *const resource,
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/setIamPolicy
  */
 struct Policy *setIamPolicy(const char *const resource,
-                            const struct Policy *policy) {
+                            const struct Policy *const policy) {
   char *path;
   asprintf(&path, "/v1/%s:setIamPolicy", resource);
   {
@@ -55,8 +56,8 @@ struct Policy *setIamPolicy(const char *const resource,
 
 /* utility functions */
 
-const char *
-GetPolicyOptions_to_json(const struct GetPolicyOptions *getPolicyOptions) {
+const char *GetPolicyOptions_to_json(
+    const struct GetPolicyOptions *const getPolicyOptions) {
   enum { n = 30 };
   char *requestedPolicyVersion = malloc(n * sizeof *requestedPolicyVersion);
   memcpy(requestedPolicyVersion, "{\"requestedPolicyVersion\": \0}", n);
@@ -84,7 +85,7 @@ struct Expr *expr_from_json(const JSON_Object *const jsonObject) {
   return expr;
 }
 
-const char *expr_to_json(const struct Expr *expr) {
+const char *expr_to_json(const struct Expr *const expr) {
   char *s = NULL;
   jasprintf(&s, "{");
   if (expr->expression != NULL && expr->expression[0] != '\0')
@@ -100,7 +101,7 @@ const char *expr_to_json(const struct Expr *expr) {
   return s;
 }
 
-void expr_cleanup(struct Expr *expr) {
+void expr_cleanup(struct Expr *const expr) {
   free((void *)expr->title);
   expr->title = NULL;
   free((void *)expr->expression);
@@ -155,7 +156,7 @@ struct Binding *bindings_from_json(const JSON_Object *const jsonObject) {
   return bindings;
 }
 
-const char *bindings_to_json(const struct Binding *binding) {
+const char *bindings_to_json(const struct Binding *const binding) {
   char *s = NULL;
   size_t n;
   jasprintf(&s, "{");
@@ -188,7 +189,7 @@ const char *bindings_to_json(const struct Binding *binding) {
   return s;
 }
 
-void bindings_cleanup(struct Binding *binding) {
+void bindings_cleanup(struct Binding *const binding) {
   free((void *)binding->role);
   binding->role = NULL;
 
@@ -242,7 +243,7 @@ struct Policy *policy_from_json(const JSON_Object *const jsonObject) {
   return policy;
 }
 
-const char *policy_to_json(const struct Policy *policy) {
+const char *policy_to_json(const struct Policy *const policy) {
   char *s = NULL;
   size_t n;
   jasprintf(&s, "{\"policy\": {");
@@ -270,7 +271,7 @@ const char *policy_to_json(const struct Policy *policy) {
   return s;
 }
 
-void policy_cleanup(struct Policy *policy) {
+void policy_cleanup(struct Policy *const policy) {
   struct Binding **binding;
 
   free((void *)policy->version);

@@ -20,7 +20,7 @@ const char access_config_mock0[] = ACCESS_CONFIG_MOCK0;
   "\"https://www.googleapis.com/compute/v1/projects/myprojectid/"              \
   "global/networks/myprojectid-bucket-vm0-net\",\n"                            \
   "      \"subnetwork\": "                                                     \
-  "\"https://www.googleapis.com/cosmpute/v1/projects/myprojectid/"             \
+  "\"https://www.googleapis.com/compute/v1/projects/myprojectid/"              \
   "regions/australia-southeast2/subnetworks/"                                  \
   "myprojectid-bucket-vm0-net\",\n"                                            \
   "      \"networkIP\": \"10.0.0.1\",\n"                                       \

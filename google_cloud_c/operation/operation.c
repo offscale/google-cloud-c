@@ -3,8 +3,8 @@
 #include <google_cloud_c/client/cloud_auth.h>
 #include <google_cloud_c/operation/operation.h>
 
-struct Operation *global_operation_get(const char *project_id,
-                                       const char *resourceId) {
+struct Operation *global_operation_get(const char *const project_id,
+                                       const char *const resourceId) {
   /* Retrieves the specified Operations resource.
    * https://cloud.google.com/compute/docs/reference/rest/v1/globalOperations/get
    * GET
@@ -25,8 +25,9 @@ struct Operation *global_operation_get(const char *project_id,
   }
 }
 
-struct Operation *zonal_operation_get(const char *project_id, const char *zone,
-                                      const char *resourceId) {
+struct Operation *zonal_operation_get(const char *const project_id,
+                                      const char *const zone,
+                                      const char *const resourceId) {
   /* Retrieves the specified zone-specific Operations resource.
    * https://cloud.google.com/compute/docs/reference/rest/v1/zoneOperations/get
    * GET
@@ -46,9 +47,9 @@ struct Operation *zonal_operation_get(const char *project_id, const char *zone,
   }
 }
 
-struct Operation *regional_operation_get(const char *project_id,
-                                         const char *region,
-                                         const char *resourceId) {
+struct Operation *regional_operation_get(const char *const project_id,
+                                         const char *const region,
+                                         const char *const resourceId) {
   /* Retrieves the specified region-specific Operations resource.
    * https://cloud.google.com/compute/docs/reference/rest/v1/regionOperations/get
    * GET
@@ -113,7 +114,7 @@ struct Operation *operation_from_json(const JSON_Object *const json_object) {
   return operation;
 }
 
-const char *operation_to_json(const struct Operation *operation) {
+const char *operation_to_json(const struct Operation *const operation) {
   char *s = NULL;
   jasprintf(&s, "{");
 
@@ -206,7 +207,7 @@ enum OperationStatus str_to_OperationStatus(const char *const status) {
   return PENDING;
 }
 
-const char *OperationStatus_to_str(enum OperationStatus status) {
+const char *OperationStatus_to_str(const enum OperationStatus status) {
   switch (status) {
   case RUNNING:
     return "RUNNING";

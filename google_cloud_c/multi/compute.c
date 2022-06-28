@@ -17,11 +17,12 @@ create_fw_net_instance(const struct configuration *const config,
   set_auth_context(config->google_project_id, config->google_access_token);
   INSTANCE_CONTEXT.zone = config->google_zone;
   {
-    struct Instance *optionalInstance = instance_incomplete_create_all(
-        instance,
-        /*network_name*/ NULL,
-        /*firewall_name*/ NULL,
-        /*shell_script*/ shell_script); /* instance_create_all */
+    const struct Instance *const optionalInstance =
+        instance_incomplete_create_all(
+            instance,
+            /*network_name*/ NULL,
+            /*firewall_name*/ NULL,
+            /*shell_script*/ shell_script); /* instance_create_all */
     struct StatusAndCstrAndCStr instance_name_ip = StatusAndCstrAndCStrNull;
 
     if (optionalInstance != NULL) {
@@ -61,7 +62,7 @@ struct StatusAndCstr get_instance_ip(const struct configuration *const config,
   AUTH_CONTEXT.google_access_token = config->google_access_token;
   INSTANCE_CONTEXT.zone = config->google_zone;
   {
-    const struct Instance *optionalInstance = instance_get(instance_name);
+    const struct Instance *const optionalInstance = instance_get(instance_name);
     if (optionalInstance == NULL) {
       const struct StatusAndCstr instance_ip = {EXIT_FAILURE, NULL, 0};
       return instance_ip;

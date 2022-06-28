@@ -55,8 +55,8 @@ struct Project **project_list(void) {
     const size_t projects_items_n = json_array_get_count(projects_items_json);
     /* if (projects_items_n == 0) return NULL; */
     if (projects_items_n > 0) {
-      projects = malloc(projects_items_n * sizeof **projects);
       size_t i;
+      projects = malloc(projects_items_n * sizeof **projects);
       for (i = 0; i < projects_items_n; i++)
         projects[i] =
             project_from_json(json_array_get_object(projects_items_json, i));

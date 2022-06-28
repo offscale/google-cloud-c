@@ -30,7 +30,7 @@ struct Topic *get_topic(const char *const topic_id) {
  * https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics/create
  * */
 struct Topic *create_topic(const char *const topic_id,
-                           const struct Topic *topic) {
+                           const struct Topic *const topic) {
   char *path;
   asprintf(&path, "/v1/%s", topic_id);
 
@@ -74,7 +74,7 @@ enum Encoding str_to_Encoding(const char *const encoding) {
     return ENCODING_UNSPECIFIED;
 }
 
-const char *Encoding_to_str(enum Encoding encoding) {
+const char *Encoding_to_str(const enum Encoding encoding) {
   switch (encoding) {
   case JSON:
     return "JSON";
@@ -128,7 +128,7 @@ struct Topic *topic_from_json(const JSON_Object *const jsonObject) {
 }
 
 const char *
-SchemaSettings_to_json(const struct SchemaSettings *schemaSettings) {
+SchemaSettings_to_json(const struct SchemaSettings *const schemaSettings) {
   char *s = NULL;
   jasprintf(&s, "{");
   if (schemaSettings->schema != NULL && schemaSettings->schema[0] != '\0')
@@ -141,7 +141,7 @@ SchemaSettings_to_json(const struct SchemaSettings *schemaSettings) {
   return s;
 }
 
-const char *topic_to_json(const struct Topic *topic) {
+const char *topic_to_json(const struct Topic *const topic) {
   char *s = NULL;
   jasprintf(&s, "{");
   if (topic->name != NULL && topic->name[0] != '\0')

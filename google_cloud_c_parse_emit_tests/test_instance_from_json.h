@@ -52,7 +52,7 @@ TEST x_network_interface_from_json(void) {
                 "global/networks/myprojectid-bucket-vm0-net");
   ASSERT_STR_EQ(
       network_interface->subnetwork,
-      "https://www.googleapis.com/cosmpute/v1/projects/myprojectid/regions/"
+      "https://www.googleapis.com/compute/v1/projects/myprojectid/regions/"
       "australia-southeast2/subnetworks/myprojectid-bucket-vm0-net");
   ASSERT_STR_EQ(network_interface->networkIP, "10.0.0.1");
   ASSERT_STR_EQ(network_interface->name, "nic0");
@@ -95,14 +95,15 @@ TEST x_instance_from_json(void) {
                 "zones/australia-southeast2-a");
 
   {
-    struct NetworkInterface *network_interface = instance->networkInterfaces[0];
+    const struct NetworkInterface *const network_interface =
+        instance->networkInterfaces[0];
     ASSERT_STR_EQ(network_interface->kind, "compute#networkInterface");
     ASSERT_STR_EQ(network_interface->network,
                   "https://www.googleapis.com/compute/v1/projects/myprojectid/"
                   "global/networks/myprojectid-bucket-vm0-net");
     ASSERT_STR_EQ(
         network_interface->subnetwork,
-        "https://www.googleapis.com/cosmpute/v1/projects/myprojectid/regions/"
+        "https://www.googleapis.com/compute/v1/projects/myprojectid/regions/"
         "australia-southeast2/subnetworks/myprojectid-bucket-vm0-net");
     ASSERT_STR_EQ(network_interface->networkIP, "10.0.0.1");
     ASSERT_STR_EQ(network_interface->name, "nic0");
@@ -124,7 +125,7 @@ TEST x_instance_from_json(void) {
   }
 
   {
-    struct Disk *disk = instance->disks[0];
+    const struct Disk *const disk = instance->disks[0];
     ASSERT_STR_EQ(disk->kind, "compute#attachedDisk");
     ASSERT_STR_EQ(disk->type, "PERSISTENT");
     ASSERT_STR_EQ(disk->mode, "READ_WRITE");
@@ -144,7 +145,7 @@ TEST x_instance_from_json(void) {
       struct GuestOsFeatures **guestOsFeatures;
       const char *guest_os_features_types[] = {"UEFI_COMPATIBLE",
                                                "VIRTIO_SCSI_MULTIQUEUE", NULL};
-      const char **mock_guest_os_features_type;
+      const char *const *mock_guest_os_features_type;
       for (mock_guest_os_features_type = guest_os_features_types,
           guestOsFeatures = disk->guestOsFeatures;
            *guest_os_features_types != NULL && *guestOsFeatures != NULL;

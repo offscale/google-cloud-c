@@ -84,9 +84,10 @@ struct Instance *instance_get(const char *const instance_name) {
   }
 }
 
-struct Instance *instance_insert(const struct InstanceIncomplete *instance,
-                                 const char *network_name,
-                                 const char *shell_script) {
+struct Instance *
+instance_insert(const struct InstanceIncomplete *const instance,
+                const char *const network_name,
+                const char *shell_script) {
   /* CREATE THE INSTANCE (with startup script) */
   /* https://cloud.google.com/compute/docs/reference/rest/v1/instances/insert
    * POST
@@ -203,7 +204,7 @@ struct Instance *instance_insert(const struct InstanceIncomplete *instance,
 }
 
 struct Instance *instance_incomplete_create_all(
-    const struct InstanceIncomplete *instance, const char *network_name,
+    const struct InstanceIncomplete *const instance, const char *network_name,
     const char *firewall_name, const char *const shell_script) {
   /* Creates network, firewall, and instance */
 
@@ -310,7 +311,7 @@ struct Instance *instance_incomplete_create_all(
 
 /* Utility functions */
 
-const char *instance_to_json(const struct InstanceIncomplete *instance) {
+const char *instance_to_json(const struct InstanceIncomplete *const instance) {
   char *instance_json_str;
   asprintf(&instance_json_str,
            "{\n"
@@ -731,7 +732,7 @@ enum InstanceStatus str_to_InstanceStatus(const char *const status) {
   return STAGING;
 }
 
-const char *InstanceStatus_to_str(enum InstanceStatus status) {
+const char *InstanceStatus_to_str(const enum InstanceStatus status) {
   switch (status) {
   case PROVISIONING:
     return "PROVISIONING";

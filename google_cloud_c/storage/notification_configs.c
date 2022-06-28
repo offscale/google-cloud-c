@@ -14,7 +14,7 @@ notification_response_handler(const struct ServerResponse *);
  * https://storage.googleapis.com/storage/v1/b/bucket/notificationConfigs/notification
  * https://cloud.google.com/storage/docs/json_api/v1/notifications/get */
 struct Notification *
-get_notification_configuration(const struct configuration *config,
+get_notification_configuration(const struct configuration *const config,
                                const char *const id) {
   char *path;
   asprintf(&path, "/storage/v1/b/%s/notificationConfigs/%s",
@@ -93,7 +93,7 @@ notification_from_json(const JSON_Object *const created_json_object) {
 
 struct Notification *
 notification_response_handler(const struct ServerResponse *const response) {
-  if ((*response).status_code == 200 && (*response).body[0] != '\0') {
+  if (response->status_code == 200 && response->body[0] != '\0') {
     const JSON_Value *const created_json_value =
         json_parse_string((*response).body);
     const JSON_Object *const created_json_object =

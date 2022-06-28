@@ -31,7 +31,7 @@ get_pubsub_subscription(const char *const subscription_id) {
  * */
 struct Subscription *
 create_pubsub_subscription(const char *const subscription_id,
-                           const struct Subscription *subscription) {
+                           const struct Subscription *const subscription) {
   char *path;
   asprintf(&path, "/v1/%s", subscription_id);
 
@@ -52,7 +52,8 @@ create_pubsub_subscription(const char *const subscription_id,
  * POST https://pubsub.googleapis.com/v1/{subscription}:pull
  * */
 struct ReceivedMessages *
-pull_pubsub_subscription(const char *const subscription_id, int maxMessages) {
+pull_pubsub_subscription(const char *const subscription_id,
+                         const int maxMessages) {
   char *path, *body;
   asprintf(&path, "/v1/%s:pull", subscription_id);
   asprintf(&body, "{\"maxMessages\": %d}", maxMessages);
@@ -73,9 +74,9 @@ pull_pubsub_subscription(const char *const subscription_id, int maxMessages) {
  * POST https://pubsub.googleapis.com/v1/{subscription}:acknowledge
  * */
 bool acknowledge_pubsub_subscription(const char *const subscription_id,
-                                     const struct AckIds *ack_ids) {
+                                     const struct AckIds *const ack_ids) {
   char *path;
-  asprintf(&path, "/v1/%s", subscription_id);
+  asprintf(&path, "/v1/%s:acknowledge", subscription_id);
 
   {
     const struct ServerResponse response =
@@ -115,7 +116,7 @@ enum PubSubState str_to_PubSubState(const char *const state) {
     return STATE_UNSPECIFIED;
 }
 
-const char *PubSubState_to_str(enum PubSubState state) {
+const char *PubSubState_to_str(const enum PubSubState state) {
   switch (state) {
   case ACTIVE:
     return "ACTIVE";
@@ -192,7 +193,8 @@ subscription_from_json(const JSON_Object *const jsonObject) {
   return subscription;
 }
 
-const char *subscription_to_json(const struct Subscription *subscription) {
+const char *
+subscription_to_json(const struct Subscription *const subscription) {
   char *s = NULL;
 
   jasprintf(&s, "{");
@@ -230,7 +232,7 @@ const char *subscription_to_json(const struct Subscription *subscription) {
   return s;
 }
 
-void subscription_cleanup(struct Subscription *subscription) {
+void subscription_cleanup(struct Subscription *const subscription) {
   free(subscription->labels);
   free(subscription);
 }
@@ -291,7 +293,6 @@ receivedMessages_from_json(const JSON_Object *const jsonObject) {
         else
           receivedMessage->deliveryAttempt = 0;
       }
-
       receivedMessages->receivedMessages[i] = receivedMessage;
     }
     receivedMessages->receivedMessages[json_items_n - 1] = NULL;
@@ -320,7 +321,7 @@ void receivedMessages_cleanup(struct ReceivedMessages **receivedMessages) {
   receivedMessages = NULL;
 }
 
-const char *AckIds_to_json_str(const struct AckIds *ack_ids) {
+const char *AckIds_to_json_str(const struct AckIds *const ack_ids) {
   char *s = NULL;
   size_t n;
   const char **w;
