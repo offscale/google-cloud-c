@@ -210,6 +210,9 @@ Disks_from_json(const JSON_Array *);
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Disk *
 Disk_from_json(const JSON_Object *);
 
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const char *
+Disk_to_json(const struct Disk *);
+
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT enum InstanceStatus
 str_to_InstanceStatus(const char *);
 

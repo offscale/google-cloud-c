@@ -8,6 +8,8 @@
 #define strdup _strdup
 #endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
 
+#define BOOLALPHA(e)(e)?"true":"false"
+
 struct InstanceContext INSTANCE_CONTEXT = {NULL, NULL, NULL};
 
 const struct Instances instancesNull = {NULL, 0};
@@ -481,6 +483,38 @@ struct Disk *Disk_from_json(const JSON_Object *const jsonObject) {
         json_object_get_array(jsonObject, "guestOsFeatures"));
   disk->diskSizeGb = json_object_get_string(jsonObject, "diskSizeGb");
   return disk;
+}
+
+const char *Disk_to_json(const struct Disk *const disk) {
+  char *s = NULL;
+  jasprintf(&s,
+            "    {\n"
+            "      \"kind\": \"%s\",\n"
+            "      \"type\": \"%s\",\n"
+            "      \"mode\": \"%s\",\n"
+            "      \"source\": \"%s\",\n"
+            "      \"deviceName\": \"%s\",\n"
+            "      \"index\": %d,\n"
+            "      \"boot\": %s,\n"
+            "      \"autoDelete\": %s,\n",
+            disk->kind, disk->type, disk->mode, disk->source, disk->deviceName,
+            disk->index, BOOLALPHA(disk->boot), BOOLALPHA(disk->autoDelete));
+  /*
+  jasprintf(&s, "      \"licenses\": [\n"
+            "        \"%s\"\n"
+            "      ],\n",
+            disk->licenses);
+  */
+  jasprintf(&s, "      \"interface\": \"%s\",\n", disk->interface);
+  /*jasprintf(&s, "      \"guestOsFeatures\": [\n"
+                "        {\n \"type\": \"%s\"\n        },\n"
+                "        {\n \"type\": \"%s\"\n        }\n"
+                "      ],\n");*/
+  jasprintf(&s,
+            "      \"diskSizeGb\": \"%s\"\n"
+            "    }\n",
+            disk->diskSizeGb);
+  return s;
 }
 
 struct NetworkInterface *

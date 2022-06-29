@@ -63,6 +63,12 @@ TEST x_network_interface_to_json(void) {
   PASS();
 }
 
+TEST x_disk_to_json(void) {
+  struct Disk disk;
+  ASSERT_STR_EQ(Disk_to_json(&disk), disk_mock0);
+  PASS();
+}
+
 TEST x_instance_to_json(void) {
   /*JSON_Value *const instance_val = json_parse_string(instance_mock0);
   const JSON_Object *const instance_json = json_value_get_object(instance_val);

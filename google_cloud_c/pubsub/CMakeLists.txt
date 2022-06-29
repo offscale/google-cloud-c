@@ -23,10 +23,6 @@ target_link_libraries(
         "${LIBRARY_NAME}"
         PUBLIC
         "${PROJECT_NAME}_client"
-)
-target_link_libraries(
-        "${LIBRARY_NAME}"
-        PUBLIC
         "${PROJECT_NAME}_common"
 )
 
@@ -36,12 +32,6 @@ target_link_libraries(
         PRIVATE
         "unofficial::parson::parson"
 )
-
-find_package(c89stringutils CONFIG REQUIRED)
-target_link_libraries("${LIBRARY_NAME}" PRIVATE "c89stringutils" "c89stringutils_compiler_flags")
-
-find_path(C89STRINGUTILS_INCLUDE_DIRS "c89stringutils_string_extras.h")
-target_include_directories("${LIBRARY_NAME}" PRIVATE ${C89STRINGUTILS_INCLUDE_DIRS})
 
 set_target_properties(
         "${LIBRARY_NAME}"
