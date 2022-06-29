@@ -25,6 +25,8 @@ target_link_libraries(
         PUBLIC
         "${PROJECT_NAME}_client"
 )
+find_package(c89stringutils CONFIG REQUIRED)
+target_link_libraries("${LIBRARY_NAME}" PRIVATE "c89stringutils" "c89stringutils_compiler_flags")
 
 set_target_properties(
         "${LIBRARY_NAME}"

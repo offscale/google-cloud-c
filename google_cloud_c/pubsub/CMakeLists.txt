@@ -24,6 +24,11 @@ target_link_libraries(
         PUBLIC
         "${PROJECT_NAME}_client"
 )
+target_link_libraries(
+        "${LIBRARY_NAME}"
+        PUBLIC
+        "${PROJECT_NAME}_common"
+)
 
 find_package(unofficial-parson CONFIG REQUIRED)
 target_link_libraries(
