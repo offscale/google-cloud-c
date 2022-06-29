@@ -1,5 +1,5 @@
-#ifndef GOOGLE_CLOUD_C_CLIENT_OPERATION_H
-#define GOOGLE_CLOUD_C_CLIENT_OPERATION_H
+#ifndef GOOGLE_CLOUD_C_CLIENT_BUCKET_NOTIFICATION_H
+#define GOOGLE_CLOUD_C_CLIENT_BUCKET_NOTIFICATION_H
 
 #ifdef __cplusplus
 #include <cassert>
@@ -14,7 +14,7 @@ extern "C" {
 
 #include <parson.h>
 
-#include <google_cloud_c/operation/google_cloud_c_operation_export.h>
+#include <google_cloud_c/bucket_notification/google_cloud_c_bucket_notification_export.h>
 
 /* =================
  * |   Operation   |
@@ -42,11 +42,11 @@ struct BucketNotification {
 
 /* utility functions */
 
-extern GOOGLE_CLOUD_C_OPERATION_EXPORT struct BucketNotification *
+extern GOOGLE_CLOUD_C_BUCKET_NOTIFICATION_EXPORT struct BucketNotification *
 bucket_notification_from_json(const JSON_Object *);
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
-#endif /* !GOOGLE_CLOUD_C_CLIENT_OPERATION_H */
+#endif /* !GOOGLE_CLOUD_C_CLIENT_BUCKET_NOTIFICATION_H */
