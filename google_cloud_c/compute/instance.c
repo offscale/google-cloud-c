@@ -513,6 +513,35 @@ NetworkInterface_from_json(const JSON_Object *const jsonObject) {
   return networkInterface;
 }
 
+const char *NetworkInterface_to_json(
+    const struct NetworkInterface *const networkInterface) {
+  char *s = NULL;
+  jasprintf(&s,
+            "    {\n"
+            "      \"kind\": \"%s\",\n"
+            "      \"network\": \"%s\",\n"
+            "      \"subnetwork\": \"%s\",\n"
+            "      \"networkIP\": \"%s\",\n"
+            "      \"name\": \"%s\",\n"
+            "      \"accessConfigs\": [\n",
+            networkInterface->kind, networkInterface->network,
+            networkInterface->subnetwork, networkInterface->networkIP,
+            networkInterface->name);
+  {
+    struct AccessConfigs **accessConfig;
+    for (accessConfig = networkInterface->accessConfigs; *accessConfig;
+         accessConfig++)
+      jasprintf(&s, AccessConfigs_to_json(*accessConfig));
+    jasprintf(&s, "      ],\n");
+  }
+  jasprintf(&s,
+            "      \"fingerprint\": \"%s\",\n"
+            "      \"stackType\": \"%s\"\n"
+            "    }\n",
+            networkInterface->fingerprint, networkInterface->stackType);
+  return s;
+}
+
 struct AccessConfigs *
 AccessConfigs_from_json(const JSON_Object *const jsonObject) {
   struct AccessConfigs *accessConfigs = malloc(sizeof *accessConfigs);

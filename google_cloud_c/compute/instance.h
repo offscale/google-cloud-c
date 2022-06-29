@@ -171,14 +171,17 @@ instance_incomplete_create_all(const struct InstanceIncomplete *, const char *,
 
 /* Utility functions */
 
-extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct NetworkInterface *
-NetworkInterface_from_json(const JSON_Object *);
-
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct AccessConfigs *
 AccessConfigs_from_json(const JSON_Object *);
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const char *
 AccessConfigs_to_json(const struct AccessConfigs *);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct NetworkInterface *
+NetworkInterface_from_json(const JSON_Object *);
+
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const char *
+NetworkInterface_to_json(const struct NetworkInterface *);
 
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Tags *
 Tags_from_json(const JSON_Object *);

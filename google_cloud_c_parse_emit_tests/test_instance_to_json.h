@@ -35,38 +35,30 @@ TEST x_access_config_to_json(void) {
 }
 
 TEST x_network_interface_to_json(void) {
-  /*JSON_Value *const network_interface_val =
-      json_parse_string(network_interface_mock0);
-  const JSON_Object *const network_interface_json =
-      json_value_get_object(network_interface_val);
-  const struct NetworkInterface *const network_interface =
-      NetworkInterface_to_json(network_interface_json);
+  const struct AccessConfigs access_config = {
+      "ONE_TO_ONE_NAT", "external-nat",         "34.0.0.1",
+      "PREMIUM",        "compute#accessConfig",
+  };
+  struct NetworkInterface network_interface = {
+      "https://www.googleapis.com/compute/v1/projects/myprojectid/"
+      "global/networks/myprojectid-bucket-vm0-net",
+      "https://www.googleapis.com/compute/v1/projects/myprojectid/"
+      "regions/australia-southeast2/subnetworks/"
+      "myprojectid-bucket-vm0-net",
+      "10.0.0.1",
+      "nic0",
+      "compute#networkInterface",
+      "ufVDhkGBA88=",
+      "IPV4_ONLY",
+      NULL};
+  network_interface.accessConfigs =
+      malloc(2 * sizeof network_interface.accessConfigs);
+  network_interface.accessConfigs[0] = (struct AccessConfigs *)&access_config;
+  network_interface.accessConfigs[1] = NULL;
+  const char *const network_interface_str =
+      NetworkInterface_to_json((struct NetworkInterface *)&network_interface);
 
-  ASSERT_STR_EQ(network_interface->kind, "compute#networkInterface");
-  ASSERT_STR_EQ(network_interface->network,
-                "https://www.googleapis.com/compute/v1/projects/myprojectid/"
-                "global/networks/myprojectid-bucket-vm0-net");
-  ASSERT_STR_EQ(
-      network_interface->subnetwork,
-      "https://www.googleapis.com/compute/v1/projects/myprojectid/regions/"
-      "australia-southeast2/subnetworks/myprojectid-bucket-vm0-net");
-  ASSERT_STR_EQ(network_interface->networkIP, "10.0.0.1");
-  ASSERT_STR_EQ(network_interface->name, "nic0");
-  ASSERT_STR_EQ(network_interface->fingerprint, "ufVDhkGBA88=");
-  ASSERT_STR_EQ(network_interface->stackType, "IPV4_ONLY");
-
-  {
-    const struct AccessConfigs *const access_config =
-        network_interface->accessConfigs[0];
-    ASSERT_STR_EQ(access_config->kind, "compute#accessConfig");
-    ASSERT_STR_EQ(access_config->type, "ONE_TO_ONE_NAT");
-    ASSERT_STR_EQ(access_config->name, "external-nat");
-    ASSERT_STR_EQ(access_config->natIP, "34.0.0.1");
-    ASSERT_STR_EQ(access_config->networkTier, "PREMIUM");
-  }
-  ASSERT_EQ(network_interface->accessConfigs[1], NULL);
-
-  json_value_free(network_interface_val);*/
+  ASSERT_STR_EQ(network_interface_str, network_interface_mock0);
 
   PASS();
 }
