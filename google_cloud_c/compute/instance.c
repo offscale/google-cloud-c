@@ -4,6 +4,10 @@
 #include <google_cloud_c/compute/compute_common.h>
 #include <google_cloud_c/compute/instance.h>
 
+#if defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__)
+#define strdup _strdup
+#endif /* defined(_WIN32) || defined(__WIN32__) || defined(__WINDOWS__) */
+
 struct InstanceContext INSTANCE_CONTEXT = {NULL, NULL, NULL};
 
 const struct Instances instancesNull = {NULL, 0};

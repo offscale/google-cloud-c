@@ -232,7 +232,7 @@ subscription_to_json(const struct Subscription *const subscription) {
   return s;
 }
 
-void subscription_cleanup(struct Subscription *const subscription) {
+void subscription_cleanup(struct Subscription *subscription) {
   free(subscription->labels);
   free(subscription);
 }
