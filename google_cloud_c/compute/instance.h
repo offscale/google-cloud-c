@@ -177,6 +177,9 @@ NetworkInterface_from_json(const JSON_Object *);
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct AccessConfigs *
 AccessConfigs_from_json(const JSON_Object *);
 
+extern GOOGLE_CLOUD_C_COMPUTE_EXPORT const char *
+AccessConfigs_to_json(const struct AccessConfigs *);
+
 extern GOOGLE_CLOUD_C_COMPUTE_EXPORT struct Tags *
 Tags_from_json(const JSON_Object *);
 

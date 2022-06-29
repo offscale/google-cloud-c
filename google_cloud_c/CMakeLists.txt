@@ -1,5 +1,6 @@
 add_library("${PROJECT_NAME}" INTERFACE)
 foreach (lib
+        "bucket_notification"
         "common" "client" "operation"
         "compute" "project" "pubsub"
         "storage" "userinfo" "multi")
@@ -8,6 +9,7 @@ foreach (lib
   list(APPEND installable_libs "${lib_name}")
   target_link_libraries("${PROJECT_NAME}" INTERFACE "${lib_name}")
 endforeach (lib
+            "bucket_notification"
             "common" "client" "operation"
             "compute" "project" "pubsub"
             "storage" "userinfo" "multi")

@@ -521,6 +521,22 @@ AccessConfigs_from_json(const JSON_Object *const jsonObject) {
   return accessConfigs;
 }
 
+const char *
+AccessConfigs_to_json(const struct AccessConfigs *const accessConfigs) {
+  char *s;
+  asprintf(&s,
+           "        {\n"
+           "          \"kind\": \"%s\",\n"
+           "          \"type\": \"%s\",\n"
+           "          \"name\": \"%s\",\n"
+           "          \"natIP\": \"%s\",\n"
+           "          \"networkTier\": \"%s\"\n"
+           "        }\n",
+           accessConfigs->kind, accessConfigs->type, accessConfigs->name,
+           accessConfigs->natIP, accessConfigs->networkTier);
+  return s;
+}
+
 struct Item *Item_from_json(const JSON_Object *const jsonObject) {
   struct Item *item = malloc(sizeof *item);
   item->key = json_object_get_string(jsonObject, "key");

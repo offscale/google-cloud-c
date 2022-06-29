@@ -39,6 +39,7 @@ set(Header_Files
         "test_subscription_from_json.h"
 
         "instance_mocks.h"
+        "test_instance_to_json.h"
         "test_instance_from_json.h"
 )
 source_group("${LIBRARY_NAME} Header Files" FILES "${Header_Files}")
