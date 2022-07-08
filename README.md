@@ -3,7 +3,7 @@ google-cloud-c
 [![CI for Linux, Windows, macOS](https://github.com/offscale/google-cloud-c/actions/workflows/linux-Windows-macOS.yml/badge.svg)](https://github.com/offscale/google-cloud-c/actions/workflows/linux-Windows-macOS.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-Google Cloud Client library in C. TODO: code-generate the bulk of this library.
+Google Cloud Client library in C. TODO: code-generate the bulk of this library using [cdd-c](https://github.com/SamuelMarks/cdd-c).
 
 ## vcpkg
 
