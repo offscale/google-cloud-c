@@ -5,6 +5,16 @@ google-cloud-c
 
 Google Cloud Client library in C. TODO: code-generate the bulk of this library using [cdd-c](https://github.com/SamuelMarks/cdd-c).
 
+## Generation
+
+Except common utility functions, this entire library will be generated, including:
+
+  - JSON parsing and emission;
+  - HTTPS requests;
+  - Tests and mocks for ^.
+
+…using [cdd-c](https://github.com/SamuelMarks/cdd-c).
+
 ## vcpkg
 
 [`vcpkg`](https://vcpkg.io) is an open-source cross-platform library package management system from [Microsoft](https://microsoft.com); targeting macOS, Linux, and Windows.
