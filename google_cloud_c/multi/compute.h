@@ -41,6 +41,6 @@ get_instance_ip(const struct configuration *, const char *);
 
 #ifdef __cplusplus
 } /*extern "C"*/
-#endif /* __cplusplus */
+#endif /*__cplusplus*/ /* __cplusplus */
 
 #endif /* !GOOGLE_CLOUD_C_COMPUTE_H */

@@ -37,7 +37,6 @@ TEST x_subscription_to_json(void) {
   subscription->messageRetentionDuration = "messageRetentionDuration";
   subscription->ackDeadlineSeconds = 0;
   subscription->retainAckedMessages = true;
-  subscription->messageRetentionDuration = "messageRetentionDuration";
   subscription->labels = malloc(2 * sizeof subscription->labels);
   subscription->labels[0] = "foo";
   subscription->labels[1] = NULL;
