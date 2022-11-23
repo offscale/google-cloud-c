@@ -20,12 +20,12 @@ target_include_directories(
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-find_package(unofficial-parson CONFIG REQUIRED)
+find_package(parson CONFIG REQUIRED)
 
 target_link_libraries(
         "${LIBRARY_NAME}"
         PUBLIC
-        "unofficial::parson::parson"
+        "parson::parson"
 )
 
 find_package(c89stringutils CONFIG REQUIRED)

@@ -20,7 +20,7 @@ target_include_directories(
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-find_package(unofficial-parson CONFIG REQUIRED)
+find_package(parson CONFIG REQUIRED)
 find_package(libcurl-simple-https CONFIG REQUIRED)
 
 if (MSVC)
@@ -34,7 +34,7 @@ endif ()
 target_link_libraries(
         "${LIBRARY_NAME}"
         PUBLIC
-        "unofficial::parson::parson"
+        "parson::parson"
         "libcurl-simple-https"
         "${CURL_LINK_LIBRARIES}"
         "${PROJECT_NAME}_client"

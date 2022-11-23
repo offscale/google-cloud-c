@@ -71,7 +71,7 @@ else ()
     get_curl(CURL_LINK_LIBRARIES)
 endif ()
 
-#find_package(unofficial-parson CONFIG REQUIRED)
+#find_package(parson CONFIG REQUIRED)
 #find_package(libcurl-simple-https CONFIG REQUIRED)
 
 target_link_libraries(
@@ -115,7 +115,7 @@ target_include_directories(
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-#find_package(unofficial-parson CONFIG REQUIRED)
+#find_package(parson CONFIG REQUIRED)
 #find_package(libcurl-simple-https CONFIG REQUIRED)
 
 target_link_libraries(

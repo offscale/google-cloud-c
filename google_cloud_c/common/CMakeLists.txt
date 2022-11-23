@@ -14,11 +14,11 @@ source_group("${LIBRARY_NAME} Source Files" FILES "${Source_Files}")
 
 add_library("${LIBRARY_NAME}" "${Header_Files}" "${Source_Files}")
 
-find_package(unofficial-parson CONFIG REQUIRED)
+find_package(parson CONFIG REQUIRED)
 target_link_libraries(
         "${LIBRARY_NAME}"
         PRIVATE
-        "unofficial::parson::parson"
+        "parson::parson"
 )
 
 include(GNUInstallDirs)
