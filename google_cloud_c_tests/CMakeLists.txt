@@ -18,13 +18,13 @@ file(DOWNLOAD "${GREATEST_URL}" "${GREATEST_FILE}"
 # Configure #
 #############
 
-# https://github.com/GoogleCloudPlatform/gsutil/blob/7d103/gslib/utils/system_util.py#L174-L193
+# https://github.com/GoogleCloudPlatform/gsutil/blob/01044a9/gslib/utils/system_util.py#L174-L193
 if (NOT DEFINED CLIENT_ID)
     set(CLIENT_ID "32555940559.apps.googleusercontent.com")
     # set(CLIENT_ID "909320924072.apps.googleusercontent.com")
 endif (NOT DEFINED CLIENT_ID)
 
-# https://github.com/GoogleCloudPlatform/gsutil/blob/7d103/gslib/utils/system_util.py#L174-L193
+# https://github.com/GoogleCloudPlatform/gsutil/blob/01044a9/gslib/utils/system_util.py#L174-L193
 if (NOT DEFINED CLIENT_SECRET)
     set(CLIENT_SECRET "ZmssLNjJy2998hD4CTg2ejr2")
     # set(CLIENT_SECRET "p3RlpR10xMFh9ZXBS/ZNLYUu")
